@@ -643,6 +643,7 @@ class SoccerLiveCard extends HTMLElement {
       wrapper.style.setProperty('--card-background-color', '#1e293b');
       wrapper.style.setProperty('--secondary-text-color', '#94a3b8');
       wrapper.style.setProperty('--divider-color', 'rgba(255,255,255,0.10)');
+      wrapper.style.borderTop = '4px solid #38bdf8';
     } else if (appearance === 'light') {
       wrapper.style.background = '#ffffff';
       wrapper.style.color = '#0f172a';
@@ -650,9 +651,11 @@ class SoccerLiveCard extends HTMLElement {
       wrapper.style.setProperty('--card-background-color', '#f8fafc');
       wrapper.style.setProperty('--secondary-text-color', '#64748b');
       wrapper.style.setProperty('--divider-color', '#e2e8f0');
+      wrapper.style.borderTop = '4px solid #0284c7';
     } else { // 'ha'
       wrapper.style.background = 'var(--ha-card-background, var(--card-background-color, #ffffff))';
       wrapper.style.color = 'var(--primary-text-color, #0f172a)';
+      wrapper.style.borderTop = '4px solid var(--primary-color, #03a9f4)';
     }
   }
 
