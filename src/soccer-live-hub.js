@@ -920,7 +920,7 @@ for (const t of ['soccer-live-hub', 'custom:soccer-live-hub']) {
       type: t,
       name: 'Soccer Live Hub',
       description: 'Modular football hub card with reorderable modules, tabs or stack layout.',
-      preview: false,
+      preview: true,
       documentationURL: 'https://github.com/nelsonamen/Teste',
     });
   }
