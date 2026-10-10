@@ -4,6 +4,12 @@ import { blendHassSources } from "./cards/shared-source-blend.js";
 import { discoverSoccerModels, discoverSoccerTeams, renderAppearanceControl } from './cards/editor-helper.js';
 import { applySkin } from './skins.js';
 
+console.info(
+  '%c SOCCER-LIVE-HUB %c Loaded successfully ',
+  'background: #0284c7; color: #fff; font-weight: bold; padding: 2px 6px; border-radius: 4px;',
+  'color: #0284c7; font-weight: bold;'
+);
+
 // Core Card elements
 import './cards/Team/soccer-live-team.js';
 import './cards/Standings/soccer-live-standings.js';
