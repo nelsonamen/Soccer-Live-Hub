@@ -1,0 +1,203 @@
+import { LitElement, html } from 'lit';
+import { editorStyles, renderLanguageControl, soccerEntityIds } from '../editor-helper.js';
+import { t, resolveLang } from '../../i18n.js';
+import { renderSkinControls } from '../skin-editor.js';
+
+class SoccerLiveBracketEditor extends LitElement {
+  static get properties() {
+    return {
+      _config: { type: Object },
+      hass: { type: Object },
+      entities: { type: Array },
+      standingsEntities: { type: Array },
+      matchesEntities: { type: Array },
+    };
+  }
+
+  constructor() {
+    super();
+    this.entities = [];
+    this.standingsEntities = [];
+    this.matchesEntities = [];
+  }
+
+  static get styles() { return editorStyles; }
+
+  setConfig(config) {
+    if (!config) throw new Error('Invalid configuration');
+    this._config = { ...config };
+  }
+
+  _t(key) { return t(key, resolveLang(this.hass, this._config)); }
+
+  get config() { return this._config; }
+
+  updated(changedProperties) {
+    if (changedProperties.has('hass')) this._fetchEntities();
+  }
+
+  _fireConfigChanged(newConfig) {
+    this._config = newConfig;
+    this.dispatchEvent(new CustomEvent('config-changed', {
+      detail: { config: newConfig }, bubbles: true, composed: true,
+    }));
+    this.requestUpdate();
+  }
+
+  _entityChanged(ev) {
+    if (!this._config) return;
+    const value = ev.target.value;
+    if (value === this._config.entity) return;
+    this._fireConfigChanged({ ...this._config, entity: value });
+  }
+
+  _switchChanged(ev) {
+    if (!this._config) return;
+    const target = ev.target;
+    if (!target.dataset || !target.dataset.configValue) return;
+    const key = target.dataset.configValue;
+    const value = target.checked;
+    if (this._config[key] === value) return;
+    this._fireConfigChanged({ ...this._config, [key]: value });
+  }
+
+  _selectChanged(ev) {
+    if (!this._config) return;
+    const target = ev.target;
+    if (!target.dataset || !target.dataset.configValue) return;
+    const key = target.dataset.configValue;
+    const value = target.value;
+    if (this._config[key] === value) return;
+    if (value === '') {
+      const cfg = { ...this._config };
+      delete cfg[key];
+      this._fireConfigChanged(cfg);
+    } else {
+      this._fireConfigChanged({ ...this._config, [key]: value });
+    }
+  }
+
+  _textChanged(ev) {
+    if (!this._config) return;
+    const target = ev.target;
+    const key = target.dataset.configValue;
+    const value = target.value;
+    if (this._config[key] === value) return;
+    if (value === '') {
+      const cfg = { ...this._config };
+      delete cfg[key];
+      this._fireConfigChanged(cfg);
+    } else {
+      this._fireConfigChanged({ ...this._config, [key]: value });
+    }
+  }
+
+  _fetchEntities() {
+    if (!this.hass) return;
+    // Match by sensor_type too (language-independent), so localized entity_ids
+    // still appear in the dropdowns (#28).
+    this.entities = soccerEntityIds(this.hass, {
+      sensorTypes: ['bracket'], includes: ['soccerlive_bracket', 'soccer_live_bracket'],
+    });
+    this.standingsEntities = soccerEntityIds(this.hass, {
+      sensorTypes: ['standings'], includes: ['soccerlive_standings', 'soccer_live_standings'],
+    });
+    this.matchesEntities = soccerEntityIds(this.hass, {
+      sensorTypes: ['match_day', 'team_matches', 'team_matches_mixed', 'all_matches_today'],
+      includes: ['soccerlive_all', 'soccer_live_all'],
+    });
+  }
+
+  render() {
+    if (!this._config || !this.hass) return html``;
+    const cur = this._config.entity || '';
+    const inList = cur && this.entities.includes(cur);
+    return html`
+      <div class="card-config">
+        <h3>${this._t("editor.sensor")}</h3>
+        <div>
+          <label class="field-label">${this._t('editor.entity')}</label>
+          <select @change=${this._entityChanged}>
+            ${!inList ? html`<option value="${cur}" selected>${cur || this._t('editor.select')}</option>` : ''}
+            ${this.entities.map(e => html`<option value="${e}" ?selected=${e === cur}>${e}</option>`)}
+          </select>
+          <div class="hint" style="margin-top: 4px;">${this._t('editor.hint_bracket_competitions')}</div>
+        </div>
+
+        <h3>${this._t("editor.settings")}</h3>
+        <div>
+          <label class="field-label">${this._t('editor.style')}</label>
+          <select data-config-value="style" @change=${this._selectChanged}>
+            <option value="list" ?selected=${this._config.style !== 'tree'}>${this._t('editor.style_list')}</option>
+            <option value="tree" ?selected=${this._config.style === 'tree'}>${this._t('editor.style_tree')}</option>
+          </select>
+        </div>
+        <div class="option">
+          <label>${this._t('editor.hide_header')}</label>
+          <ha-switch
+            .checked=${this._config.hide_header === true}
+            data-config-value="hide_header"
+            @change=${this._switchChanged}
+          ></ha-switch>
+        </div>
+        ${this._config.style !== 'tree' ? html`
+          <div class="option">
+            <label>${this._t('editor.bracket_compact')}</label>
+            <ha-switch
+              .checked=${this._config.compact === true}
+              data-config-value="compact"
+              @change=${this._switchChanged}
+            ></ha-switch>
+          </div>
+        ` : ''}
+        ${this._config.style === 'tree' ? html`
+          <div class="option">
+            <label>${this._t('editor.tree_playoffs')}</label>
+            <ha-switch
+              .checked=${this._config.tree_show_playoffs === true}
+              data-config-value="tree_show_playoffs"
+              @change=${this._switchChanged}
+            ></ha-switch>
+          </div>
+        ` : ''}
+        <div>
+          <label class="field-label">${this._t('editor.my_team')}</label>
+          <input type="text"
+            data-config-value="my_team"
+            .value=${this._config.my_team || ''}
+            placeholder="${this._t('editor.my_team_hint')}"
+            @change=${this._textChanged}
+          >
+        </div>
+        <div>
+          <label class="field-label">${this._t('editor.groups_entity')}</label>
+          <select data-config-value="groups_entity" @change=${this._selectChanged}>
+            <option value="" ?selected=${!this._config.groups_entity}>— None —</option>
+            ${this.standingsEntities.map(e => html`<option value="${e}" ?selected=${e === this._config.groups_entity}>${e}</option>`)}
+          </select>
+          <div class="hint" style="margin-top:4px">${this._t('editor.hint_groups_entity')}</div>
+        </div>
+        <div>
+          <label class="field-label">${this._t('editor.matches_entity')}</label>
+          <select data-config-value="matches_entity" @change=${this._selectChanged}>
+            <option value="" ?selected=${!this._config.matches_entity}>— None —</option>
+            ${this.matchesEntities.map(e => html`<option value="${e}" ?selected=${e === this._config.matches_entity}>${e}</option>`)}
+          </select>
+          <div class="hint" style="margin-top:4px">${this._t('editor.hint_matches_entity')}</div>
+        </div>
+
+        <div>
+          <label class="field-label">${this._t('editor.skin')}</label>
+          ${renderSkinControls(this, this._config, (k) => (this._t ? this._t(k) : k))}
+        </div>
+        <div>
+          ${renderLanguageControl(this, this._config, (k) => (this._t ? this._t(k) : k))}
+        </div>
+      </div>
+    `;
+  }
+}
+
+if (!customElements.get('soccer-live-bracket-editor')) {
+  customElements.define('soccer-live-bracket-editor', SoccerLiveBracketEditor);
+}

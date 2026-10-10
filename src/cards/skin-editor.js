@@ -66,6 +66,9 @@ function colorField(config, key, lkey, label, setField) {
  * simple + advanced colour inputs, a contrast warning and a reset.
  */
 export function renderSkinControls(host, config, t) {
+  if (config?._hide_skin_controls || host?.dataset?.moduleEditor === 'true') {
+    return html``;
+  }
   const label = (k) => (typeof t === 'function' ? t(k) : k);
   const setField = (key, value) => fireConfig(host, { ...config, [key]: value });
   const clearField = (key) => { const next = { ...config }; delete next[key]; fireConfig(host, next); };

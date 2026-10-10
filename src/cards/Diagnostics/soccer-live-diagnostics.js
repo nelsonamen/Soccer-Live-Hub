@@ -1,0 +1,276 @@
+import { LitElement, html, css } from "lit";
+import { parseMatchDate, resolveLang, t } from "../../i18n.js";
+import { skinStyles, applySkin } from "../../skins.js";
+import { renderCardError } from "../card-error.js";
+import { soccerCardShellStyles } from "../card-shell.js";
+import { dataAlertStyles, renderDataAlerts } from "../shared-data-alerts.js";
+
+class SoccerLiveDiagnosticsCard extends LitElement {
+  static get properties() {
+    return {
+      hass: {},
+      _config: {},
+    };
+  }
+
+  setConfig(config) {
+    if (!config.entity) throw new Error("Entity required");
+    this._config = config;
+    applySkin(this, config);
+  }
+
+  getCardSize() { return 2; }
+  _t(key, vars) { return t(key, resolveLang(this.hass, this._config), vars); }
+  static getConfigElement() { return document.createElement("soccer-live-diagnostics-editor"); }
+  static getStubConfig() { return { entity: "sensor.soccer_live_", card_type: "diagnostics" }; }
+
+  static get styles() {
+    return [skinStyles, soccerCardShellStyles, dataAlertStyles, css`
+      ha-card {
+        background: var(--cl-bg);
+        color: var(--cl-text);
+        padding: 0;
+        border-radius: 20px;
+        overflow: hidden;
+      }
+      .content { position: relative; z-index: 1; padding: 16px; }
+      .header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+      .title { font-size: 15px; font-weight: 900; }
+      .status {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 5px 10px; border-radius: 999px;
+        font-size: 11px; font-weight: 800; text-transform: uppercase;
+        border: 1px solid var(--cl-chip-border);
+        background: var(--cl-chip-bg);
+      }
+      .status.ok { color: var(--cl-green); }
+      .status.error { color: var(--cl-live); }
+      .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .metric {
+        min-width: 0; padding: 10px;
+        border: 1px solid var(--cl-divider);
+        border-radius: 10px;
+        background: var(--cl-surface);
+      }
+      .label { color: var(--cl-text-2); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; }
+      .value { margin-top: 4px; color: var(--cl-text); font-size: 13px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .error-box {
+        margin-top: 10px; padding: 10px;
+        border: 1px solid rgba(239,68,68,0.35);
+        border-radius: 10px;
+        color: var(--cl-live);
+        background: rgba(239,68,68,0.10);
+        font-size: 12px;
+      }
+      .quality-bar { height: 7px; margin-top: 8px; overflow: hidden; border-radius: 99px; background: var(--cl-divider); }
+      .quality-bar > i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,var(--cl-live),var(--cl-warning),var(--cl-green)); }
+      .recommendations {
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid var(--cl-divider);
+        border-radius: 10px;
+        background: var(--cl-surface);
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 7px;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        min-height: 22px;
+        padding: 3px 8px;
+        border: 1px solid var(--cl-chip-border);
+        border-radius: 999px;
+        background: var(--cl-chip-bg);
+        color: var(--cl-text);
+        font-size: 11px;
+        font-weight: 800;
+      }
+      .capabilities { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; margin-top: 8px; }
+      .capability { display:flex; align-items:center; gap:7px; min-width:0; padding:7px 8px; border:1px solid var(--cl-divider); border-radius:9px; background:var(--cl-surface); font-size:10px; }
+      .capability b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .capability.available i { color:var(--cl-green); }.capability.pending i { color:var(--cl-warning); }.capability.error i,.capability.unavailable i { color:var(--cl-text-2); }
+      .checklist { display:grid; gap:6px; margin-top:8px; }
+      .check { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:7px 8px; border:1px solid var(--cl-divider); border-radius:9px; background:var(--cl-surface); font-size:11px; }
+      .check b { text-transform:uppercase; font-size:9px; letter-spacing:.05em; }
+      .check.pass b { color:var(--cl-green); }.check.warning b,.check.pending b { color:var(--cl-warning); }.check.fail b { color:var(--cl-live); }
+      @media (max-width: 420px) {
+        .grid, .capabilities { grid-template-columns: 1fr; }
+      }
+    `];
+  }
+
+  _format(value) {
+    if (value === undefined || value === null || value === "") return "-";
+    if (Array.isArray(value)) return String(value.length);
+    return String(value);
+  }
+
+  _setupState(configEntryId) {
+    if (!configEntryId) return null;
+    return Object.values(this.hass?.states || {}).find(state => (
+      state?.attributes?.config_entry_id === configEntryId
+      && state?.attributes?.configured_entities != null
+    )) || null;
+  }
+
+  _age(value) {
+    const date = parseMatchDate(value);
+    if (!date) return "-";
+    const minutes = Math.max(0, Math.round((Date.now() - date.getTime()) / 60000));
+    if (minutes < 1) return this._t("time.now");
+    if (minutes < 60) return `${minutes}m`;
+    const hours = Math.round(minutes / 60);
+    if (hours < 48) return `${hours}h`;
+    return `${Math.round(hours / 24)}d`;
+  }
+
+  _recommendedCards(sensorType) {
+    const map = {
+      team_match: ["team", "countdown", "match_center", "lineup", "timeline", "team_form"],
+      team_matches: ["matches", "ticker", "live_match", "team_form"],
+      team_matches_mixed: ["team_competitions", "season_overview", "matches", "ticker", "team_form"],
+      all_matches_today: ["matches", "ticker", "live_match"],
+      standings: ["standings", "mini_standings"],
+      top_scorers: ["scorers"],
+      bracket: ["bracket"],
+      news: ["news"],
+      commentary: ["commentary", "timeline"],
+    };
+    return (map[sensorType] || []).map(key => this._t(`diag.card_${key}`));
+  }
+
+  render() {
+    applySkin(this, this._config);
+    if (!this.hass || !this._config) return html``;
+    const stateObj = this.hass.states[this._config.entity];
+    if (!stateObj) {
+      return renderCardError("!", this._t("ui.entity_not_found"), this._config.entity, this._t("ui.check_entity_config"));
+    }
+
+    const attrs = stateObj.attributes || {};
+    const apiStatus = attrs.api_status || "unknown";
+    const statusClass = apiStatus === "ok" ? "ok" : "error";
+    const statusLabel = this._t(`diag.status_${["ok", "error"].includes(apiStatus) ? apiStatus : "unknown"}`);
+    const lastUpdate = attrs.last_successful_update || attrs.last_request_time;
+    const sensorType = attrs.sensor_type || "unknown";
+    const recommended = this._recommendedCards(sensorType);
+    const quality = attrs.data_quality || {};
+    const blend = attrs.source_blend || {};
+    const setup = this._setupState(attrs.config_entry_id);
+    const installation = setup?.attributes?.installation_check || {};
+    const requestPlan = attrs.request_priority_plan || {};
+    const planCapability = item => ({ lineup: 'lineups', prematch: 'predictions' }[item] || item);
+    const clubConflicts = attrs.club?.source_conflicts?.length || 0;
+    const capabilityMatrix = attrs.capability_matrix || setup?.attributes?.capability_matrix || {};
+    const season = attrs.season_transition || {};
+    const metrics = [
+      [this._t("diag.setup_status"), setup?.state],
+      [this._t("diag.sensor"), sensorType],
+      [this._t("diag.state"), stateObj.state],
+      [this._t("diag.matches"), attrs.schedule_match_count ?? attrs.total_matches],
+      [this._t("diag.live"), attrs.schedule_live_count ?? attrs.live_matches_count],
+      [this._t("diag.upcoming"), attrs.schedule_upcoming_count ?? attrs.upcoming_matches_count],
+      [this._t("diag.recent"), attrs.schedule_recent_count ?? attrs.finished_matches_count],
+      [this._t("diag.requests"), attrs.request_count],
+      [
+        this._t("diag.polling"),
+        attrs.effective_poll_interval != null
+          ? `${attrs.effective_poll_interval}s · ${String(attrs.polling_reason || "normal").replaceAll("_", " ")}`
+          : null,
+      ],
+      [this._t("diag.last_update"), lastUpdate],
+      [this._t("diag.sensor_age"), this._age(lastUpdate)],
+      [this._t("quality.completeness"), quality.average_completeness != null ? `${quality.average_completeness}%` : null],
+      [this._t("quality.conflicts"), quality.conflicts?.length],
+      [this._t("diag.club_source_conflicts"), clubConflicts || null],
+      [this._t("diag.season_status"), season.status],
+      [this._t("diag.archive_sync"), setup?.attributes?.archive_sync_status],
+      [this._t("diag.coordinator_cycles"), setup?.attributes?.coordinator_cycle_count],
+      [this._t("diag.scheduled_refreshes"), setup?.attributes?.scheduled_refreshes],
+      ...(blend.secondary ? [
+        [this._t("diag.source_blend"), `${blend.primary} + ${blend.secondary}`],
+        [this._t("diag.enriched_fields"), blend.enriched_fields],
+        [this._t("quality.conflicts"), blend.conflicts],
+      ] : []),
+    ];
+
+    return html`
+      <ha-card>
+        <div class="hero-bg"></div>
+        <div class="content">
+          <div class="header">
+            <div class="title">${this._config.title || this._t('card.diagnostics')}</div>
+            <div class="status ${statusClass}" title=${apiStatus}>${statusLabel}</div>
+          </div>
+          <div class="grid">
+            ${metrics.map(([label, value]) => html`
+              <div class="metric">
+                <div class="label">${label}</div>
+                <div class="value" title="${this._format(value)}">${this._format(value)}</div>
+              </div>
+            `)}
+          </div>
+          ${recommended.length ? html`
+            <div class="recommendations">
+              <div class="label">${this._t("editor.diag_recommended_cards")}</div>
+              <div class="chips">
+                ${recommended.map(card => html`<span class="chip">${card}</span>`)}
+              </div>
+            </div>
+          ` : ""}
+          ${installation.checks?.length ? html`
+            <div class="recommendations">
+              <div class="label">${this._t('diag.installation_check')} · ${installation.score ?? 0}%</div>
+              <div class="checklist">${installation.checks.map(check => html`
+                <div class="check ${check.status}">
+                  <span>${this._t(`setup.${check.code}`)}</span>
+                  <b>${this._t(`setup.status_${check.status}`)}</b>
+                </div>
+              `)}</div>
+            </div>
+          ` : ''}
+          ${requestPlan.priority?.length ? html`
+            <div class="recommendations">
+              <div class="label">${this._t('diag.request_plan')} · ${this._t(`quota.${requestPlan.quota_level || 'normal'}`)}</div>
+              <div class="chips">
+                ${requestPlan.allowed.map(item => html`<span class="chip">✓ ${this._t(`capability.${planCapability(item)}`)}</span>`)}
+                ${requestPlan.deferred.map(item => html`<span class="chip">⏸ ${this._t(`capability.${planCapability(item)}`)}</span>`)}
+              </div>
+            </div>
+          ` : ''}
+          ${quality.average_completeness != null ? html`
+            <div class="recommendations">
+              <div class="label">${this._t("quality.coverage")} · ${this._t(`quality.${quality.level || 'limited'}`)}</div>
+              <div class="quality-bar"><i style="width:${quality.average_completeness}%"></i></div>
+              ${quality.issues?.length ? html`<div class="chips">${quality.issues.map(issue => html`<span class="chip">⚠ ${this._t(`quality.issue_${issue}`)}</span>`)}</div>` : ''}
+            </div>
+          ` : ''}
+          ${Object.keys(capabilityMatrix).length ? html`
+            <div class="recommendations">
+              <div class="label">${this._t('diag.capabilities')}</div>
+              <div class="capabilities">${Object.entries(capabilityMatrix).map(([key, item]) => html`
+                <div class="capability ${item.status}" title=${this._t(`capability.reason_${item.reason}`)}>
+                  <i>${item.available ? '●' : item.status === 'pending' ? '◐' : '○'}</i>
+                  <b>${this._t(`capability.${key}`)}</b>
+                </div>
+              `)}</div>
+            </div>
+          ` : ''}
+          ${renderDataAlerts(attrs.data_alerts, {
+            t: (key, vars) => this._t(key, vars),
+            compact: true,
+          })}
+          ${attrs.last_error ? html`<div class="error-box">${attrs.last_error}</div>` : ""}
+        </div>
+      </ha-card>
+    `;
+  }
+}
+
+if (!customElements.get("soccer-live-diagnostics")) {
+  customElements.define("soccer-live-diagnostics", SoccerLiveDiagnosticsCard);
+}

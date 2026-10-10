@@ -10,39 +10,106 @@ console.info(
   'color: #0284c7; font-weight: bold;'
 );
 
-// Core Card elements
+// Core and Imported Card elements
 import './cards/Team/soccer-live-team.js';
 import './cards/Standings/soccer-live-standings.js';
 import './cards/LastMatch/soccer-live-last-match.js';
+import './cards/Tutte/soccer-live-matches.js';
+import './cards/Countdown/soccer-live-countdown.js';
+import './cards/News/soccer-live-news.js';
+import './cards/Bracket/soccer-live-bracket.js';
+import './cards/MiniStandings/soccer-live-mini-standings.js';
+import './cards/Scorers/soccer-live-scorers.js';
+import './cards/MultiTeam/soccer-live-multi-team.js';
+import './cards/TeamCompetitions/soccer-live-team-competitions.js';
+import './cards/MatchCenter/soccer-live-match-center.js';
+import './cards/TeamForm/soccer-live-team-form.js';
+import './cards/Club/soccer-live-club.js';
+import './cards/Diagnostics/soccer-live-diagnostics.js';
+import './cards/Ticker/soccer-live-ticker.js';
+import './cards/Lineup/soccer-live-lineup.js';
+import './cards/Timeline/soccer-live-timeline.js';
+import './cards/Schedule/soccer-live-schedule.js';
+import './cards/Matchday/soccer-live-matchday.js';
+import './cards/Archive/soccer-live-archive.js';
 
-// ─── Card type registry (Core 3 Modules) ──────────────────────────────────────
+// ─── Card type registry (All Modules) ─────────────────────────────────────────
 
 const CARD_MODULES = {
   team: { editor: () => import('./cards/Team/soccer-live-team-editor.js') },
   standings: { editor: () => import('./cards/Standings/soccer-live-standings-editor.js') },
   'last-match': { editor: () => import('./cards/LastMatch/soccer-live-last-match-editor.js') },
+  matches: { editor: () => import('./cards/Tutte/soccer-live-matches-editor.js') },
+  countdown: { editor: () => import('./cards/Countdown/soccer-live-countdown-editor.js') },
+  news: { editor: () => import('./cards/News/soccer-live-news-editor.js') },
+  bracket: { editor: () => import('./cards/Bracket/soccer-live-bracket-editor.js') },
+  'mini-standings': { editor: () => import('./cards/MiniStandings/soccer-live-mini-standings-editor.js') },
+  scorers: { editor: () => import('./cards/Scorers/soccer-live-scorers-editor.js') },
+  'multi-team': { editor: () => import('./cards/MultiTeam/soccer-live-multi-team-editor.js') },
+  'team-competitions': { editor: () => import('./cards/TeamCompetitions/soccer-live-team-competitions-editor.js') },
+  'match-center': { editor: () => import('./cards/MatchCenter/soccer-live-match-center-editor.js') },
+  hub: { editor: () => import('./cards/MatchCenter/soccer-live-match-center-editor.js') },
+  race: { editor: () => import('./cards/Standings/soccer-live-standings-editor.js') },
+  'team-form': { editor: () => import('./cards/TeamForm/soccer-live-team-form-editor.js') },
+  club: { editor: () => import('./cards/Club/soccer-live-club-editor.js') },
+  diagnostics: { editor: () => import('./cards/Diagnostics/soccer-live-diagnostics-editor.js') },
+  ticker: { editor: () => import('./cards/Ticker/soccer-live-ticker-editor.js') },
+  lineup: { editor: () => import('./cards/Lineup/soccer-live-lineup-editor.js') },
+  timeline: { editor: () => import('./cards/Timeline/soccer-live-timeline-editor.js') },
+  minimal: { editor: () => import('./cards/Schedule/soccer-live-schedule-editor.js') },
+  schedule: { editor: () => import('./cards/Schedule/soccer-live-schedule-editor.js') },
+  matchday: { editor: () => import('./cards/Insights/soccer-live-insights-editor.js') },
+  archive: { editor: () => import('./cards/Insights/soccer-live-insights-editor.js') },
 };
 
 const MODULE_PROMISES = new Map();
 function loadCardModule(type, kind) {
-  const loader = CARD_MODULES[type]?.[kind];
+  const norm = normalizeCardType(type);
+  const loader = CARD_MODULES[norm]?.[kind];
   if (!loader) return Promise.resolve();
-  const key = `${type}:${kind}`;
+  const key = `${norm}:${kind}`;
   if (!MODULE_PROMISES.has(key)) MODULE_PROMISES.set(key, loader());
   return MODULE_PROMISES.get(key);
 }
 
 const CARD_REGISTRY = [
-  { value: 'team',       element: 'soccer-live-team',       label: 'Próximo Jogo', description: 'Placar ao vivo, relógio, alinhamento e tempo' },
-  { value: 'standings',  element: 'soccer-live-standings',  label: 'Classificação', description: 'Tabela classificativa da liga' },
-  { value: 'last-match', element: 'soccer-live-last-match', label: 'Último Jogo',  description: 'Resultado do último jogo terminado' },
+  { value: 'team',              element: 'soccer-live-team',              editor: 'soccer-live-team-editor',              label: 'Próximo Jogo / Ao Vivo', description: 'Placar ao vivo, relógio, alinhamento e tempo' },
+  { value: 'standings',         element: 'soccer-live-standings',         editor: 'soccer-live-standings-editor',         label: 'Classificação',          description: 'Tabela classificativa da liga com zonas' },
+  { value: 'last-match',        element: 'soccer-live-last-match',        editor: 'soccer-live-last-match-editor',        label: 'Último Jogo',            description: 'Resultado e marcadores do último jogo terminado' },
+  { value: 'matches',           element: 'soccer-live-matches',           editor: 'soccer-live-matches-editor',           label: 'Jogos / Calendário',     description: 'Lista de jogos agrupados por data com destaque ao vivo' },
+  { value: 'countdown',         element: 'soccer-live-countdown',         editor: 'soccer-live-countdown-editor',         label: 'Contagem Decrescente',   description: 'Contador regressivo para o próximo jogo com placar ao vivo' },
+  { value: 'match-center',      element: 'soccer-live-match-center',      editor: 'soccer-live-match-center-editor',      label: 'Centro de Jogo',         description: 'Resumo, estatísticas, cronologia, alinhamento e H2H' },
+  { value: 'scorers',           element: 'soccer-live-scorers',           editor: 'soccer-live-scorers-editor',           label: 'Melhores Marcadores',    description: 'Lista de marcadores com foto e número de golos' },
+  { value: 'team-form',         element: 'soccer-live-team-form',         editor: 'soccer-live-team-form-editor',         label: 'Forma da Equipa',        description: 'Tendência de forma, histórico V/E/D e golos' },
+  { value: 'lineup',            element: 'soccer-live-lineup',            editor: 'soccer-live-lineup-editor',            label: 'Onze Inicial',           description: 'Alinhamento titular de ambas as equipas' },
+  { value: 'timeline',          element: 'soccer-live-timeline',          editor: 'soccer-live-timeline-editor',          label: 'Cronologia / Eventos',   description: 'Eventos minuto a minuto da partida' },
+  { value: 'mini-standings',    element: 'soccer-live-mini-standings',    editor: 'soccer-live-mini-standings-editor',    label: 'Mini Classificação',     description: 'Classificação compacta com número de linhas configurável' },
+  { value: 'team-competitions', element: 'soccer-live-team-competitions', editor: 'soccer-live-team-competitions-editor', label: 'Competições da Equipa',  description: 'Todas as competições da equipa com abas' },
+  { value: 'multi-team',        element: 'soccer-live-multi-team',        editor: 'soccer-live-multi-team-editor',        label: 'Múltiplas Equipas',      description: 'Várias equipas num só cartão compacto' },
+  { value: 'news',              element: 'soccer-live-news',              editor: 'soccer-live-news-editor',              label: 'Notícias',               description: 'Feed de artigos com imagens e datas' },
+  { value: 'bracket',           element: 'soccer-live-bracket',           editor: 'soccer-live-bracket-editor',           label: 'Eliminatórias / Taça',   description: 'Quadro da fase a eliminar ou árvore do torneio' },
+  { value: 'club',              element: 'soccer-live-club',              editor: 'soccer-live-club-editor',              label: 'Perfil do Clube',        description: 'Perfil do clube, plantel, transferências e época' },
+  { value: 'ticker',            element: 'soccer-live-ticker',            editor: 'soccer-live-ticker-editor',            label: 'Ticker de Jogos',        description: 'Faixa horizontal com os jogos de hoje' },
+  { value: 'minimal',           element: 'soccer-live-schedule',          editor: 'soccer-live-schedule-editor',          label: 'Vista Minimalista',      description: 'Vista minimalista em texto: jogos, próximo jogo ou forma' },
+  { value: 'matchday',          element: 'soccer-live-matchday',          editor: 'soccer-live-insights-editor',          label: 'Jornada',                description: 'Uma jornada com estado, jogos e dados' },
+  { value: 'archive',           element: 'soccer-live-archive',           editor: 'soccer-live-insights-editor',          label: 'Arquivo',                description: 'Histórico pessoal de jogos terminados' },
+  { value: 'diagnostics',       element: 'soccer-live-diagnostics',       editor: 'soccer-live-diagnostics-editor',       label: 'Diagnóstico',            description: 'Estado de saúde dos sensores e agendamento' },
+  { value: 'hub',               element: 'soccer-live-match-center',      editor: 'soccer-live-match-center-editor',      label: 'Match Hub',              description: 'Vista dinâmica adaptada à fase (pré-jogo, ao vivo, pós-jogo)' },
+  { value: 'race',              element: 'soccer-live-standings',         editor: 'soccer-live-standings-editor',         label: 'Corrida ao Título',      description: 'Diferença de pontos para título, vagas europeias e descida' },
 ];
+
+const CARD_TYPE_ALIASES = { schedule: 'minimal' };
+function normalizeCardType(cardType) {
+  return CARD_TYPE_ALIASES[cardType] || cardType;
+}
 
 const TYPE_TO_ELEMENT = Object.fromEntries(CARD_REGISTRY.map(c => [c.value, c.element]));
 const LEGACY_ELEMENTS = new Set(CARD_REGISTRY.map(c => c.element));
+const CARD_EDITORS    = Object.fromEntries(CARD_REGISTRY.filter(c => c.editor).map(c => [c.value, c.editor]));
 
 function resolveElement(cardType) {
-  return TYPE_TO_ELEMENT[cardType] || (LEGACY_ELEMENTS.has(cardType) ? cardType : 'soccer-live-team');
+  const norm = normalizeCardType(cardType);
+  return TYPE_TO_ELEMENT[norm] || (LEGACY_ELEMENTS.has(norm) ? norm : 'soccer-live-team');
 }
 
 const WRAPPER_TYPE = 'custom:soccer-live-hub';
@@ -62,6 +129,9 @@ class SoccerLiveCardEditor extends LitElement {
     super();
     this._config = {};
     this._selectedModuleIndex = 0;
+    this._subEditor = null;
+    this._subEditorType = null;
+    this._subEditorIndex = null;
   }
 
   setConfig(config) {
@@ -99,6 +169,7 @@ class SoccerLiveCardEditor extends LitElement {
     modules[index] = modules[targetIdx];
     modules[targetIdx] = temp;
     this._selectedModuleIndex = targetIdx;
+    this._subEditorIndex = null;
     this._dispatch({ ...this._config, modules });
   }
 
@@ -109,18 +180,80 @@ class SoccerLiveCardEditor extends LitElement {
     const models = discoverSoccerModels(this.hass, this._config) || {};
 
     let defaultEntity = '';
-    if (type === 'team') defaultEntity = models.match_model;
-    else if (type === 'standings') defaultEntity = models.standings_model;
-    else if (type === 'last-match') defaultEntity = models.last_match_model;
+    const norm = normalizeCardType(type);
+    if (norm === 'team' || norm === 'countdown' || norm === 'lineup' || norm === 'timeline' || norm === 'match-center' || norm === 'hub') {
+      defaultEntity = models.match_model;
+    } else if (norm === 'standings' || norm === 'mini-standings' || norm === 'race') {
+      defaultEntity = models.standings_model;
+    } else if (norm === 'last-match' || norm === 'archive') {
+      defaultEntity = models.last_match_model;
+    } else if (norm === 'scorers') {
+      defaultEntity = models.scorers_model;
+    } else if (norm === 'news') {
+      defaultEntity = models.news_model;
+    } else if (norm === 'bracket') {
+      defaultEntity = models.bracket_model;
+    } else if (norm === 'club') {
+      defaultEntity = models.club_model;
+    } else if (norm === 'matches' || norm === 'ticker' || norm === 'team-competitions' || norm === 'matchday' || norm === 'minimal') {
+      defaultEntity = models.match_model;
+    }
 
     const newMod = {
       id: `mod_${Date.now()}`,
       type,
       title,
-      entity: defaultEntity,
+      entity: defaultEntity || '',
     };
     const modules = [...(this._config.modules || []), newMod];
     this._selectedModuleIndex = modules.length - 1;
+    this._subEditorIndex = null;
+    this._dispatch({ ...this._config, modules });
+  }
+
+  _changeModuleType(index, newType) {
+    if (!newType) return;
+    const modules = [...(this._config.modules || [])];
+    const mod = modules[index];
+    if (!mod) return;
+    const oldType = mod.type;
+    const meta = CARD_REGISTRY.find(c => c.value === newType);
+    const newTitle = meta ? meta.label : newType;
+
+    const models = discoverSoccerModels(this.hass, { ...this._config, team: mod.team || this._config.team }) || {};
+    let defaultEntity = mod.entity || '';
+    const norm = normalizeCardType(newType);
+    if (norm === 'team' || norm === 'countdown' || norm === 'lineup' || norm === 'timeline' || norm === 'match-center' || norm === 'hub') {
+      defaultEntity = models.match_model || defaultEntity;
+    } else if (norm === 'standings' || norm === 'mini-standings' || norm === 'race') {
+      defaultEntity = models.standings_model || defaultEntity;
+    } else if (norm === 'last-match' || norm === 'archive') {
+      defaultEntity = models.last_match_model || defaultEntity;
+    } else if (norm === 'scorers') {
+      defaultEntity = models.scorers_model || defaultEntity;
+    } else if (norm === 'news') {
+      defaultEntity = models.news_model || defaultEntity;
+    } else if (norm === 'bracket') {
+      defaultEntity = models.bracket_model || defaultEntity;
+    } else if (norm === 'club') {
+      defaultEntity = models.club_model || defaultEntity;
+    } else if (norm === 'matches' || norm === 'ticker' || norm === 'team-competitions' || norm === 'matchday' || norm === 'minimal') {
+      defaultEntity = models.match_model || defaultEntity;
+    }
+
+    const oldMeta = CARD_REGISTRY.find(c => c.value === oldType);
+    const shouldUpdateTitle = !mod.title || mod.title === oldMeta?.label || mod.title === oldType;
+
+    modules[index] = {
+      id: mod.id,
+      type: newType,
+      title: shouldUpdateTitle ? newTitle : mod.title,
+      team: mod.team,
+      entity: defaultEntity,
+    };
+    this._subEditor = null;
+    this._subEditorType = null;
+    this._subEditorIndex = null;
     this._dispatch({ ...this._config, modules });
   }
 
@@ -131,6 +264,7 @@ class SoccerLiveCardEditor extends LitElement {
     const cloned = { ...source, id: `mod_${Date.now()}`, title: `${source.title} (Cópia)` };
     modules.splice(index + 1, 0, cloned);
     this._selectedModuleIndex = index + 1;
+    this._subEditorIndex = null;
     this._dispatch({ ...this._config, modules });
   }
 
@@ -138,6 +272,9 @@ class SoccerLiveCardEditor extends LitElement {
     const modules = [...(this._config.modules || [])];
     modules.splice(index, 1);
     this._selectedModuleIndex = Math.max(0, index - 1);
+    this._subEditor = null;
+    this._subEditorType = null;
+    this._subEditorIndex = null;
     this._dispatch({ ...this._config, modules });
   }
 
@@ -161,18 +298,126 @@ class SoccerLiveCardEditor extends LitElement {
       const nextMod = { ...mod, team: teamName };
       if (!teamName) delete nextMod.team;
       const models = discoverSoccerModels(this.hass, { ...this._config, team: teamName || this._config.team });
-      if (mod.type === 'team') nextMod.entity = models.match_model || mod.entity;
-      else if (mod.type === 'standings') nextMod.entity = models.standings_model || mod.entity;
-      else if (mod.type === 'last-match') nextMod.entity = models.last_match_model || mod.entity;
+      const norm = normalizeCardType(mod.type);
+      if (norm === 'team' || norm === 'countdown' || norm === 'lineup' || norm === 'timeline' || norm === 'match-center' || norm === 'hub') {
+        nextMod.entity = models.match_model || mod.entity;
+      } else if (norm === 'standings' || norm === 'mini-standings' || norm === 'race') {
+        nextMod.entity = models.standings_model || mod.entity;
+      } else if (norm === 'last-match' || norm === 'archive') {
+        nextMod.entity = models.last_match_model || mod.entity;
+      } else if (norm === 'scorers') {
+        nextMod.entity = models.scorers_model || mod.entity;
+      } else if (norm === 'news') {
+        nextMod.entity = models.news_model || mod.entity;
+      } else if (norm === 'bracket') {
+        nextMod.entity = models.bracket_model || mod.entity;
+      } else if (norm === 'club') {
+        nextMod.entity = models.club_model || mod.entity;
+      } else if (norm === 'matches' || norm === 'ticker' || norm === 'team-competitions' || norm === 'matchday' || norm === 'minimal') {
+        nextMod.entity = models.match_model || mod.entity;
+      }
       return nextMod;
     });
     this._dispatch({ ...this._config, modules });
+  }
+
+  updated(changedProps) {
+    super.updated(changedProps);
+    if (changedProps.has('hass') && this._subEditor) {
+      this._subEditor.hass = this.hass;
+    }
+    this._syncSubEditor();
+  }
+
+  _syncSubEditor() {
+    const container = this.shadowRoot?.getElementById('module-sub-editor-container');
+    if (!container) return;
+
+    const modules = this._config.modules || [];
+    const selectedIdx = Math.min(this._selectedModuleIndex, Math.max(0, modules.length - 1));
+    const selectedMod = modules[selectedIdx];
+
+    if (!selectedMod) {
+      container.innerHTML = '';
+      this._subEditor = null;
+      this._subEditorType = null;
+      this._subEditorIndex = null;
+      return;
+    }
+
+    const rawType = selectedMod.type || 'team';
+    const type = normalizeCardType(rawType);
+    const editorName = CARD_EDITORS[type];
+
+    if (!editorName) {
+      container.innerHTML = '<div style="font-size: 12px; color: var(--secondary-text-color); padding: 8px 0;">Este tipo de módulo não tem opções adicionais.</div>';
+      this._subEditor = null;
+      this._subEditorType = null;
+      this._subEditorIndex = null;
+      return;
+    }
+
+    if (!customElements.get(editorName)) {
+      container.innerHTML = `<div style="font-size: 12px; color: var(--secondary-text-color); padding: 8px 0;">${this._t('ui.loading')}</div>`;
+      loadCardModule(type, 'editor').then(() => {
+        this._syncSubEditor();
+      }).catch(err => {
+        container.innerHTML = `<div style="font-size: 12px; color: #ef4444; padding: 8px 0;">Erro ao carregar editor: ${err}</div>`;
+      });
+      return;
+    }
+
+    const modConfig = {
+      ...selectedMod,
+      card_type: type,
+      _hide_skin_controls: true,
+    };
+
+    if (this._subEditor && this._subEditorType === type && this._subEditorIndex === selectedIdx) {
+      this._subEditor.hass = this.hass;
+      try {
+        this._subEditor.setConfig(modConfig);
+      } catch (e) {}
+      return;
+    }
+
+    container.innerHTML = '';
+    const sub = document.createElement(editorName);
+    sub.dataset.moduleEditor = 'true';
+    sub.hass = this.hass;
+
+    sub.addEventListener('config-changed', (e) => {
+      const detail = e.detail?.config || {};
+      const curModules = [...(this._config.modules || [])];
+      const curMod = curModules[this._selectedModuleIndex];
+      if (!curMod) return;
+
+      const merged = { ...curMod, ...detail };
+      merged.id = curMod.id;
+      merged.type = curMod.type;
+      if (curMod.title) merged.title = curMod.title;
+      if (curMod.team) merged.team = curMod.team;
+      delete merged._hide_skin_controls;
+
+      curModules[this._selectedModuleIndex] = merged;
+      this._dispatch({ ...this._config, modules: curModules });
+    });
+
+    try {
+      sub.setConfig(modConfig);
+    } catch (e) {}
+
+    container.appendChild(sub);
+    this._subEditor = sub;
+    this._subEditorType = type;
+    this._subEditorIndex = selectedIdx;
   }
 
   render() {
     const modules = this._config.modules || [];
     const selectedIdx = Math.min(this._selectedModuleIndex, Math.max(0, modules.length - 1));
     const selectedMod = modules[selectedIdx] || null;
+    const selectedMeta = selectedMod ? CARD_REGISTRY.find(c => c.value === selectedMod.type) : null;
     const availableTeams = discoverSoccerTeams(this.hass);
 
     return html`
@@ -291,6 +536,19 @@ class SoccerLiveCardEditor extends LitElement {
           </div>
 
           <div class="field-group">
+            <label class="field-label">${this._t('editor.card_type')}</label>
+            <select
+              .value=${selectedMod.type || 'team'}
+              @change=${e => this._changeModuleType(selectedIdx, e.target.value)}
+            >
+              ${CARD_REGISTRY.map(c => html`
+                <option value=${c.value} ?selected=${(selectedMod.type || 'team') === c.value}>${c.label} (${c.value})</option>
+              `)}
+            </select>
+            ${selectedMeta ? html`<div class="field-desc" style="font-size: 11px; color: var(--secondary-text-color); margin-top: 4px;">${selectedMeta.description}</div>` : ''}
+          </div>
+
+          <div class="field-group">
             <label class="field-label">${this._t('editor.module_title')}</label>
             <input
               type="text"
@@ -309,6 +567,14 @@ class SoccerLiveCardEditor extends LitElement {
               allow-custom-entity
               @value-changed=${e => this._updateSelectedModule('entity', e.detail?.value || '')}
             ></ha-entity-picker>
+          </div>
+
+          <div class="module-options-section">
+            <div class="module-options-title">
+              <span>⚙️ ${this._t('editor.module_options')}</span>
+              <span style="font-size: 11px; font-weight: 500; color: var(--secondary-text-color); text-transform: none;">— ${selectedMeta?.label || selectedMod.type}</span>
+            </div>
+            <div id="module-sub-editor-container"></div>
           </div>
 
           <div class="module-actions">
@@ -486,6 +752,25 @@ class SoccerLiveCardEditor extends LitElement {
         color: #dc2626;
         border-color: rgba(220, 38, 38, 0.3);
       }
+      .module-options-section {
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 1px solid var(--divider-color, rgba(0,0,0,0.1));
+      }
+      .module-options-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: #0284c7;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      #module-sub-editor-container {
+        display: block;
+      }
     `;
   }
 }
@@ -565,72 +850,64 @@ class SoccerLiveCard extends HTMLElement {
   }
 
   _resolveModuleEntity(mod) {
-    if (mod.type === 'team') {
-      const teamName = mod.team || this._config?.team || '';
-      const cleanTeam = teamName.toLowerCase().replace(/[^a-z0-9]/g, '');
-      for (const [id, st] of Object.entries(this._hass?.states || {})) {
-        if (!id.startsWith('sensor.')) continue;
-        const stType = st?.attributes?.sensor_type;
-        const cleanId = id.toLowerCase();
-        const attrTeam = (st?.attributes?.team_name || st?.attributes?.team || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-        if (['team_matches_mixed', 'team_matches'].includes(stType) || cleanId.includes('all_mixed') || cleanId.includes('todos')) {
-          if (!cleanTeam || cleanId.includes(cleanTeam) || attrTeam.includes(cleanTeam)) {
-            return id;
-          }
-        }
-      }
-      for (const [id, st] of Object.entries(this._hass?.states || {})) {
-        if (!id.startsWith('sensor.')) continue;
-        const stType = st?.attributes?.sensor_type;
-        const cleanId = id.toLowerCase();
-        if (['team_matches_mixed', 'team_matches'].includes(stType) || cleanId.includes('all_mixed') || cleanId.includes('todos')) {
-          return id;
-        }
-      }
-      for (const [id, st] of Object.entries(this._hass?.states || {})) {
-        if (!id.startsWith('sensor.')) continue;
-        if (st?.attributes?.sensor_type === 'team_match' || id.toLowerCase().includes('next')) {
-          return id;
-        }
-      }
-    }
-
-    if (mod.type === 'last-match') {
-      const teamName = mod.team || this._config?.team || '';
-      const cleanTeam = teamName.toLowerCase().replace(/[^a-z0-9]/g, '');
-      for (const [id, st] of Object.entries(this._hass?.states || {})) {
-        if (!id.startsWith('sensor.')) continue;
-        const stType = st?.attributes?.sensor_type;
-        const cleanId = id.toLowerCase();
-        const attrTeam = (st?.attributes?.team_name || st?.attributes?.team || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-        if (stType === 'last_match' || cleanId.includes('last')) {
-          if (!cleanTeam || cleanId.includes(cleanTeam) || attrTeam.includes(cleanTeam)) {
-            return id;
-          }
-        }
-      }
-      for (const [id, st] of Object.entries(this._hass?.states || {})) {
-        if (!id.startsWith('sensor.')) continue;
-        if (st?.attributes?.sensor_type === 'last_match' || id.toLowerCase().includes('last')) {
-          return id;
-        }
-      }
-    }
-
     if (mod.entity && this._hass?.states?.[mod.entity]) {
-      const stateObj = this._hass.states[mod.entity];
-      const sensorType = stateObj?.attributes?.sensor_type;
-      if (sensorType) {
-        if (mod.type === 'standings' && sensorType === 'standings') return mod.entity;
-      } else {
-        return mod.entity;
-      }
+      return mod.entity;
     }
-    const models = discoverSoccerModels(this._hass, this._config) || {};
-    if (mod.type === 'team') return models.match_model || mod.entity;
-    if (mod.type === 'standings') return models.standings_model || mod.entity;
-    if (mod.type === 'last-match') return models.last_match_model || mod.entity;
-    return mod.entity || models.match_model;
+    const teamName = mod.team || this._config?.team || '';
+    const cleanTeam = teamName.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const type = normalizeCardType(mod.type || 'team');
+    const models = discoverSoccerModels(this._hass, { ...this._config, team: teamName }) || {};
+
+    if (['team', 'countdown', 'lineup', 'timeline', 'match-center', 'hub'].includes(type)) {
+      if (cleanTeam) {
+        for (const [id, st] of Object.entries(this._hass?.states || {})) {
+          if (!id.startsWith('sensor.')) continue;
+          const stType = st?.attributes?.sensor_type;
+          const cleanId = id.toLowerCase();
+          const attrTeam = (st?.attributes?.team_name || st?.attributes?.team || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+          if (['team_matches_mixed', 'team_matches', 'team_match'].includes(stType) || cleanId.includes('next')) {
+            if (cleanId.includes(cleanTeam) || attrTeam.includes(cleanTeam)) return id;
+          }
+        }
+      }
+      return models.match_model || mod.entity || '';
+    }
+
+    if (type === 'last-match') {
+      if (cleanTeam) {
+        for (const [id, st] of Object.entries(this._hass?.states || {})) {
+          if (!id.startsWith('sensor.')) continue;
+          const stType = st?.attributes?.sensor_type;
+          const cleanId = id.toLowerCase();
+          const attrTeam = (st?.attributes?.team_name || st?.attributes?.team || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+          if (stType === 'last_match' || cleanId.includes('last')) {
+            if (cleanId.includes(cleanTeam) || attrTeam.includes(cleanTeam)) return id;
+          }
+        }
+      }
+      return models.last_match_model || mod.entity || '';
+    }
+
+    if (['standings', 'mini-standings', 'race'].includes(type)) {
+      return models.standings_model || mod.entity || '';
+    }
+    if (type === 'scorers') {
+      return models.scorers_model || mod.entity || '';
+    }
+    if (type === 'news') {
+      return models.news_model || mod.entity || '';
+    }
+    if (type === 'bracket') {
+      return models.bracket_model || mod.entity || '';
+    }
+    if (type === 'club') {
+      return models.club_model || mod.entity || '';
+    }
+    if (['matches', 'ticker', 'team-competitions', 'matchday', 'minimal'].includes(type)) {
+      return models.match_model || mod.entity || '';
+    }
+
+    return mod.entity || models.match_model || '';
   }
 
   setConfig(config) {
@@ -925,7 +1202,20 @@ class SoccerLiveCard extends HTMLElement {
     return el;
   }
 
-  static getStubConfig() { return { title: 'Futebol', layout: 'tabs', modules: [] }; }
+  static getStubConfig(hass) {
+    const models = discoverSoccerModels(hass, {}) || {};
+    return {
+      type: 'custom:soccer-live-hub',
+      title: 'Futebol',
+      layout: 'tabs',
+      appearance: 'ha',
+      modules: [
+        { id: 'mod_match', type: 'team', title: 'Próximo Jogo', entity: models.match_model || '' },
+        { id: 'mod_standings', type: 'standings', title: 'Classificação', entity: models.standings_model || '' },
+        { id: 'mod_last', type: 'last-match', title: 'Último Jogo', entity: models.last_match_model || '' },
+      ]
+    };
+  }
 }
 
 if (!customElements.get('soccer-live-hub')) {

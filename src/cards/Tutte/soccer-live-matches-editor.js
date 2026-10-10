@@ -1,0 +1,321 @@
+import { LitElement, html, css } from 'lit';
+import { t, resolveLang } from '../../i18n.js';
+import { editorStyles, renderLanguageControl, soccerEntityIds } from '../editor-helper.js';
+import { renderSkinControls } from '../skin-editor.js';
+
+class SoccerLiveMatchesEditor extends LitElement {
+  static get properties() {
+    return {
+      _config: { type: Object },
+      hass: { type: Object },
+      entities: { type: Array },
+    };
+  }
+
+  constructor() {
+    super();
+    this.entities = [];
+  }
+
+  static get styles() { return [editorStyles, css`.hint{margin-top:-4px}`]; }
+
+  setConfig(config) {
+    if (!config) throw new Error('Invalid configuration');
+    this._config = { ...config };
+  }
+
+  _t(key) { return t(key, resolveLang(this.hass, this._config)); }
+
+
+  get config() { return this._config; }
+
+  updated(changedProperties) {
+    if (changedProperties.has('hass')) this._fetchEntities();
+  }
+
+  _fireConfigChanged(newConfig) {
+    this._config = newConfig;
+    this.dispatchEvent(new CustomEvent('config-changed', {
+      detail: { config: newConfig },
+      bubbles: true,
+      composed: true,
+    }));
+    this.requestUpdate();
+  }
+
+  _entityChanged(ev) {
+    if (!this._config) return;
+    const value = ev.target.value;
+    if (value === this._config.entity) return;
+    this._fireConfigChanged({ ...this._config, entity: value });
+  }
+
+  _switchChanged(ev) {
+    if (!this._config) return;
+    const target = ev.target;
+    if (!target.dataset || !target.dataset.configValue) return;
+    const key = target.dataset.configValue;
+    const value = target.checked;
+    if (this._config[key] === value) return;
+    this._fireConfigChanged({ ...this._config, [key]: value });
+  }
+
+  _selectChanged(ev) {
+    if (!this._config) return;
+    const target = ev.target;
+    if (!target.dataset || !target.dataset.configValue) return;
+    const key = target.dataset.configValue;
+    const value = target.value;
+    if (this._config[key] === value) return;
+    this._fireConfigChanged({ ...this._config, [key]: value });
+  }
+
+  _numberChanged(ev) {
+    if (!this._config) return;
+    const target = ev.target;
+    if (!target.dataset || !target.dataset.configValue) return;
+    const key = target.dataset.configValue;
+    const value = parseInt(target.value, 10);
+    if (isNaN(value)) return;
+    if (this._config[key] === value) return;
+    this._fireConfigChanged({ ...this._config, [key]: value });
+  }
+
+  _fetchEntities() {
+    if (!this.hass) return;
+    // Match by sensor_type (language-independent) as well as the English name
+    // pattern, so localized entity_ids like `..._alle_spiele` still appear (#28).
+    this.entities = soccerEntityIds(this.hass, {
+      sensorTypes: ['team_matches', 'team_matches_mixed', 'all_matches_today', 'match_day'],
+      includes: ['soccerlive_all', 'soccer_live_all'],
+    });
+  }
+
+  render() {
+    if (!this._config || !this.hass) return html``;
+    const currentEntity = this._config.entity || '';
+    const entityInList = currentEntity && this.entities.includes(currentEntity);
+    const matches = this.hass?.states?.[currentEntity]?.attributes?.matches || [];
+    const competitions = [...new Set(matches.map(match => match.league_name).filter(Boolean))].sort();
+    const seasons = [...new Set(matches.map(match => match.season_label).filter(Boolean))].sort().reverse();
+    const groups = [...new Set(matches.map(match => match.group).filter(Boolean))].sort();
+
+    return html`
+      <div class="card-config">
+        <h3>${this._t("editor.sensor")}</h3>
+        <div>
+          <label class="field-label">${this._t('editor.entity')}</label>
+          <select @change=${this._entityChanged}>
+            ${!entityInList ? html`<option value="${currentEntity}" selected>${currentEntity || this._t('editor.select')}</option>` : ''}
+            ${this.entities.map(e => html`
+              <option value="${e}" ?selected=${e === currentEntity}>${e}</option>
+            `)}
+          </select>
+        </div>
+
+        <h3>${this._t("editor.settings")}</h3>
+
+        <div>
+          <label class="field-label">${this._t('editor.competition_filter')}</label>
+          <select data-config-value="filter_competition" @change=${this._selectChanged}>
+            <option value="">${this._t('filter.all')}</option>
+            ${competitions.map(value => html`<option value=${value} ?selected=${this._config.filter_competition === value}>${value}</option>`)}
+          </select>
+        </div>
+        <div>
+          <label class="field-label">${this._t('editor.season_filter')}</label>
+          <select data-config-value="filter_season" @change=${this._selectChanged}>
+            <option value="">${this._t('filter.all')}</option>
+            ${seasons.map(value => html`<option value=${value} ?selected=${this._config.filter_season === value}>${value}</option>`)}
+          </select>
+        </div>
+        <div>
+          <label class="field-label">${this._t('editor.match_filter')}</label>
+          <select data-config-value="filter_state" @change=${this._selectChanged}>
+            <option value="">${this._t('filter.all')}</option>
+            <option value="in" ?selected=${this._config.filter_state === 'in'}>${this._t('status.live')}</option>
+            <option value="pre" ?selected=${this._config.filter_state === 'pre'}>${this._t('filter.upcoming')}</option>
+            <option value="post" ?selected=${this._config.filter_state === 'post'}>${this._t('filter.finished')}</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">${this._t('editor.venue_filter')}</label>
+          <select data-config-value="filter_venue" @change=${this._selectChanged}>
+            <option value="">${this._t('filter.all')}</option>
+            <option value="home" ?selected=${this._config.filter_venue === 'home'}>${this._t('generic.home')}</option>
+            <option value="away" ?selected=${this._config.filter_venue === 'away'}>${this._t('generic.away')}</option>
+          </select>
+        </div>
+        ${groups.length ? html`
+        <div>
+          <label class="field-label">${this._t('editor.group_filter')}</label>
+          <select data-config-value="filter_group" @change=${this._selectChanged}>
+            <option value="">${this._t('filter.all')}</option>
+            ${groups.map(value => html`<option value=${value} ?selected=${this._config.filter_group === value}>${value}</option>`)}
+          </select>
+        </div>` : ''}
+
+        <div>
+          <label class="field-label">${this._t('editor.my_team')}</label>
+          <input type="text" placeholder=${this._t('editor.my_team_hint')}
+            .value=${this._config.my_team || ''}
+            @change=${(e) => this._fireConfigChanged({...this._config, my_team: e.target.value})} />
+        </div>
+
+        <div class="option">
+          <label>${this._t('editor.only_my_group')}</label>
+          <ha-switch .checked=${this._config.only_my_group === true}
+            data-config-value="only_my_group" @change=${this._switchChanged}></ha-switch>
+        </div>
+
+        <div class="option">
+          <label>${this._t('editor.exclude_my_team')}</label>
+          <ha-switch .checked=${this._config.exclude_my_team === true}
+            data-config-value="exclude_my_team" @change=${this._switchChanged}></ha-switch>
+        </div>
+
+        <div class="option">
+          <label>${this._t('editor.compact_list')}</label>
+          <ha-switch .checked=${this._config.compact === true}
+            data-config-value="compact" @change=${this._switchChanged}></ha-switch>
+        </div>
+
+        ${this._config.compact === true ? html`
+        <div>
+          <label class="field-label">${this._t('editor.text_size')}</label>
+          <select data-config-value="text_size" @change=${this._selectChanged}>
+            ${['xs', 'small', 'normal', 'large'].map((s) => html`
+              <option value="${s}" ?selected=${(this._config.text_size || 'normal') === s}>${this._t('schedule.size_' + s)}</option>`)}
+          </select>
+        </div>` : ''}
+
+        <div class="option">
+          <label>${this._t('editor.show_live_ticker')}</label>
+          <ha-switch .checked=${this._config.show_live_ticker !== false}
+            data-config-value="show_live_ticker" @change=${this._switchChanged}></ha-switch>
+        </div>
+
+        <div class="option">
+          <label>${this._t('editor.show_finished')}</label>
+          <ha-switch
+            .checked=${this._config.show_finished_matches !== false}
+            data-config-value="show_finished_matches"
+            @change=${this._switchChanged}
+          ></ha-switch>
+        </div>
+
+        <div class="option">
+          <label>${this._t('editor.hide_header')}</label>
+          <ha-switch
+            .checked=${this._config.hide_header === true}
+            data-config-value="hide_header"
+            @change=${this._switchChanged}
+          ></ha-switch>
+        </div>
+
+        <div class="option">
+          <label>${this._t('editor.hide_broadcasts')}</label>
+          <ha-switch
+            .checked=${this._config.hide_broadcasts === true}
+            data-config-value="hide_broadcasts"
+            @change=${this._switchChanged}
+          ></ha-switch>
+        </div>
+
+        <div class="option">
+          <label>${this._t('editor.hide_source_sections')}</label>
+          <ha-switch
+            .checked=${this._config.hide_source_sections === true}
+            data-config-value="hide_source_sections"
+            @change=${this._switchChanged}
+          ></ha-switch>
+        </div>
+
+        <div class="option">
+          <label>${this._t('editor.smart_order')}</label>
+          <ha-switch
+            .checked=${this._config.smart_order === true ||
+              (this._config.smart_order === undefined && this.hass?.states?.[this._config.entity]?.attributes?.recommended_match_order === 'smart')}
+            data-config-value="smart_order"
+            @change=${this._switchChanged}
+          ></ha-switch>
+        </div>
+
+        <div class="option">
+          <label>${this._t('editor.newest_first')}</label>
+          <ha-switch
+            .checked=${this._config.reverse_order === true}
+            data-config-value="reverse_order"
+            @change=${this._switchChanged}
+          ></ha-switch>
+        </div>
+
+        <div class="option">
+          <label>${this._t('editor.show_event_toasts')}</label>
+          <ha-switch
+            .checked=${this._config.show_event_toasts === true}
+            data-config-value="show_event_toasts"
+            @change=${this._switchChanged}
+          ></ha-switch>
+        </div>
+
+        <div>
+          <label class="field-label">${this._t('editor.max_events_visible')}</label>
+          <input
+            type="number"
+            min="1"
+            max="100"
+            .value=${this._config.max_events_visible || 5}
+            data-config-value="max_events_visible"
+            @change=${this._numberChanged}
+          />
+        </div>
+
+        <div>
+          <label class="field-label">${this._t('editor.max_events_total')}</label>
+          <input
+            type="number"
+            min="1"
+            max="500"
+            .value=${this._config.max_events_total || 50}
+            data-config-value="max_events_total"
+            @change=${this._numberChanged}
+          />
+        </div>
+
+        <div>
+          <label class="field-label">${this._t('editor.group_by')}</label>
+          <select data-config-value="group_by" @change=${this._selectChanged}>
+            <option value="day" ?selected=${!this._config.group_by || this._config.group_by === 'day'}>${this._t('editor.group_by_date')}</option>
+            <option value="competition" ?selected=${this._config.group_by === 'competition'}>${this._t('editor.group_by_competition')}</option>
+          </select>
+        </div>
+
+        ${this._config.show_finished_matches !== false ? html`
+        <div>
+          <label class="field-label">${this._t('editor.hide_older_than_days')}</label>
+          <input
+            type="number"
+            min="0"
+            max="365"
+            .value=${this._config.hide_past_days || 0}
+            data-config-value="hide_past_days"
+            @change=${this._numberChanged}
+          />
+        </div>
+        ` : ''}
+        <div>
+          <label class="field-label">${this._t('editor.skin')}</label>
+          ${renderSkinControls(this, this._config, (k) => (this._t ? this._t(k) : k))}
+        </div>
+        <div>
+          ${renderLanguageControl(this, this._config, (k) => (this._t ? this._t(k) : k))}
+        </div>
+      </div>
+    `;
+  }
+}
+
+if (!customElements.get('soccer-live-matches-editor')) {
+  customElements.define('soccer-live-matches-editor', SoccerLiveMatchesEditor);
+}

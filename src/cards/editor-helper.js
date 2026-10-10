@@ -19,6 +19,15 @@ export const editorStyles = css`
   .hint { font-size: 12px; color: var(--secondary-text-color); }
   .field-info { background: rgba(33, 150, 243, 0.1); border-left: 3px solid var(--primary-color); padding: 8px 12px; border-radius: 2px; font-size: 12px; margin-top: 8px; }
   .field-warning { background: rgba(255, 152, 0, 0.1); border-left: 3px solid #ff9800; padding: 8px 12px; border-radius: 2px; font-size: 12px; margin-top: 8px; }
+  :host([data-module-editor]) .skin-controls,
+  :host([data-module-editor]) .appearance-controls,
+  :host([data-module-editor]) .custom-skin-field,
+  :host([data-module-editor]) [data-skin-section],
+  :host([data-module-editor]) div:has(> label.field-label:only-child),
+  :host([data-module-editor]) .picker-wrap,
+  :host([data-module-editor]) .profile-picker {
+    display: none !important;
+  }
 `;
 
 // Languages offered by the cards (besides "" = inherit / HA locale), shown by
@@ -186,6 +195,14 @@ export function discoverSoccerModels(hass, config = {}) {
       models.standings_model = entityId;
     } else if (!models.last_match_model && (sensorType === 'last_match' || cleanId.includes('last'))) {
       models.last_match_model = entityId;
+    } else if (!models.scorers_model && (sensorType === 'top_scorers' || cleanId.includes('scorers') || cleanId.includes('marcador'))) {
+      models.scorers_model = entityId;
+    } else if (!models.news_model && (sensorType === 'news' || cleanId.includes('news') || cleanId.includes('noticia'))) {
+      models.news_model = entityId;
+    } else if (!models.bracket_model && (sensorType === 'bracket' || cleanId.includes('bracket') || cleanId.includes('eliminatoria'))) {
+      models.bracket_model = entityId;
+    } else if (!models.club_model && (sensorType === 'club' || cleanId.includes('club'))) {
+      models.club_model = entityId;
     }
   }
 
@@ -228,6 +245,46 @@ export function discoverSoccerModels(hass, config = {}) {
       if (!entityId.startsWith('sensor.')) continue;
       if (stateObj?.attributes?.sensor_type === 'standings') {
         models.standings_model = entityId;
+        break;
+      }
+    }
+  }
+
+  if (!models.scorers_model) {
+    for (const [entityId, stateObj] of Object.entries(hass.states)) {
+      if (!entityId.startsWith('sensor.')) continue;
+      if (stateObj?.attributes?.sensor_type === 'top_scorers' || entityId.toLowerCase().includes('scorers')) {
+        models.scorers_model = entityId;
+        break;
+      }
+    }
+  }
+
+  if (!models.news_model) {
+    for (const [entityId, stateObj] of Object.entries(hass.states)) {
+      if (!entityId.startsWith('sensor.')) continue;
+      if (stateObj?.attributes?.sensor_type === 'news' || entityId.toLowerCase().includes('news')) {
+        models.news_model = entityId;
+        break;
+      }
+    }
+  }
+
+  if (!models.bracket_model) {
+    for (const [entityId, stateObj] of Object.entries(hass.states)) {
+      if (!entityId.startsWith('sensor.')) continue;
+      if (stateObj?.attributes?.sensor_type === 'bracket' || entityId.toLowerCase().includes('bracket')) {
+        models.bracket_model = entityId;
+        break;
+      }
+    }
+  }
+
+  if (!models.club_model) {
+    for (const [entityId, stateObj] of Object.entries(hass.states)) {
+      if (!entityId.startsWith('sensor.')) continue;
+      if (stateObj?.attributes?.sensor_type === 'club' || entityId.toLowerCase().includes('club')) {
+        models.club_model = entityId;
         break;
       }
     }

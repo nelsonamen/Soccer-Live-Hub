@@ -1,0 +1,128 @@
+import { LitElement, html, css } from "lit";
+import { t, resolveLang } from "../../i18n.js";
+import { editorStyles, renderLanguageControl } from "../editor-helper.js";
+import { renderSkinControls } from "../skin-editor.js";
+import { variantsForSensorType } from "../shared-minimal-model.js";
+
+class SoccerLiveScheduleEditor extends LitElement {
+  static get properties() { return { _config: { type: Object }, hass: { type: Object } }; }
+
+  static get styles() {
+    return [editorStyles, css`
+      .card-config { gap: 14px; }
+    `];
+  }
+
+  setConfig(config) { this._config = { ...config }; }
+  _t(key) { return t(key, resolveLang(this.hass, this._config)); }
+
+  _fireConfigChanged(next) {
+    this._config = next;
+    this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: next }, bubbles: true, composed: true }));
+    this.requestUpdate();
+  }
+  _set(key, value) { this._fireConfigChanged({ ...this._config, [key]: value }); }
+  _selectChanged(e) { this._set(e.target.dataset.configValue, e.target.value); }
+  _numberChanged(e) { this._set(e.target.dataset.configValue, Number(e.target.value)); }
+  _toggleChanged(e) { this._set(e.target.dataset.configValue, e.target.checked); }
+
+  _entities() {
+    if (!this.hass) return [];
+    return Object.keys(this.hass.states)
+      .filter((id) => id.includes("soccerlive_") || id.includes("soccer_live_"))
+      .sort();
+  }
+
+  render() {
+    if (!this._config || !this.hass) return html``;
+    const entities = this._entities();
+    const current = this._config.entity || "";
+    const show = this._config.show || "upcoming";
+    const variant = this._config.variant || "fixtures";
+    // Offer only variants that make sense for the selected sensor (a standings
+    // sensor has no fixtures for next/form); keep the current one if it's set.
+    const sensorType = this.hass?.states?.[current]?.attributes?.sensor_type;
+    const allowed = variantsForSensorType(sensorType);
+    const variantOpts = allowed.includes(variant) ? allowed : [variant, ...allowed];
+    return html`
+      <div class="card-config">
+        <h3>${this._t("editor.sensor")}</h3>
+        <div>
+          <label class="field-label">${this._t("editor.entity")}</label>
+          <select data-config-value="entity" @change=${this._selectChanged}>
+            ${!entities.includes(current) ? html`<option value="${current}" selected>${current || this._t('editor.select')}</option>` : ""}
+            ${entities.map((e) => html`<option value="${e}" ?selected=${e === current}>${e}</option>`)}
+          </select>
+        </div>
+
+        <h3>${this._t("editor.settings")}</h3>
+        <div>
+          <label class="field-label">${this._t("minimal.variant")}</label>
+          <select data-config-value="variant" @change=${this._selectChanged}>
+            ${variantOpts.map((v) => html`
+              <option value="${v}" ?selected=${variant === v}>${this._t("minimal.variant_" + v)}</option>`)}
+          </select>
+          ${!allowed.includes(variant) ? html`<div class="field-warning">${this._t("minimal.variant_unsupported")}</div>` : ""}
+        </div>
+        ${variant === "fixtures" ? html`
+        <div>
+          <label class="field-label">${this._t("schedule.show")}</label>
+          <select data-config-value="show" @change=${this._selectChanged}>
+            <option value="upcoming" ?selected=${show === "upcoming"}>${this._t("schedule.show_upcoming")}</option>
+            <option value="previous" ?selected=${show === "previous"}>${this._t("schedule.show_previous")}</option>
+            <option value="all" ?selected=${show === "all"}>${this._t("schedule.show_all")}</option>
+          </select>
+        </div>` : ""}
+        ${variant !== "next" ? html`
+        <div>
+          <label class="field-label">${this._t("editor.max_matches")}</label>
+          <input type="number" min="1" max="50" data-config-value="max_matches"
+            .value=${this._config.max_matches ?? 15} @change=${this._numberChanged} />
+        </div>` : ""}
+        <div>
+          <label class="field-label">${this._t("editor.text_size")}</label>
+          <select data-config-value="text_size" @change=${this._selectChanged}>
+            ${["xs", "small", "normal", "large"].map((s) => html`
+              <option value="${s}" ?selected=${(this._config.text_size || "normal") === s}>${this._t("schedule.size_" + s)}</option>`)}
+          </select>
+        </div>
+        <div>
+          <label class="field-label">${this._t("editor.my_team")}</label>
+          <input type="text" placeholder="${this._t("editor.my_team_hint")}"
+            .value=${this._config.my_team || ""} @change=${(e) => this._set("my_team", e.target.value)} />
+        </div>
+        ${variant === "fixtures" ? html`
+        <div class="option">
+          <label>${this._t("schedule.show_competition")}</label>
+          <ha-switch .checked=${this._config.show_competition !== false} data-config-value="show_competition" @change=${this._toggleChanged}></ha-switch>
+        </div>` : ""}
+        ${variant === "fixtures" || variant === "next" ? html`
+        <div>
+          <label class="field-label">${this._t("editor.group_filter")}</label>
+          <input type="text" .value=${this._config.filter_group || ""}
+            @change=${(e) => this._set("filter_group", e.target.value)} />
+        </div>
+        <div class="option">
+          <label>${this._t("editor.only_my_group")}</label>
+          <ha-switch .checked=${this._config.only_my_group === true} data-config-value="only_my_group" @change=${this._toggleChanged}></ha-switch>
+        </div>
+        <div class="option">
+          <label>${this._t("editor.exclude_my_team")}</label>
+          <ha-switch .checked=${this._config.exclude_my_team === true} data-config-value="exclude_my_team" @change=${this._toggleChanged}></ha-switch>
+        </div>` : ""}
+        <div class="option">
+          <label>${this._t("editor.hide_header")}</label>
+          <ha-switch .checked=${this._config.hide_header === true} data-config-value="hide_header" @change=${this._toggleChanged}></ha-switch>
+        </div>
+
+        <h3>${this._t("editor.appearance")}</h3>
+        <div>${renderSkinControls(this, this._config, (k) => (this._t ? this._t(k) : k))}</div>
+        <div>${renderLanguageControl(this, this._config, (k) => (this._t ? this._t(k) : k))}</div>
+      </div>
+    `;
+  }
+}
+
+if (!customElements.get("soccer-live-schedule-editor")) {
+  customElements.define("soccer-live-schedule-editor", SoccerLiveScheduleEditor);
+}
