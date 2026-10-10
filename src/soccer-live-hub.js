@@ -1227,12 +1227,3 @@ if (!window.customCards.some(c => c.type === 'soccer-live-hub')) {
     documentationURL: 'https://github.com/nelsonamen/Teste',
   });
 }
-if (!window.customCards.some(c => c.type === 'soccer-live-card')) {
-  window.customCards.push({
-    type: 'soccer-live-card',
-    name: 'Soccer Live Card',
-    description: 'Cartão modular de futebol (Soccer Live Hub).',
-    preview: true,
-    documentationURL: 'https://github.com/nelsonamen/Teste',
-  });
-}
