@@ -153,7 +153,9 @@ class SoccerLiveCardEditor extends LitElement {
   }
 
   _dispatch(config) {
-    const nextConfig = { ...config, type: WRAPPER_TYPE };
+    const rawType = this._config?.type || WRAPPER_TYPE;
+    const type = rawType.startsWith('custom:') ? rawType : `custom:${rawType}`;
+    const nextConfig = { ...config, type };
     this.dispatchEvent(new CustomEvent('config-changed', {
       detail: { config: nextConfig },
       bubbles: true,
@@ -387,6 +389,8 @@ class SoccerLiveCardEditor extends LitElement {
     sub.hass = this.hass;
 
     sub.addEventListener('config-changed', (e) => {
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       const detail = e.detail?.config || {};
       const curModules = [...(this._config.modules || [])];
       const curMod = curModules[this._selectedModuleIndex];
@@ -398,6 +402,7 @@ class SoccerLiveCardEditor extends LitElement {
       if (curMod.title) merged.title = curMod.title;
       if (curMod.team) merged.team = curMod.team;
       delete merged._hide_skin_controls;
+      delete merged.card_type;
 
       curModules[this._selectedModuleIndex] = merged;
       this._dispatch({ ...this._config, modules: curModules });
@@ -555,18 +560,6 @@ class SoccerLiveCardEditor extends LitElement {
               .value=${selectedMod.title || ''}
               @change=${e => this._updateSelectedModule('title', e.target.value)}
             >
-          </div>
-
-          <div class="field-group">
-            <label class="field-label">${this._t('editor.entity')}</label>
-            <ha-entity-picker
-              .key=${selectedMod.entity || ''}
-              .hass=${this.hass}
-              .value=${selectedMod.entity || ''}
-              .includeDomains=${['sensor']}
-              allow-custom-entity
-              @value-changed=${e => this._updateSelectedModule('entity', e.detail?.value || '')}
-            ></ha-entity-picker>
           </div>
 
           <div class="module-options-section">
@@ -1192,14 +1185,7 @@ class SoccerLiveCard extends HTMLElement {
   getCardSize() { return 8; }
 
   static getConfigElement() {
-    const el = document.createElement('soccer-live-hub-editor');
-    if (el && typeof el.setConfig !== 'function') {
-      el.setConfig = function(config) {
-        this._config = config;
-        if (typeof this.requestUpdate === 'function') this.requestUpdate();
-      };
-    }
-    return el;
+    return document.createElement('soccer-live-hub-editor');
   }
 
   static getStubConfig(hass) {
@@ -1224,16 +1210,29 @@ if (!customElements.get('soccer-live-hub')) {
 if (!customElements.get('soccer-live-card')) {
   customElements.define('soccer-live-card', SoccerLiveCard);
 }
+if (!customElements.get('soccer-live-hub-editor')) {
+  customElements.define('soccer-live-hub-editor', SoccerLiveCardEditor);
+}
+if (!customElements.get('soccer-live-card-editor')) {
+  customElements.define('soccer-live-card-editor', SoccerLiveCardEditor);
+}
 
 window.customCards = window.customCards || [];
-for (const t of ['soccer-live-hub', 'custom:soccer-live-hub']) {
-  if (!window.customCards.some(c => c.type === t)) {
-    window.customCards.push({
-      type: t,
-      name: 'Soccer Live Hub',
-      description: 'Modular football hub card with reorderable modules, tabs or stack layout.',
-      preview: true,
-      documentationURL: 'https://github.com/nelsonamen/Teste',
-    });
-  }
+if (!window.customCards.some(c => c.type === 'soccer-live-hub')) {
+  window.customCards.push({
+    type: 'soccer-live-hub',
+    name: 'Soccer Live Hub',
+    description: 'Cartão modular com placares ao vivo, classificação, último jogo e mais.',
+    preview: true,
+    documentationURL: 'https://github.com/nelsonamen/Teste',
+  });
+}
+if (!window.customCards.some(c => c.type === 'soccer-live-card')) {
+  window.customCards.push({
+    type: 'soccer-live-card',
+    name: 'Soccer Live Card',
+    description: 'Cartão modular de futebol (Soccer Live Hub).',
+    preview: true,
+    documentationURL: 'https://github.com/nelsonamen/Teste',
+  });
 }
