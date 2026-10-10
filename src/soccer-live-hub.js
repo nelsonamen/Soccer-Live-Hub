@@ -190,6 +190,16 @@ class SoccerLiveCardEditor extends LitElement {
         </div>
 
         <div class="field-group">
+          <label class="field-label">Subtítulo do Cartão</label>
+          <input
+            type="text"
+            .value=${this._config.subtitle || ''}
+            placeholder="ex. A tua vista de futebol"
+            @change=${e => this._dispatch({ ...this._config, subtitle: e.target.value })}
+          >
+        </div>
+
+        <div class="field-group">
           <label class="field-label">${this._t('editor.layout_mode')}</label>
           <select
             .value=${this._config.layout || 'tabs'}
@@ -676,14 +686,17 @@ class SoccerLiveCard extends HTMLElement {
       this.innerHTML = '';
       const wrapper = document.createElement('ha-card');
       wrapper.className = 'soccer-live-hub-wrapper';
-      wrapper.style.cssText = 'border-radius: 20px; overflow: hidden; padding: 0;';
+      wrapper.style.cssText = 'border-radius: 20px; overflow: hidden; padding: 0; border-top: 4px solid #e50000;';
       this._applyWrapperTheme(wrapper);
 
       if (this._config.title) {
         const header = document.createElement('div');
         header.className = 'soccer-live-card-title';
-        header.style.cssText = 'font-size:16px;font-weight:700;padding:12px 16px 4px;';
-        header.textContent = this._config.title;
+        header.style.cssText = 'padding: 16px 18px 8px;';
+        header.innerHTML = `
+          <div style="font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--primary-text-color);">${this._config.title}</div>
+          <div style="font-size: 12px; color: var(--secondary-text-color); margin-top: 2px; font-weight: 500;">${this._config.subtitle || 'Soccer Live Hub'}</div>
+        `;
         wrapper.appendChild(header);
       }
 
