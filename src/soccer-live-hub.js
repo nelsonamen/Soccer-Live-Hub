@@ -10,6 +10,17 @@ console.info(
   'color: #0284c7; font-weight: bold;'
 );
 
+window.customCards = window.customCards || [];
+if (!window.customCards.some(c => c.type === 'soccer-live-hub')) {
+  window.customCards.push({
+    type: 'soccer-live-hub',
+    name: 'Soccer Live Hub',
+    description: 'Cartão modular de Futebol com placares ao vivo, classificação, último jogo e mais.',
+    preview: true,
+    documentationURL: 'https://github.com/nelsonamen/Teste',
+  });
+}
+
 // Core and Imported Card elements
 import './cards/Team/soccer-live-team.js';
 import './cards/Standings/soccer-live-standings.js';
