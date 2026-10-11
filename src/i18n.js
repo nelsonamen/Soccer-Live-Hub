@@ -658,7 +658,7 @@ const TRANSLATIONS = {
     'standings.preseason': 'Season {season} has not started yet',
 
     // Match display
-    'match.vs': 'vs',
+    'match.vs': 'VS',
     'match.draw': 'D',
     'tab.overview': 'Overview',
     'tab.stats': 'Stats',
@@ -1589,7 +1589,7 @@ const TRANSLATIONS = {
     'card.diagnostics': 'Diagnostiek',
     'standings.preseason': 'Seizoen {season} is nog niet begonnen',
 
-    'match.vs': 'tegen',
+    'match.vs': 'VS',
     'match.draw': 'G',
     'tab.overview': 'Overzicht',
     'tab.stats': 'Stats',
@@ -2646,7 +2646,7 @@ const TRANSLATIONS = {
     'card.diagnostics': 'Diagnostica',
     'standings.preseason': 'La stagione {season} non è ancora iniziata',
 
-    'match.vs': 'contro',
+    'match.vs': 'VS',
     'match.draw': 'P',
     'tab.overview': 'Panoramica',
     'tab.stats': 'Statistiche',
@@ -3574,7 +3574,7 @@ const TRANSLATIONS = {
     'card.diagnostics': 'Diagnostics',
     'standings.preseason': 'La saison {season} n\'a pas encore commencé',
 
-    'match.vs': 'contre',
+    'match.vs': 'VS',
     'match.draw': 'N',
     'tab.overview': 'Aperçu',
     'tab.stats': 'Stats',
@@ -4502,7 +4502,7 @@ const TRANSLATIONS = {
     'card.diagnostics': 'Diagnósticos',
     'standings.preseason': 'La temporada {season} no ha comenzado aún',
 
-    'match.vs': 'vs',
+    'match.vs': 'VS',
     'match.draw': 'E',
     'tab.overview': 'Resumen',
     'tab.stats': 'Stats',
@@ -5400,7 +5400,7 @@ const TRANSLATIONS = {
     'card.diagnostics': 'Diagnose',
     'standings.preseason': 'Saison {season} hat noch nicht begonnen',
 
-    'match.vs': 'gegen',
+    'match.vs': 'VS',
     'match.draw': 'U',
     'tab.overview': 'Übersicht',
     'tab.stats': 'Statistiken',
@@ -6378,7 +6378,7 @@ const TRANSLATIONS = {
     'card.diagnostics': 'Diagnósticos',
     'standings.preseason': 'A temporada {season} ainda não começou',
 
-    'match.vs': 'contra',
+    'match.vs': 'VS',
     'match.draw': 'E',
     'tab.overview': 'Resumo',
     'tab.stats': 'Estatísticas',
