@@ -5,8 +5,7 @@ import { renderInfoState, renderSyncStatusOrEmpty } from "../card-error.js";
 import { OfflineCache } from "../offline-cache.js";
 import { displayCompetitionName, resolveCompetitionLogo } from "../shared-competition.js";
 import { scoreText } from "../shared-score.js";
-import { pickLastMatch, pickLastFromMatches } from "../shared-last-match.js";
-import { groupFilterActive, filterByGroup } from "../shared-group-filter.js";
+import { pickLastMatch } from "../shared-last-match.js";
 import { renderPopupTimeline, renderPopupLineup, renderPopupSectionStyles } from "../shared-match-sections.js";
 import { pitchStyles } from "../shared-pitch.js";
 import { matchStatRows, translateStatKey } from "../shared-stat-labels.js";
@@ -67,12 +66,7 @@ class SoccerLiveLastMatchCard extends LitElement {
         renderInfoState("📅", this._t("last_match.none"), this._t("last_match.none_hint")));
     }
 
-    // With a group filter, pick the last finished match from the group-filtered
-    // full list (so only_my_group + exclude_my_team shows the last result of the
-    // other team in your group); otherwise the normal team pick.
-    const match = groupFilterActive(this._config)
-      ? pickLastFromMatches(filterByGroup(attrs.matches || [], this._config))
-      : pickLastMatch(attrs);
+    const match = pickLastMatch(attrs);
     if (!match) {
       return html`<ha-card>${renderInfoState("📅", this._t("last_match.none"), this._t("last_match.none_hint"))}</ha-card>`;
     }
@@ -207,7 +201,7 @@ class SoccerLiveLastMatchCard extends LitElement {
     const competition = displayCompetitionName(match.league_name, lang);
 
     return html`
-      <div class="lmp-box" role="dialog" aria-modal="true" aria-label="${this._t("popup.match_details")}">
+      <div class="lmp-box">
         <button class="lmp-close" aria-label="${this._t("last_match.close")}" @click=${() => { this._showDetails = false; }}>×</button>
         <div class="lmp-score-row">
           <img class="lmp-logo" src="${match.home_logo}" alt="" @error=${e => e.target.style.display = "none"}>

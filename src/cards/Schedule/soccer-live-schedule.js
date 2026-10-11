@@ -5,7 +5,7 @@ import { renderCardError, renderInfoState } from "../card-error.js";
 import { renderLoading } from "../loading-spinner.js";
 import { soccerCardShellStyles } from "../card-shell.js";
 import { displayCompetitionName } from "../shared-competition.js";
-import { pickNextMatch, pickNextFromMatches, nextWhenKind, computeForm, standingsRows, teamMatchesName, matchSideIsTeam } from "../shared-minimal-model.js";
+import { pickNextMatch, nextWhenKind, computeForm, standingsRows, teamMatchesName, matchSideIsTeam } from "../shared-minimal-model.js";
 import { groupFilterActive, filterByGroup } from "../shared-group-filter.js";
 
 // Text-size presets -> [font-size px, vertical row padding px].
@@ -115,7 +115,7 @@ class SoccerLiveScheduleCard extends LitElement {
     // list (so e.g. only_my_group + exclude_my_team shows the next match of the
     // other team in your group); otherwise use the normal live-first pick.
     const m = groupFilterActive(this._config)
-      ? pickNextFromMatches(filterByGroup(attrs.matches || [], this._config))
+      ? pickNextMatch({ matches: filterByGroup(attrs.matches || [], this._config) })
       : pickNextMatch(attrs);
     if (!m) return null;
     const kind = nextWhenKind(m);

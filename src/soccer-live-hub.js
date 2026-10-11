@@ -807,19 +807,10 @@ class SoccerLiveCard extends HTMLElement {
   }
 
   _getModules() {
-    if (Array.isArray(this._config?.modules) && this._config.modules.length > 0) {
+    if (Array.isArray(this._config?.modules)) {
       return this._config.modules.filter(Boolean);
     }
-    const models = discoverSoccerModels(this._hass, this._config) || {};
-    const defaults = [];
-    if (models.match_model) defaults.push({ id: 'mod_match', type: 'team', title: 'Próximo Jogo', entity: models.match_model });
-    if (models.standings_model) defaults.push({ id: 'mod_standings', type: 'standings', title: 'Classificação', entity: models.standings_model });
-    if (models.last_match_model) defaults.push({ id: 'mod_last', type: 'last-match', title: 'Último Jogo', entity: models.last_match_model });
-
-    if (!defaults.length) {
-      defaults.push({ id: 'mod_default', type: 'team', title: 'Próximo Jogo', entity: this._config?.entity || '' });
-    }
-    return defaults;
+    return [];
   }
 
   _getGroupedModules() {
@@ -1176,9 +1167,19 @@ class SoccerLiveCard extends HTMLElement {
   }
 
   _placeholder() {
-    const el = document.createElement('ha-card');
-    el.style.cssText = 'padding:24px;text-align:center;color:#94a3b8;font-size:13px;';
-    const lang = this._hass ? (this._hass.language || 'en').split('-')[0] : 'en';
+    const el = document.createElement('div');
+    el.style.cssText = `
+      border: 2px dashed var(--divider-color, rgba(127,127,127,0.35));
+      border-radius: 16px;
+      padding: 36px 24px;
+      text-align: center;
+      color: var(--secondary-text-color, #64748b);
+      font-size: 14px;
+      font-weight: 500;
+      margin: 16px;
+      background: rgba(0, 0, 0, 0.01);
+    `;
+    const lang = resolveLang(this._hass, this._config);
     el.textContent = t('ui.open_editor_to_configure', lang);
     return el;
   }
@@ -1196,18 +1197,14 @@ class SoccerLiveCard extends HTMLElement {
     return document.createElement('soccer-live-hub-editor');
   }
 
-  static getStubConfig(hass) {
-    const models = discoverSoccerModels(hass, {}) || {};
+  static getStubConfig() {
     return {
       type: 'custom:soccer-live-hub',
-      title: 'Futebol',
+      title: 'Desporto',
+      subtitle: 'Soccer Live Hub',
       layout: 'tabs',
       appearance: 'ha',
-      modules: [
-        { id: 'mod_match', type: 'team', title: 'Próximo Jogo', entity: models.match_model || '' },
-        { id: 'mod_standings', type: 'standings', title: 'Classificação', entity: models.standings_model || '' },
-        { id: 'mod_last', type: 'last-match', title: 'Último Jogo', entity: models.last_match_model || '' },
-      ]
+      modules: []
     };
   }
 }
