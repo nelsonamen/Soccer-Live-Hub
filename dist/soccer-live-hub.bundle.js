@@ -3929,19 +3929,6 @@
           </div>
 
           <div class="field-group">
-            <label class="field-label">${this._t("editor.card_type")}</label>
-            <select
-              .value=${a.type||"team"}
-              @change=${e=>this._changeModuleType(t,e.target.value)}
-            >
-              ${ua.map(e=>i.qy`
-                <option value=${e.value} ?selected=${(a.type||"team")===e.value}>${e.label} (${e.value})</option>
-              `)}
-            </select>
-            ${s?i.qy`<div class="field-desc" style="font-size: 11px; color: var(--secondary-text-color); margin-top: 4px;">${s.description}</div>`:""}
-          </div>
-
-          <div class="field-group">
             <label class="field-label">${this._t("editor.module_title")}</label>
             <input
               type="text"

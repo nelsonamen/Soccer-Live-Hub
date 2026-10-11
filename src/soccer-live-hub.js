@@ -546,19 +546,6 @@ class SoccerLiveCardEditor extends LitElement {
           </div>
 
           <div class="field-group">
-            <label class="field-label">${this._t('editor.card_type')}</label>
-            <select
-              .value=${selectedMod.type || 'team'}
-              @change=${e => this._changeModuleType(selectedIdx, e.target.value)}
-            >
-              ${CARD_REGISTRY.map(c => html`
-                <option value=${c.value} ?selected=${(selectedMod.type || 'team') === c.value}>${c.label} (${c.value})</option>
-              `)}
-            </select>
-            ${selectedMeta ? html`<div class="field-desc" style="font-size: 11px; color: var(--secondary-text-color); margin-top: 4px;">${selectedMeta.description}</div>` : ''}
-          </div>
-
-          <div class="field-group">
             <label class="field-label">${this._t('editor.module_title')}</label>
             <input
               type="text"
