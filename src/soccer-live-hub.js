@@ -1161,38 +1161,7 @@ class SoccerLiveCard extends HTMLElement {
       if (modConfig.entity) console.warn(`SoccerLiveCard: setConfig failed for module ${mod.id}:`, e);
     }
     if (this._hass) {
-      let blendedHass = blendHassSources(this._hass, modConfig);
-      const broadcastEntity = mod.broadcast_entity;
-      const broadcastVal = (broadcastEntity && this._hass?.states?.[broadcastEntity])
-        ? (['unavailable', 'unknown'].includes(this._hass.states[broadcastEntity].state) ? '' : this._hass.states[broadcastEntity].state)
-        : mod.broadcast;
-
-      if (broadcastVal && modConfig.entity && blendedHass?.states?.[modConfig.entity]) {
-        const origState = blendedHass.states[modConfig.entity];
-        const attrs = { ...origState.attributes };
-        attrs.broadcast = broadcastVal;
-        attrs.broadcasts = [broadcastVal];
-        if (attrs.next_match && typeof attrs.next_match === 'object') {
-          attrs.next_match = { ...attrs.next_match, broadcast: broadcastVal, broadcasts: [broadcastVal] };
-        }
-        if (Array.isArray(attrs.upcoming_matches)) {
-          attrs.upcoming_matches = attrs.upcoming_matches.map(m => m ? { ...m, broadcast: broadcastVal, broadcasts: [broadcastVal] } : m);
-        }
-        if (Array.isArray(attrs.matches)) {
-          attrs.matches = attrs.matches.map(m => m ? { ...m, broadcast: broadcastVal, broadcasts: [broadcastVal] } : m);
-        }
-        blendedHass = {
-          ...blendedHass,
-          states: {
-            ...blendedHass.states,
-            [modConfig.entity]: {
-              ...origState,
-              attributes: attrs
-            }
-          }
-        };
-      }
-      el.hass = blendedHass;
+      el.hass = blendHassSources(this._hass, modConfig);
       el._isLoading = false;
     }
 
