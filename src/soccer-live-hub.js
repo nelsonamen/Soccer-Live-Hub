@@ -1169,17 +1169,25 @@ class SoccerLiveCard extends HTMLElement {
 
       if (broadcastVal && modConfig.entity && blendedHass?.states?.[modConfig.entity]) {
         const origState = blendedHass.states[modConfig.entity];
+        const attrs = { ...origState.attributes };
+        attrs.broadcast = broadcastVal;
+        attrs.broadcasts = [broadcastVal];
+        if (attrs.next_match && typeof attrs.next_match === 'object') {
+          attrs.next_match = { ...attrs.next_match, broadcast: broadcastVal, broadcasts: [broadcastVal] };
+        }
+        if (Array.isArray(attrs.upcoming_matches)) {
+          attrs.upcoming_matches = attrs.upcoming_matches.map(m => m ? { ...m, broadcast: broadcastVal, broadcasts: [broadcastVal] } : m);
+        }
+        if (Array.isArray(attrs.matches)) {
+          attrs.matches = attrs.matches.map(m => m ? { ...m, broadcast: broadcastVal, broadcasts: [broadcastVal] } : m);
+        }
         blendedHass = {
           ...blendedHass,
           states: {
             ...blendedHass.states,
             [modConfig.entity]: {
               ...origState,
-              attributes: {
-                ...origState.attributes,
-                broadcast: broadcastVal,
-                broadcasts: [broadcastVal]
-              }
+              attributes: attrs
             }
           }
         };
