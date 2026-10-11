@@ -16,11 +16,11 @@ export const skinStyles = css`
     --cl-win: #10b981;
     --cl-draw: #64748b;
     --cl-loss: #ef4444;
-    --cl-accent-soft: rgba(var(--cl-accent-rgb),0.10);
+    --cl-accent-soft: rgba(0,0,0,0.04);
     --cl-accent-visible: var(--cl-accent);
   }
 
-  /* Clean Royal Blue / Slate Accent (NO PURPLE, NO PINK) */
+  /* Clean Neutral Base Accent */
   :host,
   :host([data-palette="purple"]),
   :host([data-palette="custom"]),
@@ -49,8 +49,8 @@ export const skinStyles = css`
     --cl-overlay-soft: rgba(0,0,0,0.35);
     --cl-bar-outline: rgba(255,255,255,0.14);
     --cl-bar-separator: rgba(255,255,255,0.25);
-    --cl-chip-bg: rgba(2,132,199,0.14);
-    --cl-chip-border: rgba(2,132,199,0.30);
+    --cl-chip-bg: #1e293b;
+    --cl-chip-border: rgba(255,255,255,0.15);
     --cl-toast-bg: #1e293b;
     --cl-num-bg: #1e293b;
   }
@@ -89,7 +89,7 @@ export const skinStyles = css`
     --cl-overlay-soft: rgba(0,0,0,0.25);
     --cl-bar-outline: var(--divider-color, #e2e8f0);
     --cl-bar-separator: rgba(0,0,0,0.12);
-    --cl-chip-bg: rgba(2,132,199,0.08);
+    --cl-chip-bg: var(--secondary-background-color, #f1f5f9);
     --cl-chip-border: var(--divider-color, #e2e8f0);
     --cl-toast-bg: var(--card-background-color, #0f172a);
     --cl-num-bg: var(--card-background-color, #ffffff);
