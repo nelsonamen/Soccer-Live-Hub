@@ -36,7 +36,11 @@ class SoccerLiveTeamCardEditor extends LitElement {
 
   setConfig(config) {
     if (!config) throw new Error('Invalid configuration');
-    this._config = { ...config };
+    const cleaned = { ...config };
+    if (cleaned.entity && (cleaned.entity.startsWith('sensor.sun_') || cleaned.entity.startsWith('sensor.time') || cleaned.entity.startsWith('sensor.date'))) {
+      delete cleaned.entity;
+    }
+    this._config = cleaned;
   }
 
   get config() { return this._config; }

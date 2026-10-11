@@ -1123,8 +1123,8 @@ class SoccerLiveMatchesCard extends LitElement {
         overflow: hidden;
         border-radius: 20px;
         padding: 0;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.15);
-        background: var(--cl-bg);
+        box-shadow: none;
+        background: transparent;
         color: var(--cl-text);
       }
       ha-card.empty {
@@ -1133,13 +1133,7 @@ class SoccerLiveMatchesCard extends LitElement {
         color: var(--cl-text-2);
       }
       .hero-bg {
-        position: absolute;
-        inset: 0;
-        background:
-          radial-gradient(ellipse at 0% 0%, rgba(var(--cl-accent-rgb),0.10), transparent 50%),
-          radial-gradient(ellipse at 100% 100%, rgba(var(--cl-accent-2-rgb),0.10), transparent 50%);
-        pointer-events: none;
-        z-index: 0;
+        display: none !important;
       }
       .live-ticker {
         display: flex; align-items: center; gap: 10px;

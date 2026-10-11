@@ -9,68 +9,13 @@ export const soccerCardShellStyles = css`
     position: relative;
     overflow: hidden;
     border-radius: 20px;
-    box-shadow: 0 4px 24px var(--cl-shadow, rgba(0,0,0,0.24));
-    background: var(--cl-bg);
+    box-shadow: none;
+    background: transparent;
     color: var(--cl-text);
   }
 
-  .hero-bg {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse at 0% 0%, rgba(var(--cl-accent-rgb),0.18), transparent 55%),
-      radial-gradient(ellipse at 100% 100%, rgba(var(--cl-accent-2-rgb),0.14), transparent 55%);
-    pointer-events: none;
-    z-index: 0;
-  }
-  /* Optional crest watermark (custom palette background_image), centred and faint
-     behind the content. Rendered on the .hero-bg layer (z-index:0), so the
-     content — which every card places above it — stays on top. Absent by
-     default (background-image: none). */
-  .hero-bg::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: var(--cl-bg-image, none);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: var(--cl-bg-image-size, 80%) auto;
-    opacity: var(--cl-bg-image-opacity, 0.07);
-    pointer-events: none;
-  }
-
-  .bg-logos {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    pointer-events: none;
-    overflow: hidden;
-    z-index: 0;
-  }
-
-  .bg-logo {
-    width: 60%;
-    height: 140%;
-    display: flex;
-    align-items: center;
-    opacity: 0.08;
-  }
-
-  .bg-logo.home {
-    justify-content: flex-start;
-    transform: translateX(-30%);
-  }
-
-  .bg-logo.away {
-    justify-content: flex-end;
-    transform: translateX(30%);
-  }
-
-  .bg-logo img {
-    width: 100%;
-    object-fit: contain;
+  .hero-bg, .bg-logos {
+    display: none !important;
   }
 
   .card-content {
@@ -81,6 +26,7 @@ export const soccerCardShellStyles = css`
   .top-bar {
     position: relative;
     z-index: 1;
+    background: transparent;
   }
 
   button:focus-visible,
@@ -89,7 +35,7 @@ export const soccerCardShellStyles = css`
   input:focus-visible,
   summary:focus-visible,
   a:focus-visible {
-    outline: 3px solid color-mix(in srgb, var(--cl-accent, #6366f1) 72%, white);
+    outline: 2px solid var(--cl-accent, #0284c7);
     outline-offset: 2px;
   }
 
@@ -102,33 +48,8 @@ export const soccerCardShellStyles = css`
     content-visibility: auto;
     contain-intrinsic-size: auto 52px;
   }
-
-  @media (pointer: coarse) {
-    button,
-    [role="button"],
-    select {
-      min-height: 36px;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      scroll-behavior: auto !important;
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-    }
-  }
 `;
 
 export function renderCardHero(homeLogo, awayLogo) {
-  return html`
-    <div class="bg-logos">
-      ${homeLogo ? html`<div class="bg-logo home"><img src="${homeLogo}" alt="" loading="lazy"></div>` : ''}
-      ${awayLogo ? html`<div class="bg-logo away"><img src="${awayLogo}" alt="" loading="lazy"></div>` : ''}
-    </div>
-    <div class="hero-bg"></div>
-  `;
+  return html``;
 }

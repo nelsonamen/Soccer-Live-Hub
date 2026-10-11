@@ -150,6 +150,14 @@ class SoccerLiveCardEditor extends LitElement {
     if (!Array.isArray(this._config.modules)) {
       this._config.modules = [];
     }
+    this._config.modules = this._config.modules.map(mod => {
+      if (mod?.entity && (mod.entity.startsWith('sensor.sun_') || mod.entity.startsWith('sensor.time') || mod.entity.startsWith('sensor.date'))) {
+        const nextMod = { ...mod };
+        delete nextMod.entity;
+        return nextMod;
+      }
+      return mod;
+    });
     this.requestUpdate();
   }
 

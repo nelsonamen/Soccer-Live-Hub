@@ -266,7 +266,7 @@ class SoccerLiveTeamFormCard extends LitElement {
 
   static get styles() {
     return [skinStyles, soccerCardShellStyles, soccerHeaderStyles, css`
-      ha-card { background: var(--cl-bg); color: var(--cl-text); border-radius: 20px; overflow: hidden; padding: 0; }
+      ha-card { background: transparent; color: var(--cl-text); border-radius: 0; box-shadow: none; overflow: hidden; padding: 0; }
       .section { padding: 8px 16px 2px; border-bottom: 1px solid var(--cl-divider, rgba(255,255,255,0.06)); }
       .section:last-child { border-bottom: none; padding-bottom: 8px; }
       .section-label { font-size: 10px; font-weight: 700; color: var(--cl-text-2, #94a3b8); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; }

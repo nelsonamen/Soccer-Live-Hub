@@ -79,7 +79,7 @@ class SoccerLiveMultiTeamCard extends LitElement {
 
   static get styles() {
     return [skinStyles, soccerCardShellStyles, spinnerStyles, css`
-      ha-card { background: var(--cl-bg); color: var(--cl-text); padding: 12px; border-radius: 20px; overflow: hidden; }
+      ha-card { background: transparent; color: var(--cl-text); padding: 0; border-radius: 0; box-shadow: none; overflow: hidden; }
       .title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--cl-text-2); margin-bottom: 10px; }
       .match-row { position: relative; z-index: 1; display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--divider-color, rgba(255,255,255,0.07)); gap: 8px; }
       .match-row:last-child { border-bottom: none; }
