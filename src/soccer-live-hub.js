@@ -572,6 +572,18 @@ class SoccerLiveCardEditor extends LitElement {
             >
           </div>
 
+          <div class="field-group">
+            <label class="field-label">Sensor de Canal / Transmissão (Broadcast Sensor)</label>
+            <ha-entity-picker
+              .key=${selectedMod.broadcast_entity || ''}
+              .hass=${this.hass}
+              .value=${selectedMod.broadcast_entity || ''}
+              .includeDomains=${['sensor']}
+              allow-custom-entity
+              @value-changed=${e => this._updateSelectedModule('broadcast_entity', e.detail?.value || '')}
+            ></ha-entity-picker>
+          </div>
+
           <div class="module-options-section">
             <div class="module-options-title">
               <span>⚙️ ${this._t('editor.module_options')}</span>
@@ -1160,7 +1172,12 @@ class SoccerLiveCard extends HTMLElement {
     }
     if (this._hass) {
       let blendedHass = blendHassSources(this._hass, modConfig);
-      if (mod.broadcast && modConfig.entity && blendedHass?.states?.[modConfig.entity]) {
+      const broadcastEntity = mod.broadcast_entity;
+      const broadcastVal = (broadcastEntity && this._hass?.states?.[broadcastEntity])
+        ? (['unavailable', 'unknown'].includes(this._hass.states[broadcastEntity].state) ? '' : this._hass.states[broadcastEntity].state)
+        : mod.broadcast;
+
+      if (broadcastVal && modConfig.entity && blendedHass?.states?.[modConfig.entity]) {
         const origState = blendedHass.states[modConfig.entity];
         blendedHass = {
           ...blendedHass,
@@ -1170,8 +1187,8 @@ class SoccerLiveCard extends HTMLElement {
               ...origState,
               attributes: {
                 ...origState.attributes,
-                broadcast: mod.broadcast,
-                broadcasts: [mod.broadcast]
+                broadcast: broadcastVal,
+                broadcasts: [broadcastVal]
               }
             }
           }
