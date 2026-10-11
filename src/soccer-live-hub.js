@@ -562,6 +562,16 @@ class SoccerLiveCardEditor extends LitElement {
             >
           </div>
 
+          <div class="field-group">
+            <label class="field-label">Canal de TV / Transmissão (Broadcast)</label>
+            <input
+              type="text"
+              .value=${selectedMod.broadcast || ''}
+              placeholder="ex. Sport TV 1 / DAZN"
+              @change=${e => this._updateSelectedModule('broadcast', e.target.value)}
+            >
+          </div>
+
           <div class="module-options-section">
             <div class="module-options-title">
               <span>⚙️ ${this._t('editor.module_options')}</span>
@@ -1149,7 +1159,25 @@ class SoccerLiveCard extends HTMLElement {
       if (modConfig.entity) console.warn(`SoccerLiveCard: setConfig failed for module ${mod.id}:`, e);
     }
     if (this._hass) {
-      el.hass = blendHassSources(this._hass, modConfig);
+      let blendedHass = blendHassSources(this._hass, modConfig);
+      if (mod.broadcast && modConfig.entity && blendedHass?.states?.[modConfig.entity]) {
+        const origState = blendedHass.states[modConfig.entity];
+        blendedHass = {
+          ...blendedHass,
+          states: {
+            ...blendedHass.states,
+            [modConfig.entity]: {
+              ...origState,
+              attributes: {
+                ...origState.attributes,
+                broadcast: mod.broadcast,
+                broadcasts: [mod.broadcast]
+              }
+            }
+          }
+        };
+      }
+      el.hass = blendedHass;
       el._isLoading = false;
     }
 
