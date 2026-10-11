@@ -1,20 +1,6 @@
 import { html, css } from 'lit';
 import { formatMatchDateFull } from '../i18n.js';
 
-/**
- * Shared match meta component: venue row + broadcast/attendance/link chips.
- *
- * Usage:
- *   renderMatchMeta(match, { lang, t, weatherBadge, showDate, hideBroadcasts })
- *
- * @param {object} match        - Match data object from sensor attributes
- * @param {object} opts
- *   @param {string}   opts.lang            - BCP-47 locale string (for toLocaleString)
- *   @param {Function} opts.t               - Translation function (key) => string
- *   @param {any}      opts.weatherBadge    - Pre-rendered weather badge template, or null
- *   @param {boolean}  opts.showDate        - Show date/time in the venue row (default false)
- *   @param {boolean}  opts.hideBroadcasts  - Suppress broadcast chips (default false)
- */
 export const renderMatchMeta = (match, { lang = 'en', t = k => k, weatherBadge = null, showDate = false, hideBroadcasts = false } = {}) => {
   if (!match) return html``;
 
@@ -37,12 +23,19 @@ export const renderMatchMeta = (match, { lang = 'en', t = k => k, weatherBadge =
   const hasCommentary  = match.has_commentary  && (links.commentary  || links.summary);
   const hasVideo       = !!links.video;
 
-  // neutralSite is shown in the venue row, not as a chip — keep it out of hasChips
-  const hasChips = rawBroadcasts.length || hasAttendance || hasStats || hasCommentary || hasVideo;
-
   const openLink = (url) => url && /^https?:\/\//i.test(url) && window.open(url, '_blank', 'noopener,noreferrer');
 
   return html`
+    ${rawBroadcasts.length ? html`
+      <div class="smm-broadcast-banner">
+        <svg class="smm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="7" width="20" height="13" rx="2"/>
+          <polyline points="17 2 12 7 7 2"/>
+        </svg>
+        <span>${rawBroadcasts.join(' · ')}</span>
+      </div>
+    ` : ''}
+
     ${venueLabel || weatherBadge || showDate ? html`
       <div class="smm-venue-row">
         ${venueLabel ? html`
@@ -67,17 +60,8 @@ export const renderMatchMeta = (match, { lang = 'en', t = k => k, weatherBadge =
       </div>
     ` : ''}
 
-    ${hasChips ? html`
+    ${hasAttendance || hasStats || hasCommentary || hasVideo ? html`
       <div class="smm-chips">
-        ${rawBroadcasts.length ? html`
-          <span class="smm-chip broadcast">
-            <svg class="smm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="2" y="7" width="20" height="13" rx="2"/>
-              <polyline points="17 2 12 7 7 2"/>
-            </svg>
-            ${rawBroadcasts.join(' · ')}
-          </span>
-        ` : ''}
         ${hasAttendance ? html`
           <span class="smm-chip attendance">
             <svg class="smm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -110,6 +94,17 @@ export const renderMatchMeta = (match, { lang = 'en', t = k => k, weatherBadge =
 };
 
 export const matchMetaStyles = css`
+  .smm-broadcast-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--cl-text, #0f172a);
+    background: var(--cl-surface, #f8fafc);
+    border-bottom: 1px solid var(--cl-divider, rgba(0,0,0,0.08));
+  }
   .smm-venue-row {
     display: flex;
     align-items: center;
@@ -118,7 +113,7 @@ export const matchMetaStyles = css`
     padding: 10px 18px;
     font-size: 11px;
     color: var(--cl-text-2, #94a3b8);
-    border-bottom: 1px solid var(--cl-divider, rgba(255,255,255,0.06));
+    border-bottom: 1px solid var(--cl-divider, rgba(0,0,0,0.06));
   }
   .smm-venue, .smm-date {
     display: flex;
@@ -132,17 +127,17 @@ export const matchMetaStyles = css`
     white-space: nowrap;
   }
   .smm-icon {
-    width: 13px;
-    height: 13px;
+    width: 14px;
+    height: 14px;
     flex-shrink: 0;
-    opacity: 0.7;
+    opacity: 0.8;
   }
   .smm-chips {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
     padding: 10px 18px;
-    border-bottom: 1px solid var(--cl-divider, rgba(255,255,255,0.06));
+    border-bottom: 1px solid var(--cl-divider, rgba(0,0,0,0.06));
   }
   .smm-chip {
     display: inline-flex;
@@ -153,15 +148,15 @@ export const matchMetaStyles = css`
     font-size: 10px;
     font-weight: 700;
     background: var(--cl-surface, rgba(255,255,255,0.06));
-    color: var(--cl-text-2, #94a3b8);
+    color: var(--cl-text-2, #64748b);
     white-space: nowrap;
   }
   .smm-chip.link {
     cursor: pointer;
-    color: var(--cl-accent, #6366f1);
-    background: rgba(var(--cl-accent-rgb, 99 102 241), 0.1);
+    color: var(--cl-accent, #0284c7);
+    background: rgba(2, 132, 199, 0.1);
   }
   .smm-chip.link:hover {
-    background: rgba(var(--cl-accent-rgb, 99 102 241), 0.2);
+    background: rgba(2, 132, 199, 0.2);
   }
 `;
