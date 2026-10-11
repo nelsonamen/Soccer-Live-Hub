@@ -3933,16 +3933,6 @@
           </div>
 
           <div class="field-group">
-            <label class="field-label">Canal de TV / Transmissão (Broadcast)</label>
-            <input
-              type="text"
-              .value=${a.broadcast||""}
-              placeholder="ex. Sport TV 1 / DAZN"
-              @change=${e=>this._updateSelectedModule("broadcast",e.target.value)}
-            >
-          </div>
-
-          <div class="field-group">
             <label class="field-label">Sensor de Canal / Transmissão (Broadcast Sensor)</label>
             <ha-entity-picker
               .key=${a.broadcast_entity||""}
