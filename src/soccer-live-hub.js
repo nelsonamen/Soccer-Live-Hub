@@ -136,14 +136,8 @@ class SoccerLiveCardEditor extends LitElement {
 
   setConfig(config) {
     this._config = { ...(config || {}) };
-    if (!Array.isArray(this._config.modules) || this._config.modules.length === 0) {
-      const models = discoverSoccerModels(this.hass, this._config) || {};
-      const defaults = [];
-      if (models.match_model) defaults.push({ id: 'mod_match', type: 'team', title: 'Próximo Jogo', entity: models.match_model });
-      if (models.standings_model) defaults.push({ id: 'mod_standings', type: 'standings', title: 'Classificação', entity: models.standings_model });
-      if (models.last_match_model) defaults.push({ id: 'mod_last', type: 'last-match', title: 'Último Jogo', entity: models.last_match_model });
-
-      this._config.modules = defaults;
+    if (!Array.isArray(this._config.modules)) {
+      this._config.modules = [];
     }
     this.requestUpdate();
   }
@@ -933,7 +927,26 @@ class SoccerLiveCard extends HTMLElement {
 
     if (!modules.length) {
       this.innerHTML = '';
-      this.appendChild(this._placeholder());
+      const wrapper = document.createElement('ha-card');
+      wrapper.className = 'soccer-live-hub-wrapper';
+      wrapper.style.cssText = 'border-radius: 20px; overflow: hidden; padding: 0;';
+      this._applyWrapperTheme(wrapper);
+
+      const header = document.createElement('div');
+      header.className = 'soccer-live-card-title';
+      header.style.cssText = 'padding: 16px 18px 8px;';
+      header.innerHTML = `
+        <div style="font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--primary-text-color);">${this._config.title || 'Desporto'}</div>
+        <div style="font-size: 12px; color: var(--secondary-text-color); margin-top: 2px; font-weight: 500;">${this._config.subtitle || 'Soccer Live Hub'}</div>
+      `;
+      wrapper.appendChild(header);
+
+      const placeholderWrap = document.createElement('div');
+      placeholderWrap.style.cssText = 'padding: 0 16px 16px;';
+      placeholderWrap.appendChild(this._placeholder());
+
+      wrapper.appendChild(placeholderWrap);
+      this.appendChild(wrapper);
       return;
     }
 
