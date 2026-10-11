@@ -965,7 +965,7 @@ class SoccerLiveCard extends HTMLElement {
       this.innerHTML = '';
       const wrapper = document.createElement('ha-card');
       wrapper.className = 'soccer-live-hub-wrapper';
-      wrapper.style.cssText = 'border-radius: 20px; overflow: hidden; padding: 0; border-top: 4px solid #e50000;';
+      wrapper.style.cssText = 'border-radius: 20px; overflow: hidden; padding: 0; border-top: 4px solid #0284c7;';
       this._applyWrapperTheme(wrapper);
 
       if (this._config.title) {
@@ -1158,6 +1158,14 @@ class SoccerLiveCard extends HTMLElement {
               padding: 0 !important;
               margin: 0 !important;
             }
+            :host {
+              --cl-accent: #0284c7 !important;
+              --cl-accent-2: #0f172a !important;
+              --cl-accent-rgb: 2,132,199 !important;
+              --cl-accent-2-rgb: 15,23,42 !important;
+              --cl-live: #ef4444 !important;
+              --cl-live-glow: rgba(239,68,68,0.4) !important;
+            }
           `;
           el.shadowRoot.appendChild(style);
         }
@@ -1210,20 +1218,20 @@ if (!customElements.get('soccer-live-hub')) {
 if (!customElements.get('soccer-live-card')) {
   customElements.define('soccer-live-card', SoccerLiveCard);
 }
-if (!customElements.get('soccer-live-hub-editor')) {
-  customElements.define('soccer-live-hub-editor', SoccerLiveCardEditor);
-}
 if (!customElements.get('soccer-live-card-editor')) {
   customElements.define('soccer-live-card-editor', SoccerLiveCardEditor);
 }
 
 window.customCards = window.customCards || [];
-if (!window.customCards.some(c => c.type === 'soccer-live-hub')) {
-  window.customCards.push({
-    type: 'soccer-live-hub',
-    name: 'Soccer Live Hub',
-    description: 'Cartão modular com placares ao vivo, classificação, último jogo e mais.',
-    preview: true,
-    documentationURL: 'https://github.com/nelsonamen/Teste',
-  });
+const hubTypes = ['soccer-live-hub', 'custom:soccer-live-hub'];
+for (const cardType of hubTypes) {
+  if (!window.customCards.some(c => c.type === cardType)) {
+    window.customCards.push({
+      type: cardType,
+      name: 'Soccer Live Hub',
+      description: 'Cartão modular de Futebol com placares ao vivo, classificação, último jogo e mais.',
+      preview: true,
+      documentationURL: 'https://github.com/nelsonamen/Teste',
+    });
+  }
 }
