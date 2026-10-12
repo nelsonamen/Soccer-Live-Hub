@@ -98,12 +98,12 @@ export const matchMetaStyles = css`
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 18px;
+    padding: 10px 18px;
     font-size: 12px;
     font-weight: 700;
-    color: var(--cl-text, #0f172a);
-    background: var(--cl-surface, #f8fafc);
-    border-bottom: 1px solid var(--cl-divider, rgba(0,0,0,0.08));
+    color: var(--cl-text);
+    background: transparent;
+    border-bottom: 1px solid var(--cl-divider, rgba(127,127,127,0.15));
   }
   .smm-venue-row {
     display: flex;
