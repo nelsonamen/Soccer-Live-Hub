@@ -21,12 +21,11 @@ This project was inspired by:
 
 ## Features
 
-- **Unified Hub Card**: Single card with tab navigation to switch between Next Match, Standings, Scorers, Last Match, News, and Club views.
-- **Modular Architecture**: Select any module using `card_type` or combine multiple modules in a single card.
-- **Auto Discovery**: Automatically discovers related sensors for your team or league using `auto_discover_models`.
+- **Visual UI Editor**: Fully configurable directly through Home Assistant's visual UI editor.
+- **Modular Layout**: Add multiple modules (Next Match, Standings, Scorers, News, Club, Brackets) and switch views using Navigation Tabs or Vertical Stacks.
+- **Auto Discovery**: Automatically detects and links related sensors for your team or league.
 - **Adaptable Appearance**: Supports Dark, Light, and Home Assistant native themes.
-- **Multilingual**: Auto-detects Home Assistant locale with support for English, Portuguese, Dutch, German, French, Spanish, Italian, and more.
-- **Responsive Design**: Optimized for mobile, tablet, and desktop dashboards.
+- **Multilingual**: Auto-detects Home Assistant locale (English, Portuguese, Dutch, German, French, Spanish, Italian, etc.).
 
 ---
 
@@ -48,88 +47,23 @@ This project was inspired by:
 
 ---
 
-## Configuration Examples
+## How to Use
 
-All cards use `type: custom:soccer-live-hub` and specify the desired module via `card_type`.
+1. Add the **Soccer Live Hub** card in your Home Assistant dashboard editor.
+2. Choose your card title, layout mode (Tabs or Stacked), and theme appearance.
+3. Under **Modules** (`Adicionar módulo`), select the content module you want to add (Match, Standings, Scorers, News, Club, etc.) and select its sensor entity.
 
-### Main Multi-Model Tab Hub Card
-
-```yaml
-type: custom:soccer-live-hub
-card_type: hub
-auto_discover_models: true
-match_model: sensor.soccer_live_next_ned_1_feyenoord_rotterdam
-standings_model: sensor.soccer_live_standings_ned_1
-scorers_model: sensor.soccer_live_scorers_ned_1
-last_match_model: sensor.soccer_live_last_ned_1_feyenoord_rotterdam
-news_model: sensor.soccer_live_news_ned_1
-club_model: sensor.soccer_live_club_feyenoord_rotterdam
-language: auto
-appearance: ha
-```
-
-### Team Match Card
+### Minimal YAML Example
 
 ```yaml
 type: custom:soccer-live-hub
-card_type: team
-entity: sensor.soccer_live_next_ned_1_feyenoord_rotterdam
-show_event_toasts: true
-```
-
-### League Standings
-
-```yaml
-type: custom:soccer-live-hub
-card_type: standings
-entity: sensor.soccer_live_standings_ned_1
-max_teams_visible: 18
-hide_header: false
-```
-
-### Tournament Bracket
-
-```yaml
-type: custom:soccer-live-hub
-card_type: bracket
-entity: sensor.soccer_live_bracket_uefa_champions
-style: tree
-```
-
-### Matches List
-
-```yaml
-type: custom:soccer-live-hub
-card_type: matches
-entity: sensor.soccer_live_all_ned_1
-max_events_visible: 6
-```
-
-### Multi-Module Stacked Card
-
-```yaml
-type: custom:soccer-live-hub
-title: Feyenoord Dashboard
+title: Soccer Live Hub
 modules:
   - type: team
     entity: sensor.soccer_live_next_ned_1_feyenoord_rotterdam
   - type: standings
     entity: sensor.soccer_live_standings_ned_1
-  - type: matches
-    entity: sensor.soccer_live_all_ned_1
 ```
-
----
-
-## Configuration Options
-
-| Option | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `card_type` | String | `team` | Module type (`team`, `standings`, `matches`, `news`, `bracket`, `scorers`, `hub`, `club`, etc.) |
-| `entity` | String | *Required* | Soccer Live sensor entity ID |
-| `language` | String | `auto` | Language (`auto`, `en`, `pt`, `nl`, `de`, `es`, `fr`, `it`) |
-| `appearance` | String | `ha` | Theme appearance (`ha`, `dark`, `light`) |
-| `compact` | Boolean | `false` | Compact display mode |
 
 ---
 
