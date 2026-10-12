@@ -37,11 +37,14 @@ export function resolveAppearance(config) {
 }
 
 export function resolvePalette(config) {
-  return 'blue';
+  const p = config && typeof config.palette === 'string' ? config.palette.toLowerCase() : '';
+  if (PALETTES.includes(p)) return p;
+  const legacy = config?.skin ? LEGACY_SKIN_MAP[config.skin.toLowerCase()] : null;
+  return legacy ? legacy.palette : 'blue';
 }
 
 export function paletteUsesCustomColors(palette) {
-  return false;
+  return palette === 'custom' || palette === 'team';
 }
 
 export function mergeCardDefaults(config, defaults) {

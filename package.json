@@ -10,10 +10,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nelsonamen/Teste.git"
+    "url": "git+https://github.com/nelsonamen/Soccer-Live-Hub.git"
   },
   "license": "GPL-3.0-only",
-  "homepage": "https://github.com/nelsonamen/Teste#readme",
+  "homepage": "https://github.com/nelsonamen/Soccer-Live-Hub#readme",
   "devDependencies": {
     "acorn": "^8.18.0",
     "terser-webpack-plugin": "^5.6.1",
