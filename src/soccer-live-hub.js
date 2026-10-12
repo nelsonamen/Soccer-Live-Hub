@@ -1228,10 +1228,12 @@ class SoccerLiveCard extends HTMLElement {
     return document.createElement('soccer-live-hub-editor');
   }
 
-  static getStubConfig() {
+  static getStubConfig(hass) {
+    const lang = resolveLang(hass, {});
+    const defaultTitle = lang === 'pt' ? 'Desporto' : 'Sports';
     return {
       type: 'custom:soccer-live-hub',
-      title: 'Desporto',
+      title: defaultTitle,
       subtitle: 'Soccer Live Hub',
       layout: 'tabs',
       appearance: 'ha',
