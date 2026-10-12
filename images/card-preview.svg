@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 350" width="100%" height="100%">
+  <defs>
+    <style>
+      .card-bg { fill: #f8fafc; rx: 20px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.08)); }
+      .top-bar { fill: #0284c7; clip-path: polygon(0 0, 100% 0, 100% 12px, 0 12px); }
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 20px; font-weight: 800; fill: #0f172a; letter-spacing: 0.5px; }
+      .subtitle { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 500; fill: #64748b; }
+      .box { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; stroke-dasharray: 8 8; rx: 12px; }
+      .box-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 500; fill: #475569; text-anchor: middle; dominant-baseline: middle; }
+    </style>
+  </defs>
+
+  <!-- Card Container -->
+  <rect x="25" y="25" width="550" height="300" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" filter="drop-shadow(0 6px 16px rgba(15,23,42,0.08))" />
+
+  <!-- Top Blue Accent Border -->
+  <path d="M 25 41 A 16 16 0 0 1 41 25 L 559 25 A 16 16 0 0 1 575 41 L 575 35 L 25 35 Z" fill="#0284c7" />
+
+  <!-- Card Header -->
+  <text x="50" y="72" class="title">DESPORTO</text>
+  <text x="50" y="93" class="subtitle">Soccer Live Hub</text>
+
+  <!-- Unconfigured Content Box -->
+  <rect x="50" y="125" width="500" height="170" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="6 6" />
+  <text x="300" y="210" class="box-text">Soccer Live Hub — open the editor to configure this card.</text>
+</svg>
