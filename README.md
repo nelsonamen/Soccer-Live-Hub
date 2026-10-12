@@ -2,6 +2,10 @@
 
 A modular Lovelace card for Home Assistant to track live football matches, standings, squads, news, top scorers, tournament brackets, and match statistics.
 
+<p align="center">
+  <img src="images/card-preview.png" alt="Soccer Live Hub Preview" width="450">
+</p>
+
 ---
 
 ## Prerequisites
