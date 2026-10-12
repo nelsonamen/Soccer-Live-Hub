@@ -22,6 +22,7 @@ This project was inspired by:
 ## Features
 
 - **Unified Hub Card**: Single card with tab navigation to switch between Next Match, Standings, Scorers, Last Match, News, and Club views.
+- **Modular Architecture**: Select any module using `card_type` or combine multiple modules in a single card.
 - **Auto Discovery**: Automatically discovers related sensors for your team or league using `auto_discover_models`.
 - **Adaptable Appearance**: Supports Dark, Light, and Home Assistant native themes.
 - **Multilingual**: Auto-detects Home Assistant locale with support for English, Portuguese, Dutch, German, French, Spanish, Italian, and more.
@@ -49,10 +50,13 @@ This project was inspired by:
 
 ## Configuration Examples
 
-### Main Hub Card
+All cards use `type: custom:soccer-live-hub` and specify the desired module via `card_type`.
+
+### Main Multi-Model Tab Hub Card
 
 ```yaml
 type: custom:soccer-live-hub
+card_type: hub
 auto_discover_models: true
 match_model: sensor.soccer_live_next_ned_1_feyenoord_rotterdam
 standings_model: sensor.soccer_live_standings_ned_1
@@ -67,16 +71,17 @@ appearance: ha
 ### Team Match Card
 
 ```yaml
-type: custom:soccer-live-team
+type: custom:soccer-live-hub
+card_type: team
 entity: sensor.soccer_live_next_ned_1_feyenoord_rotterdam
 show_event_toasts: true
-score_size: normal
 ```
 
 ### League Standings
 
 ```yaml
-type: custom:soccer-live-standings
+type: custom:soccer-live-hub
+card_type: standings
 entity: sensor.soccer_live_standings_ned_1
 max_teams_visible: 18
 hide_header: false
@@ -85,7 +90,8 @@ hide_header: false
 ### Tournament Bracket
 
 ```yaml
-type: custom:soccer-live-bracket
+type: custom:soccer-live-hub
+card_type: bracket
 entity: sensor.soccer_live_bracket_uefa_champions
 style: tree
 ```
@@ -93,10 +99,24 @@ style: tree
 ### Matches List
 
 ```yaml
-type: custom:soccer-live-matches
+type: custom:soccer-live-hub
+card_type: matches
 entity: sensor.soccer_live_all_ned_1
 max_events_visible: 6
-show_finished_matches: true
+```
+
+### Multi-Module Stacked Card
+
+```yaml
+type: custom:soccer-live-hub
+title: Feyenoord Dashboard
+modules:
+  - type: team
+    entity: sensor.soccer_live_next_ned_1_feyenoord_rotterdam
+  - type: standings
+    entity: sensor.soccer_live_standings_ned_1
+  - type: matches
+    entity: sensor.soccer_live_all_ned_1
 ```
 
 ---
@@ -105,6 +125,7 @@ show_finished_matches: true
 
 | Option | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
+| `card_type` | String | `team` | Module type (`team`, `standings`, `matches`, `news`, `bracket`, `scorers`, `hub`, `club`, etc.) |
 | `entity` | String | *Required* | Soccer Live sensor entity ID |
 | `language` | String | `auto` | Language (`auto`, `en`, `pt`, `nl`, `de`, `es`, `fr`, `it`) |
 | `appearance` | String | `ha` | Theme appearance (`ha`, `dark`, `light`) |

@@ -1,235 +1,150 @@
-# ⚽ Soccer Live Card — Complete YAML Configuration Guide
-
-# All cards share common options:
-# - entity: Required. The Soccer Live sensor entity
-# - language: Optional. Force language (auto, en, nl, de, pt, fr, es, it)
-# - skin: Optional. Theme (dark, light, red-white, classic, neon, gold)
+# Soccer Live Hub — Complete YAML Configuration Guide
+#
+# Card Type: custom:soccer-live-hub
+# All card modules are loaded through the main `custom:soccer-live-hub` card.
+# Select the desired module using `card_type` (e.g., team, standings, matches, news, etc.)
+# or combine multiple modules using `modules:` array or `card_type: hub`.
 
 ---
 
-# 🏅 STANDINGS
-# League table with coloured zones (CL / EL / relegation), top team in gold
-type: custom:soccer-live-standings
+# STANDINGS MODULE
+type: custom:soccer-live-hub
+card_type: standings
 entity: sensor.soccer_live_standings_ned_1
 language: auto           # auto-detect from HA locale
-skin: dark              # color theme
-max_teams_visible: 18   # show top N teams (rest expandable)
-hide_header: false      # hide league name header
-show_event_toasts: false # goal animations
+appearance: ha          # ha, dark, light
+max_teams_visible: 18   # show top N teams
+hide_header: false
 
 ---
 
-# ⚽ TEAM
-# Live match: score, form pills, season record, top scorer, attendance
-type: custom:soccer-live-team
+# TEAM / MATCH MODULE
+type: custom:soccer-live-hub
+card_type: team
 entity: sensor.soccer_live_next_ned_1_feyenoord_rotterdam
-show_event_toasts: true # goal celebration with confetti
-score_size: normal      # normal, big, huge
+show_event_toasts: true # goal celebration toasts
 
 ---
 
-# 📋 MATCHES
-# Day-grouped matches with live highlighting and FT badge
-type: custom:soccer-live-matches
+# MATCHES LIST MODULE
+type: custom:soccer-live-hub
+card_type: matches
 entity: sensor.soccer_live_all_ned_1
-max_events_visible: 6     # matches shown before "show more"
-max_events_total: 50      # total matches to load
-show_finished_matches: true
-hide_past_days: 0         # hide matches from N days ago
+max_events_visible: 6
 
 ---
 
-# 📰 NEWS
-# Article feed with images and relative timestamps
-type: custom:soccer-live-news
+# NEWS MODULE
+type: custom:soccer-live-hub
+card_type: news
 entity: sensor.soccer_live_news_ned_1
 max_articles: 5
-hide_images: false
 
 ---
 
-# 👥 LINEUP
-# Starting eleven for both teams, formation, shirt numbers
-# Available shortly before kick-off (once ESPN publishes the lineups)
-type: custom:soccer-live-lineup
+# LINEUP MODULE
+type: custom:soccer-live-hub
+card_type: lineup
 entity: sensor.soccer_live_next_ned_1_feyenoord_rotterdam
 
 ---
 
-# ⏱ TIMELINE
-# Minute-by-minute log (goals, cards, substitutions)
-type: custom:soccer-live-timeline
+# TIMELINE MODULE
+type: custom:soccer-live-hub
+card_type: timeline
 entity: sensor.soccer_live_next_ned_1_feyenoord_rotterdam
-reverse_order: true     # newest events on top
 
 ---
 
-# 🏆 BRACKET
-# Knockout bracket: list view or tournament tree with trophy
-type: custom:soccer-live-bracket
+# BRACKET MODULE
+type: custom:soccer-live-hub
+card_type: bracket
 entity: sensor.soccer_live_bracket_uefa_champions
-style: tree             # list (default) or tree
-compact: false
-tree_show_playoffs: false
-
-# Bracket sensors are created automatically for:
-# Champions League, Europa League, Conference League, FA Cup,
-# Copa del Rey, World Cup, Euros, and other cup competitions
+style: tree             # list or tree
 
 ---
 
-# 🥇 TOP SCORERS
-# Top scorers list with photo, team logo and goal tally
-type: custom:soccer-live-scorers
+# TOP SCORERS MODULE
+type: custom:soccer-live-hub
+card_type: scorers
 entity: sensor.soccer_live_scorers_ned_1
 max_items: 10
-hide_header: false
-
-# Top scorers sensors (soccer_live_scorers_*) are created automatically
-# for every competition sensor
 
 ---
 
-# ⏳ COUNTDOWN
-# Countdown timer to next match with live score display
-type: custom:soccer-live-countdown
-entity: sensor.soccer_live_next_ned_1_feyenoord_rotterdam
-language: auto
-skin: dark
-
----
-
-# 🏆 MINI STANDINGS
-# Compact standings table with configurable rows and optional team highlight
-type: custom:soccer-live-mini-standings
-entity: sensor.soccer_live_standings_ned_1
-language: auto
-skin: dark
-max_rows: 5                 # show top 5 teams
-group: null                 # optional: filter by group (e.g. "WK A")
-highlight_team: null        # optional: highlight team name
-
----
-
-# ⚽ LIVE MATCH
-# Current match with key events, possession, and shot stats
-type: custom:soccer-live-live-match
-entity: sensor.soccer_live_all_ned_1
-language: auto
-skin: dark
-
----
-
-# 🔄 MULTI TEAM
-# Multiple teams' matches in one card, auto-grouped by team
-type: custom:soccer-live-multi-team
-entity: sensor.soccer_live_all_mixed_feyenoord_rotterdam
-language: auto
-skin: dark
-
----
-
-# 🗂️ TEAM COMPETITIONS
-# All team competitions with tab selector for easy switching
-type: custom:soccer-live-team-competitions
-entity: sensor.soccer_live_all_mixed_feyenoord_rotterdam
-language: auto
-skin: dark
-team_name: "Feyenoord Rotterdam"   # override displayed team name
-default_comp: "Eredivisie"         # default tab on load
-hide_header: false                 # hide team header
-
----
-
-# 💬 LIVE COMMENTARY
-# Real-time play-by-play commentary with event icons and score progression
-# ⚠️ Requires soccer_live_commentary_* sensor from integration
-# ⚠️ Commentary availability depends on ESPN API support
-type: custom:soccer-live-live-commentary
-entity: sensor.soccer_live_commentary_ned_1_feyenoord_rotterdam
-language: auto
-skin: dark
-hide_header: false
-
----
-
-# 🏎️/⚽ HUB MAIN CARD (F1 Sensor Style Model Slots)
-# Unified main card with tab bar to switch between match, standings, scorers, last match, news, bracket & club models
+# COUNTDOWN MODULE
 type: custom:soccer-live-hub
-card_type: hub                       # optional (auto-enabled if multiple models configured)
-auto_discover_models: true           # auto-discovers related team/league model sensors
+card_type: countdown
+entity: sensor.soccer_live_next_ned_1_feyenoord_rotterdam
+
+---
+
+# MINI STANDINGS MODULE
+type: custom:soccer-live-hub
+card_type: mini-standings
+entity: sensor.soccer_live_standings_ned_1
+max_rows: 5
+
+---
+
+# MATCH CENTER MODULE
+type: custom:soccer-live-hub
+card_type: match-center
+entity: sensor.soccer_live_next_ned_1_feyenoord_rotterdam
+
+---
+
+# CLUB PROFILE MODULE
+type: custom:soccer-live-hub
+card_type: club
+entity: sensor.soccer_live_club_feyenoord_rotterdam
+
+---
+
+# TEAM FORM MODULE
+type: custom:soccer-live-hub
+card_type: team-form
+entity: sensor.soccer_live_next_ned_1_feyenoord_rotterdam
+
+---
+
+# MULTI TEAM MODULE
+type: custom:soccer-live-hub
+card_type: multi-team
+entity: sensor.soccer_live_all_mixed_feyenoord_rotterdam
+
+---
+
+# TEAM COMPETITIONS MODULE
+type: custom:soccer-live-hub
+card_type: team-competitions
+entity: sensor.soccer_live_all_mixed_feyenoord_rotterdam
+
+---
+
+# MULTI-MODEL TAB HUB (F1 Sensor Style)
+type: custom:soccer-live-hub
+card_type: hub
+auto_discover_models: true
 match_model: sensor.soccer_live_next_ned_1_feyenoord_rotterdam
 standings_model: sensor.soccer_live_standings_ned_1
 scorers_model: sensor.soccer_live_scorers_ned_1
 last_match_model: sensor.soccer_live_last_ned_1_feyenoord_rotterdam
 news_model: sensor.soccer_live_news_ned_1
 club_model: sensor.soccer_live_club_feyenoord_rotterdam
-language: auto
-skin: dark
+appearance: ha
 
 ---
 
-# 🎨 THEME OPTIONS (skin)
-# Available for all cards:
-# - dark: Dark background with light text (default)
-# - light: Light background with dark text
-# - red-white: Red & white theme
-# - classic: Classic light theme
-# - neon: Neon bright colors
-# - gold: Gold & dark theme
-
----
-
-# 🌍 LANGUAGE OPTIONS
-# Supported languages:
-# - auto: Auto-detect from Home Assistant locale (default)
-# - en: English
-# - nl: Dutch (Nederlands)
-# - de: German (Deutsch)
-# - pt: Portuguese (Português)
-# - fr: French (Français)
-# - es: Spanish (Español)
-# - it: Italian (Italiano)
-
----
-
-# 📊 EXAMPLE DASHBOARD
-# Combine multiple cards for complete match coverage
-
-dashboard_title: ⚽ Soccer Live
-
-views:
-  - title: Feyenoord
-    cards:
-      - type: custom:soccer-live-team
-        entity: sensor.soccer_live_next_ned_1_feyenoord_rotterdam
-        show_event_toasts: true
-
-      - type: custom:soccer-live-countdown
-        entity: sensor.soccer_live_next_ned_1_feyenoord_rotterdam
-
-      - type: custom:soccer-live-lineup
-        entity: sensor.soccer_live_next_ned_1_feyenoord_rotterdam
-
-      - type: custom:soccer-live-live-match
-        entity: sensor.soccer_live_all_ned_1
-
-  - title: Eredivisie
-    cards:
-      - type: custom:soccer-live-standings
-        entity: sensor.soccer_live_standings_ned_1
-        max_teams_visible: 10
-
-      - type: custom:soccer-live-matches
-        entity: sensor.soccer_live_all_ned_1
-        max_events_visible: 5
-
-  - title: Europe
-    cards:
-      - type: custom:soccer-live-bracket
-        entity: sensor.soccer_live_bracket_uefa_champions
-        style: tree
-
-      - type: custom:soccer-live-scorers
-        entity: sensor.soccer_live_scorers_uefa_champions
-        max_items: 10
+# MULTI-MODULE STACKED CARD
+type: custom:soccer-live-hub
+title: Feyenoord Dashboard
+modules:
+  - type: team
+    entity: sensor.soccer_live_next_ned_1_feyenoord_rotterdam
+  - type: standings
+    entity: sensor.soccer_live_standings_ned_1
+  - type: matches
+    entity: sensor.soccer_live_all_ned_1
+  - type: news
+    entity: sensor.soccer_live_news_ned_1
