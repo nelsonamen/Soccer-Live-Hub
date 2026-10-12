@@ -603,7 +603,7 @@ const TRANSLATIONS = {
 
     // Generic UI strings
     'ui.loading': 'Loading...',
-    'ui.open_editor_to_configure': 'Soccer Live — open the editor to configure this card.',
+    'ui.open_editor_to_configure': 'Soccer Live Hub — open the editor to configure this card.',
     'ui.unknown_card_type': 'Unknown card type: "{type}"',
     'ui.select_entity': 'Select entity',
     'ui.unknown_entity': 'Unknown entity',
@@ -1536,7 +1536,7 @@ const TRANSLATIONS = {
 
 
     'ui.loading': 'Laden...',
-    'ui.open_editor_to_configure': 'Soccer Live — open de editor om deze kaart in te stellen.',
+    'ui.open_editor_to_configure': 'Soccer Live Hub — open de editor om deze kaart in te stellen.',
     'ui.unknown_card_type': 'Onbekend kaarttype: "{type}"',
     'ui.select_entity': 'Selecteer entiteit',
     'ui.unknown_entity': 'Onbekende entiteit',
@@ -2601,7 +2601,7 @@ const TRANSLATIONS = {
 
 
     'ui.loading': 'Caricamento...',
-    'ui.open_editor_to_configure': "Soccer Live — apri l'editor per configurare questa scheda.",
+    'ui.open_editor_to_configure': "Soccer Live Hub — apri l'editor per configurare questa scheda.",
     'ui.unknown_card_type': 'Tipo di scheda sconosciuto: "{type}"',
     'ui.select_entity': 'Seleziona entità',
     'ui.unknown_entity': 'Entità sconosciuta',
@@ -3529,7 +3529,7 @@ const TRANSLATIONS = {
 
 
     'ui.loading': 'Chargement...',
-    'ui.open_editor_to_configure': "Soccer Live — ouvrez l'éditeur pour configurer cette carte.",
+    'ui.open_editor_to_configure': "Soccer Live Hub — ouvrez l'éditeur pour configurer cette carte.",
     'ui.unknown_card_type': 'Type de carte inconnu : « {type} »',
     'ui.select_entity': 'Sélectionner une entité',
     'ui.unknown_entity': 'Entité inconnue',
@@ -4457,7 +4457,7 @@ const TRANSLATIONS = {
 
 
     'ui.loading': 'Cargando...',
-    'ui.open_editor_to_configure': 'Soccer Live — abre el editor para configurar esta tarjeta.',
+    'ui.open_editor_to_configure': 'Soccer Live Hub — abre el editor para configurar esta tarjeta.',
     'ui.unknown_card_type': 'Tipo de tarjeta desconocido: «{type}»',
     'ui.select_entity': 'Seleccionar entidad',
     'ui.unknown_entity': 'Entidad desconocida',
@@ -5355,7 +5355,7 @@ const TRANSLATIONS = {
 
 
     'ui.loading': 'Wird geladen...',
-    'ui.open_editor_to_configure': 'Soccer Live — öffne den Editor um diese Karte einzurichten.',
+    'ui.open_editor_to_configure': 'Soccer Live Hub — öffne den Editor um diese Karte einzurichten.',
     'ui.unknown_card_type': 'Unbekannter Kartentyp: „{type}“',
     'ui.select_entity': 'Entität auswählen',
     'ui.unknown_entity': 'Unbekannte Entität',
@@ -6333,7 +6333,7 @@ const TRANSLATIONS = {
 
 
     'ui.loading': 'Carregando...',
-    'ui.open_editor_to_configure': 'Soccer Live — abra o editor para configurar este cartão.',
+    'ui.open_editor_to_configure': 'Soccer Live Hub — abra o editor para configurar este cartão.',
     'ui.unknown_card_type': 'Tipo de cartão desconhecido: “{type}”',
     'ui.select_entity': 'Selecionar entidade',
     'ui.unknown_entity': 'Entidade desconhecida',
