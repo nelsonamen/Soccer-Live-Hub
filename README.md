@@ -53,18 +53,6 @@ This project was inspired by:
 2. Choose your card title, layout mode (Tabs or Stacked), and theme appearance.
 3. Under **Modules** (`Adicionar módulo`), select the content module you want to add (Match, Standings, Scorers, News, Club, etc.) and select its sensor entity.
 
-### Minimal YAML Example
-
-```yaml
-type: custom:soccer-live-hub
-title: Soccer Live Hub
-modules:
-  - type: team
-    entity: sensor.soccer_live_next_ned_1_feyenoord_rotterdam
-  - type: standings
-    entity: sensor.soccer_live_standings_ned_1
-```
-
 ---
 
 ## Credits
