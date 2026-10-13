@@ -1,16 +1,8 @@
-// Pure helpers for the Last Match card: pick the most recent finished match and
-// extract its goalscorers. Kept free of Home Assistant / Lit so it can be unit
-// tested directly.
+import { parseMatchTimestamp } from '../i18n.js';
 
-// Sortable timestamp from either an ISO `date_iso` or the "DD-MM-YYYY HH:MM"
-// display date, so matches from the full and the compact list compare cleanly.
+// Sortable timestamp from either `date_iso` or `date`
 function _dateKey(match) {
-  const raw = String(match?.date_iso || match?.date || '');
-  const iso = Date.parse(raw);
-  if (!Number.isNaN(iso)) return iso;
-  const m = raw.match(/^(\d{2})[-/](\d{2})[-/](\d{4})(?:\s+(\d{2}):(\d{2}))?/);
-  if (m) return new Date(+m[3], +m[2] - 1, +m[1], +(m[4] || 0), +(m[5] || 0)).getTime();
-  return 0;
+  return parseMatchTimestamp(match?.date_iso) || parseMatchTimestamp(match?.date) || 0;
 }
 
 /**

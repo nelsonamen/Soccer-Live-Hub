@@ -6619,14 +6619,24 @@ const LOCALE_MAP = {
 
 export function parseMatchDate(dateStr) {
   if (!dateStr || dateStr === 'N/A') return null;
-  const m = String(dateStr).match(/^(\d{2})[-/](\d{2})[-/](\d{4})(?:\s+(\d{2}):(\d{2}))?/);
-  if (m) {
-    const date = new Date(+m[3], +m[2] - 1, +m[1], +(m[4] || 0), +(m[5] || 0));
+  const str = String(dateStr).trim();
+
+  // 1. Try native Date parse for ISO 8601 strings (YYYY-MM-DD...)
+  const isoTime = Date.parse(str);
+  if (!Number.isNaN(isoTime) && /^\d{4}/.test(str)) {
+    return new Date(isoTime);
+  }
+
+  // 2. Check DD-MM-YYYY or DD/MM/YYYY HH:MM
+  const dmy = str.match(/^(\d{2})[-/](\d{2})[-/](\d{4})(?:\s+(\d{2}):(\d{2}))?/);
+  if (dmy) {
+    const date = new Date(+dmy[3], +dmy[2] - 1, +dmy[1], +(dmy[4] || 0), +(dmy[5] || 0));
     return Number.isFinite(date.getTime()) ? date : null;
   }
-  // ISO 8601 fallback — e.g. H2H dates from ESPN: "2022-06-23T18:00Z"
-  const iso = new Date(dateStr);
-  return Number.isFinite(iso.getTime()) ? iso : null;
+
+  // 3. Fallback
+  if (!Number.isNaN(isoTime)) return new Date(isoTime);
+  return null;
 }
 
 export function parseMatchTimestamp(dateStr) {
