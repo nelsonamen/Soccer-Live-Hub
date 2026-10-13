@@ -108,6 +108,7 @@ class SoccerLiveLastMatchCard extends LitElement {
 
     return html`
       ${renderSoccerHeader({
+        logo: leagueLogo,
         title: competition,
         badge: renderSoccerBadge(this._t("status.ft"), "ft"),
       })}
