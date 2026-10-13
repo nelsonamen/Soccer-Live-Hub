@@ -385,17 +385,23 @@ class SoccerLiveStandingsCard extends LitElement {
   }
 
   _sortStandings(standings, seasonName) {
-    let s = (standings || []).filter(t => t.rank != null);
-    if (seasonName.includes("MLS")) {
-      s = s.slice().sort((a, b) => {
-        if (b.points !== a.points) return b.points - a.points;
-        if (b.goal_difference !== a.goal_difference) return b.goal_difference - a.goal_difference;
-        return b.goals_for - a.goals_for;
-      });
-      s.forEach((t, i) => { t.rank = i + 1; });
-    } else {
-      s = s.slice().sort((a, b) => a.rank - b.rank);
-    }
+    let s = (standings || []).filter(t => t.rank != null || t.points != null);
+    s = s.slice().sort((a, b) => {
+      const ptsA = parseInt(a.points ?? a.pts ?? 0, 10);
+      const ptsB = parseInt(b.points ?? b.pts ?? 0, 10);
+      if (ptsB !== ptsA) return ptsB - ptsA;
+
+      const gdA = parseInt(a.goal_difference ?? a.gd ?? 0, 10);
+      const gdB = parseInt(b.goal_difference ?? b.gd ?? 0, 10);
+      if (gdB !== gdA) return gdB - gdA;
+
+      const gfA = parseInt(a.goals_for ?? a.gf ?? 0, 10);
+      const gfB = parseInt(b.goals_for ?? b.gf ?? 0, 10);
+      if (gfB !== gfA) return gfB - gfA;
+
+      return (a.team_name || '').localeCompare(b.team_name || '');
+    });
+    s.forEach((t, i) => { t.rank = i + 1; });
     return s;
   }
 
