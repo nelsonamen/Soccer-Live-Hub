@@ -65,7 +65,7 @@ class SoccerLiveLastMatchCard extends LitElement {
     if (!this._config || !this.hass) return html``;
     applySkin(this, this._config);
     const attrs = this._attrs();
-    if (!attrs || (!attrs.matches && !attrs.previous_matches)) {
+    if (!attrs || (!attrs.matches && !attrs.previous_matches && !attrs.match_archive && !attrs.schedule_recent_matches)) {
       return renderSyncStatusOrEmpty(attrs, (k) => this._t(k), () =>
         renderInfoState("📅", this._t("last_match.none"), this._t("last_match.none_hint")));
     }
@@ -78,14 +78,8 @@ class SoccerLiveLastMatchCard extends LitElement {
   }
 
   _hasDetails(match) {
-    return !!(
-      (match.key_events && match.key_events.length) ||
-      (match.match_details && match.match_details.length) ||
-      (match.lineup_home && match.lineup_home.length) ||
-      (match.lineup_away && match.lineup_away.length) ||
-      (match.home_statistics && Object.keys(match.home_statistics).length > 0) ||
-      (match.head_to_head && match.head_to_head.length)
-    );
+    // Every finished match is allowed to show details popup
+    return !!match;
   }
 
   _renderStatusBadge(match) {
@@ -479,5 +473,5 @@ class SoccerLiveLastMatchCard extends LitElement {
 }
 
 if (!customElements.get("soccer-live-last-match")) {
-  customElements.define("soccer-live-last-match",SoccerLiveLastMatchCard);
+  customElements.define("soccer-live-last-match", SoccerLiveLastMatchCard);
 }
