@@ -1933,7 +1933,26 @@
             ${this._t("team.details")} ›
           </button>
         </div>`:""}
-    `}_renderDetailsPortal(){const e=gt(this._attrs());if(e){if(this._portal||(this._portal=document.createElement("dialog"),this._portal.className="soccer-live-last-match-portal",this._cancel=e=>{e.preventDefault(),this._showDetails=!1},this._backdrop=e=>{e.target===this._portal&&(this._showDetails=!1)},this._escape=e=>{"Escape"===e.key&&(this._showDetails=!1)},this._portal.addEventListener("cancel",this._cancel),this._portal.addEventListener("click",this._backdrop),document.addEventListener("keydown",this._escape),document.body.appendChild(this._portal)),this._copyThemeVars(this._portal),(0,i.XX)(i.qy`${this._portalStyles()}${He("mp")}${this._renderDetails(e)}`,this._portal),!this._portal.open)try{this._portal.showModal()}catch{this._portal.setAttribute("open","")}}else this._showDetails=!1}_removeDetailsPortal(){this._portal&&(this._portal.open&&this._portal.close(),this._portal.removeEventListener("cancel",this._cancel),this._portal.removeEventListener("click",this._backdrop),document.removeEventListener("keydown",this._escape),(0,i.XX)(i.qy``,this._portal),this._portal.remove(),this._portal=null)}_copyThemeVars(e){const t=getComputedStyle(this);["--cl-bg","--cl-text","--cl-text-2","--cl-divider","--cl-accent","--cl-accent-2","--cl-accent-rgb","--cl-green","--cl-live","--cl-win","--cl-draw","--cl-loss"].forEach(a=>{const i=t.getPropertyValue(a);i&&e.style.setProperty(a,i)})}_renderDetails(e){const t=(0,s.$c)(this.hass,this._config),a=(e,t)=>this._t(e,t),o=(0,s.n1)(e.date_iso||e.date),r=o?o.toLocaleDateString(t,{weekday:"short",day:"numeric",month:"short"}):"",n=Se(e.league_name,t);return i.qy`
+    `}_renderDetailsPortal(){const e=gt(this._attrs());if(e){if(this._portal||(this._portal=document.createElement("dialog"),this._portal.className="soccer-live-last-match-portal",this._cancel=e=>{e.preventDefault(),this._showDetails=!1},this._backdrop=e=>{e.target===this._portal&&(this._showDetails=!1)},this._escape=e=>{"Escape"===e.key&&(this._showDetails=!1)},this._portal.addEventListener("cancel",this._cancel),this._portal.addEventListener("click",this._backdrop),document.addEventListener("keydown",this._escape),document.body.appendChild(this._portal)),this._copyThemeVars(this._portal),(0,i.XX)(i.qy`${this._portalStyles()}${He("mp")}${this._renderDetails(e)}`,this._portal),!this._portal.open)try{this._portal.showModal()}catch{this._portal.setAttribute("open","")}}else this._showDetails=!1}_removeDetailsPortal(){this._portal&&(this._portal.open&&this._portal.close(),this._portal.removeEventListener("cancel",this._cancel),this._portal.removeEventListener("click",this._backdrop),document.removeEventListener("keydown",this._escape),(0,i.XX)(i.qy``,this._portal),this._portal.remove(),this._portal=null)}_copyThemeVars(e){const t=getComputedStyle(this);["--cl-bg","--cl-text","--cl-text-2","--cl-divider","--cl-accent","--cl-accent-2","--cl-accent-rgb","--cl-green","--cl-live","--cl-win","--cl-draw","--cl-loss"].forEach(a=>{const i=t.getPropertyValue(a);i&&e.style.setProperty(a,i)})}separateEvents(e){const t=e.match_details||e.key_events||e.timeline||e.events||[],a=[],i=[],s=[];return t.forEach(e=>{const t="string"==typeof e?e:e.text||e.description||e.type_text||"",o=t.toLowerCase();o.includes("goal")||o.includes("golo")||"goal"===e.type?a.push(t):o.includes("yellow")||o.includes("amarelo")||"yellow_card"===e.type?i.push(t):(o.includes("red")||o.includes("vermelho")||"red_card"===e.type)&&s.push(t)}),{goals:a,yellowCards:i,redCards:s}}_renderPopupEventGroups(e){const{goals:t,yellowCards:a,redCards:s}=this.separateEvents(e);return t.length||a.length||s.length?i.qy`
+      ${t.length?i.qy`
+        <div class="lmp-event-group goal">
+          <h5 class="lmp-event-title">${this._t("popup.goals")||"Golos"}</h5>
+          <ul class="lmp-event-list">${t.map(e=>i.qy`<li>${e}</li>`)}</ul>
+        </div>
+      `:""}
+      ${a.length?i.qy`
+        <div class="lmp-event-group yellow">
+          <h5 class="lmp-event-title">${this._t("popup.yellow_cards")||"Cartões Amarelos"}</h5>
+          <ul class="lmp-event-list">${a.map(e=>i.qy`<li>${e}</li>`)}</ul>
+        </div>
+      `:""}
+      ${s.length?i.qy`
+        <div class="lmp-event-group red">
+          <h5 class="lmp-event-title">${this._t("popup.red_cards")||"Cartões Vermelhos"}</h5>
+          <ul class="lmp-event-list">${s.map(e=>i.qy`<li>${e}</li>`)}</ul>
+        </div>
+      `:""}
+    `:""}_renderDetails(e){const t=(0,s.$c)(this.hass,this._config),a=(e,t)=>this._t(e,t),o=(0,s.n1)(e.date_iso||e.date),r=o?o.toLocaleDateString(t,{weekday:"short",day:"numeric",month:"short"}):"",n=Se(e.league_name,t);return i.qy`
       <div class="lmp-box">
         <button class="lmp-close" aria-label="${this._t("last_match.close")}" @click=${()=>{this._showDetails=!1}}>×</button>
         <div class="lmp-score-row">
@@ -1948,6 +1967,7 @@
         ${n||r?i.qy`<p class="lmp-meta">${[n,r].filter(Boolean).join(" · ")}${e.venue&&"N/A"!==e.venue?` · ${e.venue}`:""}</p>`:""}
 
         ${this._renderStats(e,a)}
+        ${this._renderPopupEventGroups(e)}
         ${this._renderRatings(e)}
         ${Je(e,{translate:a})}
         ${Ze(e,{translate:a})}
@@ -1955,17 +1975,17 @@
 
         <button class="lmp-done" @click=${()=>{this._showDetails=!1}}>${this._t("last_match.close")}</button>
       </div>
-    `}_renderStats(e,t){const a=yt(e.home_statistics,e.away_statistics);if(!a.length)return"";const s=e=>{const t=parseFloat(String(e).replace("%",""));return Number.isFinite(t)?t:0};return i.qy`
+    `}_renderStats(e,t){const a=e.home_statistics||e.statistics?.home||e.stats?.home||e.homeStats||{},s=e.away_statistics||e.statistics?.away||e.stats?.away||e.awayStats||{},o=yt(a,s);if(!o.length)return"";const r=e=>{const t=parseFloat(String(e).replace("%",""));return Number.isFinite(t)?t:0};return i.qy`
       <div class="mp-section">
         <h5 class="mp-section-title">${this._t("tab.stats")}</h5>
         <div class="lmp-stats">
-          ${a.map(e=>{const a=s(e.home),o=a+s(e.away),r=o>0?Math.round(a/o*100):50;return i.qy`
+          ${o.map(e=>{const a=r(e.home),s=a+r(e.away),o=s>0?Math.round(a/s*100):50;return i.qy`
               <div class="lmp-stat">
                 <span class="lmp-stat-h">${e.home??"-"}</span>
                 <span class="lmp-stat-label">${xt(e.key,t)}</span>
                 <span class="lmp-stat-a">${e.away??"-"}</span>
               </div>
-              <div class="lmp-bar"><div class="lmp-bar-h" style="width:${r}%"></div><div class="lmp-bar-a" style="width:${100-r}%"></div></div>`})}
+              <div class="lmp-bar"><div class="lmp-bar-h" style="width:${o}%"></div><div class="lmp-bar-a" style="width:${100-o}%"></div></div>`})}
         </div>
       </div>`}_ratingChip(e){const t=parseFloat(e);if(!Number.isFinite(t))return"";const a=t>=8?"#1f9d55":t>=7?"#4a9e2f":t>=6?"#c98a00":"#c0392b";return i.qy`<span class="lmp-rating" style="background:${a}">${t.toFixed(1)}</span>`}_renderRatings(e){const t=e.player_of_the_match,a=Array.isArray(e.top_rated_players)?e.top_rated_players:[];return t||a.length?i.qy`
       <div class="mp-section">
@@ -2030,6 +2050,16 @@
       .lmp-bar { display: flex; height: 5px; border-radius: 3px; overflow: hidden; background: var(--cl-divider, rgba(127,127,127,0.2)); }
       .lmp-bar-h { background: var(--cl-accent, #3b82f6); }
       .lmp-bar-a { background: var(--cl-text-2, #9aa0a6); opacity: 0.6; }
+      .lmp-event-group { margin: 12px 0 0; padding: 12px 14px; border-radius: 10px; border-left: 3px solid; background: rgba(255,255,255,0.045); }
+      .lmp-event-group.goal { border-color: #6366f1; background: rgba(99,102,241,0.08); }
+      .lmp-event-group.yellow { border-color: #f59e0b; background: rgba(245,158,11,0.08); }
+      .lmp-event-group.red { border-color: #ef4444; background: rgba(239,68,68,0.08); }
+      .lmp-event-title { margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 800; }
+      .lmp-event-group.goal .lmp-event-title { color: #6366f1; }
+      .lmp-event-group.yellow .lmp-event-title { color: #f59e0b; }
+      .lmp-event-group.red .lmp-event-title { color: #ef4444; }
+      .lmp-event-list { margin: 0; padding-left: 18px; font-size: 0.85rem; color: var(--cl-text); }
+      .lmp-event-list li { margin: 3px 0; }
       .lmp-potm { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
       .lmp-potm-label { font-size: 0.78rem; color: var(--cl-text-2, var(--secondary-text-color)); white-space: nowrap; }
       .lmp-potm-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

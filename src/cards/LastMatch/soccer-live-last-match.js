@@ -78,7 +78,6 @@ class SoccerLiveLastMatchCard extends LitElement {
   }
 
   _hasDetails(match) {
-    // Every finished match is allowed to show details popup
     return !!match;
   }
 
@@ -242,6 +241,46 @@ class SoccerLiveLastMatchCard extends LitElement {
       });
   }
 
+  separateEvents(match) {
+    const details = match.match_details || match.key_events || match.timeline || match.events || [];
+    const goals = [];
+    const yellowCards = [];
+    const redCards = [];
+    details.forEach(d => {
+      const text = typeof d === 'string' ? d : (d.text || d.description || d.type_text || '');
+      const lower = text.toLowerCase();
+      if (lower.includes('goal') || lower.includes('golo') || d.type === 'goal') goals.push(text);
+      else if (lower.includes('yellow') || lower.includes('amarelo') || d.type === 'yellow_card') yellowCards.push(text);
+      else if (lower.includes('red') || lower.includes('vermelho') || d.type === 'red_card') redCards.push(text);
+    });
+    return { goals, yellowCards, redCards };
+  }
+
+  _renderPopupEventGroups(m) {
+    const { goals, yellowCards, redCards } = this.separateEvents(m);
+    if (!goals.length && !yellowCards.length && !redCards.length) return '';
+    return html`
+      ${goals.length ? html`
+        <div class="lmp-event-group goal">
+          <h5 class="lmp-event-title">${this._t('popup.goals') || 'Golos'}</h5>
+          <ul class="lmp-event-list">${goals.map(i => html`<li>${i}</li>`)}</ul>
+        </div>
+      ` : ''}
+      ${yellowCards.length ? html`
+        <div class="lmp-event-group yellow">
+          <h5 class="lmp-event-title">${this._t('popup.yellow_cards') || 'Cartões Amarelos'}</h5>
+          <ul class="lmp-event-list">${yellowCards.map(i => html`<li>${i}</li>`)}</ul>
+        </div>
+      ` : ''}
+      ${redCards.length ? html`
+        <div class="lmp-event-group red">
+          <h5 class="lmp-event-title">${this._t('popup.red_cards') || 'Cartões Vermelhos'}</h5>
+          <ul class="lmp-event-list">${redCards.map(i => html`<li>${i}</li>`)}</ul>
+        </div>
+      ` : ''}
+    `;
+  }
+
   _renderDetails(match) {
     const lang = resolveLang(this.hass, this._config);
     const translate = (k, v) => this._t(k, v);
@@ -266,6 +305,7 @@ class SoccerLiveLastMatchCard extends LitElement {
         ${competition || dateStr ? html`<p class="lmp-meta">${[competition, dateStr].filter(Boolean).join(" · ")}${match.venue && match.venue !== "N/A" ? ` · ${match.venue}` : ""}</p>` : ""}
 
         ${this._renderStats(match, translate)}
+        ${this._renderPopupEventGroups(match)}
         ${this._renderRatings(match)}
         ${renderPopupTimeline(match, { translate })}
         ${renderPopupLineup(match, { translate })}
@@ -277,7 +317,9 @@ class SoccerLiveLastMatchCard extends LitElement {
   }
 
   _renderStats(match, translate) {
-    const rows = matchStatRows(match.home_statistics, match.away_statistics);
+    const homeStats = match.home_statistics || match.statistics?.home || match.stats?.home || match.homeStats || {};
+    const awayStats = match.away_statistics || match.statistics?.away || match.stats?.away || match.awayStats || {};
+    const rows = matchStatRows(homeStats, awayStats);
     if (!rows.length) return "";
     const num = v => {
       const n = parseFloat(String(v).replace("%", ""));
@@ -404,6 +446,16 @@ class SoccerLiveLastMatchCard extends LitElement {
       .lmp-bar { display: flex; height: 5px; border-radius: 3px; overflow: hidden; background: var(--cl-divider, rgba(127,127,127,0.2)); }
       .lmp-bar-h { background: var(--cl-accent, #3b82f6); }
       .lmp-bar-a { background: var(--cl-text-2, #9aa0a6); opacity: 0.6; }
+      .lmp-event-group { margin: 12px 0 0; padding: 12px 14px; border-radius: 10px; border-left: 3px solid; background: rgba(255,255,255,0.045); }
+      .lmp-event-group.goal { border-color: #6366f1; background: rgba(99,102,241,0.08); }
+      .lmp-event-group.yellow { border-color: #f59e0b; background: rgba(245,158,11,0.08); }
+      .lmp-event-group.red { border-color: #ef4444; background: rgba(239,68,68,0.08); }
+      .lmp-event-title { margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 800; }
+      .lmp-event-group.goal .lmp-event-title { color: #6366f1; }
+      .lmp-event-group.yellow .lmp-event-title { color: #f59e0b; }
+      .lmp-event-group.red .lmp-event-title { color: #ef4444; }
+      .lmp-event-list { margin: 0; padding-left: 18px; font-size: 0.85rem; color: var(--cl-text); }
+      .lmp-event-list li { margin: 3px 0; }
       .lmp-potm { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
       .lmp-potm-label { font-size: 0.78rem; color: var(--cl-text-2, var(--secondary-text-color)); white-space: nowrap; }
       .lmp-potm-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
