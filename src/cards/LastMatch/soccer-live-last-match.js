@@ -190,7 +190,7 @@ class SoccerLiveLastMatchCard extends LitElement {
         </div>
       </div>
 
-      ${this._config.hide_meta !== true ? renderMatchMeta(match, { lang, t: (k, vars) => this._t(k, vars), showDate: true, hideBroadcasts: false }) : ""}
+      ${this._config.hide_meta !== true ? renderMatchMeta(match, { lang, t: (k, vars) => this._t(k, vars), showDate: true, hideBroadcasts: true }) : ""}
 
       ${this._hasDetails(match) ? html`
         <div class="lm-actions">
