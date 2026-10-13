@@ -1902,7 +1902,7 @@
         </div>
       </div>
 
-      ${!0!==this._config.hide_meta?ae(e,{lang:t,t:(e,t)=>this._t(e,t),showDate:!1}):""}
+      ${!0!==this._config.hide_meta?ae(e,{lang:t,t:(e,t)=>this._t(e,t),showDate:!1,hideBroadcasts:!0}):""}
 
       ${this._hasDetails(e)?i.qy`
         <div class="lm-actions">
