@@ -80,9 +80,10 @@ class SoccerLiveLastMatchCard extends LitElement {
   _hasDetails(match) {
     return !!(
       (match.key_events && match.key_events.length) ||
+      (match.match_details && match.match_details.length) ||
       (match.lineup_home && match.lineup_home.length) ||
       (match.lineup_away && match.lineup_away.length) ||
-      match.home_statistics ||
+      (match.home_statistics && Object.keys(match.home_statistics).length > 0) ||
       (match.head_to_head && match.head_to_head.length)
     );
   }
