@@ -1,13 +1,20 @@
 import { parseMatchTimestamp } from '../i18n.js';
 
 export function isFinishedMatch(match) {
-  if (match?.state) {
+  if (!match) return false;
+  if (match.state) {
     const s = String(match.state).trim().toLowerCase();
-    return ['post', 'finished', 'ft', 'complete', 'completed', 'ended'].includes(s);
+    if (['post', 'finished', 'ft', 'complete', 'completed', 'ended'].includes(s)) return true;
+    if (['pre', 'scheduled', 'upcoming', 'in', 'live'].includes(s)) return false;
   }
-  const status = String(match?.status || match?.status_detail || '').trim().toLowerCase();
-  return ['full time', 'finished', 'final', 'ft', 'einde wedstrijd', 'encerrado', 'terminado']
-    .some(term => status.includes(term));
+  const status = String(match.status || match.status_detail || '').trim().toLowerCase();
+  if (['full time', 'finished', 'final', 'ft', 'einde wedstrijd', 'encerrado', 'terminado']
+    .some(term => status.includes(term))) return true;
+
+  const hs = match.home_score;
+  const as = match.away_score;
+  const hasValidScore = hs != null && as != null && String(hs) !== '' && String(as) !== '' && String(hs) !== 'N/A' && String(as) !== 'N/A' && !isNaN(Number(hs)) && !isNaN(Number(as));
+  return hasValidScore;
 }
 
 export function matchTimestamp(match) {

@@ -9,19 +9,23 @@ function _dateKey(match) {
 /**
  * Return the most recently finished match, or null.
  *
- * Compares finished matches from both the primary `matches` list and the
- * `previous_matches` list, picking the most recent one chronologically.
+ * Compares finished matches from primary `matches`, `previous_matches`,
+ * `match`, `next_match`, or state object attributes, picking the most recent one.
  */
 export function pickLastMatch(attributes) {
-  const matches = Array.isArray(attributes?.matches) ? attributes.matches : [];
-  const previous = Array.isArray(attributes?.previous_matches) ? attributes.previous_matches : [];
-  const finished = matches.filter(m => m && isFinishedMatch(m));
-  const compact = previous.filter(m => m && isFinishedMatch(m));
-  const pool = [...finished, ...compact];
-  if (!pool.length) return null;
+  if (!attributes) return null;
+  const matches = Array.isArray(attributes.matches) ? attributes.matches : [];
+  const previous = Array.isArray(attributes.previous_matches) ? attributes.previous_matches : [];
+  const singleMatch = attributes.match && typeof attributes.match === 'object' ? [attributes.match] : [];
+  const nextMatch = attributes.next_match && typeof attributes.next_match === 'object' ? [attributes.next_match] : [];
+  const selfMatch = (attributes.home_team || attributes.home_score != null || attributes.state) ? [attributes] : [];
+
+  const pool = [...matches, ...previous, ...singleMatch, ...nextMatch, ...selfMatch];
+  const finished = pool.filter(m => m && isFinishedMatch(m));
+  if (!finished.length) return null;
 
   const seen = new Set();
-  const uniquePool = pool.filter(m => {
+  const uniquePool = finished.filter(m => {
     const key = m.event_id != null ? String(m.event_id) : `${m.home_team}_${m.away_team}_${m.date_iso || m.date}`;
     if (seen.has(key)) return false;
     seen.add(key);
