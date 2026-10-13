@@ -1,25 +1,15 @@
 import { html, css } from 'lit';
 
 /**
- * Shared header component matching the Team card design contract.
+ * Shared header component matching the Team card design contract (without icons).
  *
- * @param {string|null} logo     - URL of logo shown in the comp-icon wrapper
  * @param {string}      title    - Main title text (competition name, team name, …)
  * @param {TemplateResult|null} badge - Optional right-side badge (use renderSoccerBadge)
- * @param {string}      fallbackIcon - Emoji shown when logo is absent (default '⚽')
  */
-export const renderSoccerHeader = ({ logo, title, badge = null, fallbackIcon = '⚽' }) => {
-  const validLogo = logo && logo !== 'N/A' ? logo : null;
+export const renderSoccerHeader = ({ title, badge = null }) => {
   return html`
   <div class="top-bar">
     <div class="competition">
-      <span class="comp-icon">
-        ${validLogo ? html`
-          <img src="${validLogo}" alt=""
-            @error=${e => { e.target.style.display = 'none'; e.target.nextElementSibling && (e.target.nextElementSibling.style.display = ''); }}>
-          <span style="display:none">${fallbackIcon}</span>
-        ` : fallbackIcon}
-      </span>
       <span class="comp-name">${title || ' '}</span>
     </div>
     ${badge || ''}
@@ -49,24 +39,6 @@ export const soccerHeaderStyles = css`
     color: var(--cl-text);
     letter-spacing: -0.01em;
     min-width: 0;
-  }
-  .comp-icon {
-    flex-shrink: 0;
-    width: 24px;
-    height: 24px;
-    border-radius: 8px;
-    background: var(--cl-surface, #f8fafc);
-    border: 1px solid var(--cl-divider, rgba(0,0,0,0.08));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    overflow: hidden;
-  }
-  .comp-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
   }
   .comp-name {
     white-space: nowrap;
