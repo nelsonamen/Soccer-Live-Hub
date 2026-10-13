@@ -251,16 +251,12 @@ export function discoverSoccerModels(hass, config = {}) {
  */
 export function renderLanguageControl(host, config, t) {
   const label = (k) => (typeof t === 'function' ? t(k) : k);
-  const entityId = config?.entity || (config?.entities && config.entities[0]);
-  const sharedLang = entityId && host?.hass?.states?.[entityId]?.attributes?.card_defaults?.language;
   const current = config?.language || '';
-  const autoLabel = sharedLang
-    ? `${LANGUAGE_NAME[sharedLang] || sharedLang} · ${label('skin.shared')}${sharedVia(host, config, label)}`
-    : label('lang.auto');
+  const autoLabel = label('lang.auto');
   const onChange = (e) => {
     const v = e.target.value;
     const next = { ...config };
-    if (v) next.language = v; else delete next.language;  // clear the key, don't store ''
+    if (v) next.language = v; else delete next.language;
     fireEditorConfig(host, next);
   };
   return html`
