@@ -562,17 +562,19 @@ class SoccerLiveCardEditor extends LitElement {
             >
           </div>
 
-          <div class="field-group">
-            <label class="field-label">Sensor de Canal / Transmissão (Broadcast Sensor)</label>
-            <ha-entity-picker
-              .key=${selectedMod.broadcast_entity || ''}
-              .hass=${this.hass}
-              .value=${selectedMod.broadcast_entity || ''}
-              .includeDomains=${['sensor']}
-              allow-custom-entity
-              @value-changed=${e => this._updateSelectedModule('broadcast_entity', e.detail?.value || '')}
-            ></ha-entity-picker>
-          </div>
+          ${['team', 'countdown', 'matches', 'ticker', 'match-center', 'hub', 'team-competitions'].includes(normalizeCardType(selectedMod.type)) ? html`
+            <div class="field-group">
+              <label class="field-label">Sensor de Canal / Transmissão (Broadcast Sensor)</label>
+              <ha-entity-picker
+                .key=${selectedMod.broadcast_entity || ''}
+                .hass=${this.hass}
+                .value=${selectedMod.broadcast_entity || ''}
+                .includeDomains=${['sensor']}
+                allow-custom-entity
+                @value-changed=${e => this._updateSelectedModule('broadcast_entity', e.detail?.value || '')}
+              ></ha-entity-picker>
+            </div>
+          ` : ''}
 
           <div class="module-options-section">
             <div class="module-options-title">

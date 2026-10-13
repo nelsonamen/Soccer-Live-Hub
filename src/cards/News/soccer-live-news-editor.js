@@ -91,13 +91,7 @@ class SoccerLiveNewsEditor extends LitElement {
             data-config-value="max_articles"
             @change=${this._numberChanged} />
         </div>
-        <div>
-          <label class="field-label">${this._t('editor.skin')}</label>
-          ${renderSkinControls(this, this._config, (k) => (this._t ? this._t(k) : k))}
-        </div>
-        <div>
-          ${renderLanguageControl(this, this._config, (k) => (this._t ? this._t(k) : k))}
-        </div>
+        ${renderSkinControls(this, this._config, (k) => (this._t ? this._t(k) : k))}
       </div>
     `;
   }

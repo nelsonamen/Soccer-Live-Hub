@@ -16,16 +16,24 @@ function _dateKey(match) {
 /**
  * Return the most recently finished match, or null.
  *
- * Prefers a finished match from the primary `matches` list because those carry
- * full detail (scorers, statistics) while the integration keeps them around;
- * once they roll off it falls back to the compact `previous_matches` list.
+ * Compares finished matches from both the primary `matches` list and the
+ * `previous_matches` list, picking the most recent one chronologically.
  */
 export function pickLastMatch(attributes) {
   const matches = Array.isArray(attributes?.matches) ? attributes.matches : [];
   const previous = Array.isArray(attributes?.previous_matches) ? attributes.previous_matches : [];
   const finished = matches.filter(m => m && m.state === 'post');
   const compact = previous.filter(m => m && (m.state === 'post' || m.state == null));
-  const pool = finished.length ? finished : compact;
+  const pool = [...finished, ...compact];
   if (!pool.length) return null;
-  return [...pool].sort((a, b) => _dateKey(b) - _dateKey(a))[0];
+
+  const seen = new Set();
+  const uniquePool = pool.filter(m => {
+    const key = m.event_id != null ? String(m.event_id) : `${m.home_team}_${m.away_team}_${m.date_iso || m.date}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  return uniquePool.sort((a, b) => _dateKey(b) - _dateKey(a))[0];
 }

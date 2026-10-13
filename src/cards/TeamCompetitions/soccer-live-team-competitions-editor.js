@@ -59,14 +59,7 @@ class SoccerLiveTeamCompetitionsEditor extends LitElement {
           <ha-switch .checked=${this._config.hide_header === true} data-config-value="hide_header" @change=${this._switchChanged}></ha-switch>
         </div>
 
-        <h3>${this._t("editor.appearance")}</h3>
-        <div>
-          <label class="field-label">${this._t('editor.theme')}</label>
-          ${renderSkinControls(this, this._config, (k) => (this._t ? this._t(k) : k))}
-        </div>
-        <div>
-          ${renderLanguageControl(this, this._config, (k) => (this._t ? this._t(k) : k))}
-        </div>
+        ${renderSkinControls(this, this._config, (k) => (this._t ? this._t(k) : k))}
       </div>
     `;
   }

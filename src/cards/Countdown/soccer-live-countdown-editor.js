@@ -54,14 +54,7 @@ class SoccerLiveCountdownEditor extends LitElement {
           <label>${this._t('editor.compact')}</label>
           <ha-switch .checked=${this._config.compact === true} data-config-value="compact" @change=${this._switchChanged}></ha-switch>
         </div>
-        <h3>${this._t("editor.appearance")}</h3>
-        <div>
-          <label class="field-label">${this._t('editor.theme')}</label>
-          ${renderSkinControls(this, this._config, (k) => (this._t ? this._t(k) : k))}
-        </div>
-        <div>
-          ${renderLanguageControl(this, this._config, (k) => (this._t ? this._t(k) : k))}
-        </div>
+        ${renderSkinControls(this, this._config, (k) => (this._t ? this._t(k) : k))}
       </div>
     `;
   }

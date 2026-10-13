@@ -51,14 +51,7 @@ class SoccerLiveLastMatchEditor extends LitElement {
           <div class="hint" style="margin-top: 4px;">${this._t('last_match.editor_hint')}</div>
         </div>
 
-        <h3>${this._t("editor.settings")}</h3>
-        <div>
-          <label class="field-label">${this._t('editor.skin')}</label>
-          ${renderSkinControls(this, this._config, (k) => (this._t ? this._t(k) : k))}
-        </div>
-        <div>
-          ${renderLanguageControl(this, this._config, (k) => (this._t ? this._t(k) : k))}
-        </div>
+        ${renderSkinControls(this, this._config, (k) => (this._t ? this._t(k) : k))}
       </div>
     `;
   }
