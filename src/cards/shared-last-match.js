@@ -1,5 +1,6 @@
 import { parseMatchTimestamp } from '../i18n.js';
 import { isFinishedMatch } from './shared-match-order.js';
+import { normalizeArchiveMatch } from './shared-archive-model.js';
 
 // Sortable timestamp from either `date_iso` or `date`
 function _dateKey(match) {
@@ -24,7 +25,10 @@ export function pickLastMatch(attributes) {
   const nextMatch = attributes.next_match && typeof attributes.next_match === 'object' ? [attributes.next_match] : [];
   const selfMatch = (attributes.home_team || attributes.home_score != null || attributes.state) ? [attributes] : [];
 
-  const pool = [...matches, ...previous, ...archive, ...recent, ...past, ...singleMatch, ...nextMatch, ...selfMatch];
+  const pool = [...matches, ...previous, ...archive, ...recent, ...past, ...singleMatch, ...nextMatch, ...selfMatch]
+    .map(normalizeArchiveMatch)
+    .filter(Boolean);
+
   const finished = pool.filter(m => m && isFinishedMatch(m));
   if (!finished.length) return null;
 
