@@ -4,17 +4,20 @@ export function isFinishedMatch(match) {
   if (!match) return false;
   if (match.state) {
     const s = String(match.state).trim().toLowerCase();
-    if (['post', 'finished', 'ft', 'complete', 'completed', 'ended'].includes(s)) return true;
     if (['pre', 'scheduled', 'upcoming', 'in', 'live'].includes(s)) return false;
+    if (['post', 'finished', 'ft', 'complete', 'completed', 'ended'].includes(s)) return true;
   }
-  const status = String(match.status || match.status_detail || '').trim().toLowerCase();
-  if (['full time', 'finished', 'final', 'ft', 'einde wedstrijd', 'encerrado', 'terminado']
-    .some(term => status.includes(term))) return true;
 
   const hs = match.home_score;
   const as = match.away_score;
   const hasValidScore = hs != null && as != null && String(hs) !== '' && String(as) !== '' && String(hs) !== 'N/A' && String(as) !== 'N/A' && !isNaN(Number(hs)) && !isNaN(Number(as));
-  return hasValidScore;
+  if (hasValidScore) return true;
+
+  const status = String(match.status || match.status_detail || '').trim().toLowerCase();
+  if (['full time', 'finished', 'final', 'ft', 'einde wedstrijd', 'encerrado', 'terminado']
+    .some(term => status.includes(term))) return true;
+
+  return false;
 }
 
 export function matchTimestamp(match) {
