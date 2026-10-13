@@ -11,12 +11,13 @@ import { pitchStyles } from "../shared-pitch.js";
 import { matchStatRows, translateStatKey } from "../shared-stat-labels.js";
 import { renderMatchMeta, matchMetaStyles } from "../shared-match-meta.js";
 import { soccerCardShellStyles } from "../card-shell.js";
+import { renderSoccerHeader, renderSoccerBadge, soccerHeaderStyles } from "../shared-header.js";
 
 /**
  * Soccer Live Last Match Card
  * Shows the most recent finished match for a team in a premium hero layout:
- * competition header, large team logos, final score, venue/broadcast meta,
- * plus a Details button that opens a popup with full match details.
+ * competition header with surface container icon, large team logos, final score,
+ * venue/broadcast meta, plus a Details button that opens a full details popup.
  */
 class SoccerLiveLastMatchCard extends LitElement {
   static get properties() {
@@ -109,13 +110,11 @@ class SoccerLiveLastMatchCard extends LitElement {
       : html`<div class="lm-logo placeholder">⚽</div>`;
 
     return html`
-      <div class="top-bar">
-        <div class="lm-comp">
-          ${leagueLogo ? html`<img src="${leagueLogo}" alt="">` : html`<span>⚽</span>`}
-          ${competition || html`<span>&nbsp;</span>`}
-        </div>
-        ${dateStr ? html`<div class="badge">${dateStr}</div>` : ""}
-      </div>
+      ${renderSoccerHeader({
+        logo: leagueLogo,
+        title: competition,
+        badge: dateStr ? renderSoccerBadge(dateStr, "date") : null,
+      })}
 
       <div class="lm-score-row">
         <div class="lm-side home">
@@ -380,13 +379,9 @@ class SoccerLiveLastMatchCard extends LitElement {
   }
 
   static get styles() {
-    return [skinStyles, soccerCardShellStyles, matchMetaStyles, css`
+    return [skinStyles, soccerCardShellStyles, soccerHeaderStyles, matchMetaStyles, css`
       :host { display: block; }
       ha-card { padding: 16px 18px; overflow: hidden; background: var(--cl-bg); color: var(--cl-text); border-radius: 20px; }
-      .top-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
-      .lm-comp { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 700; color: var(--cl-text-2); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .lm-comp img { width: 18px; height: 18px; object-fit: contain; }
-      .badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 99px; background: var(--cl-surface-2, rgba(255,255,255,0.1)); color: var(--cl-text-2); white-space: nowrap; }
       .lm-score-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; margin: 16px 0 12px; }
       .lm-side { display: flex; align-items: center; gap: 10px; min-width: 0; }
       .lm-side.away { justify-content: flex-end; }
