@@ -53,7 +53,6 @@ class SoccerLiveTeamFormCard extends LitElement {
   _t(key) { return t(key, resolveLang(this.hass, this._config)); }
 
   _detectTeam(previousMatches) {
-    // Count team name frequency across all previous matches — the one appearing most is ours
     const freq = {};
     (previousMatches || []).forEach(m => {
       [m.home_team, m.away_team].filter(Boolean).forEach(name => {
@@ -61,7 +60,6 @@ class SoccerLiveTeamFormCard extends LitElement {
       });
     });
     const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
-    // Only trust detection when the top team appears in every match (tracked team always present)
     if (sorted.length && sorted[0][1] === previousMatches.length) return sorted[0][0];
     return '';
   }
@@ -98,17 +96,12 @@ class SoccerLiveTeamFormCard extends LitElement {
   _renderCard(attrs) {
     const prev      = attrs.previous_matches || [];
     const next      = (attrs.matches || [])[0];
-    // upcoming_matches starts after matches[0] when that entry is scheduled.
-    // A live match belongs in the current-match area, not in the upcoming list.
     const upcomingRaw = attrs.upcoming_matches || [];
     const upcoming = (next && next.state === 'pre')
       ? [next, ...upcomingRaw]
       : upcomingRaw;
-    // Team detection: prefer explicit config, then sensor attribute, then frequency analysis
-    // of previous_matches (the team appearing in every match is the tracked one).
     const team    = this._config.team_name || attrs.team_name || this._detectTeam(prev) || '';
     const tracked = team.toLowerCase();
-    // Determine if tracked team is home or away in the next match for correct logo/standing
     const trackedIsHome = tracked && next?.home_team?.toLowerCase().includes(tracked);
     const trackedIsAway = tracked && next?.away_team?.toLowerCase().includes(tracked);
     const logo = attrs.team_logo
@@ -139,12 +132,37 @@ class SoccerLiveTeamFormCard extends LitElement {
       return { scored: isHome ? hs : as_, conceded: isHome ? as_ : hs };
     }).filter(Boolean);
 
-    // ESPN form strings (last 5)
+    // Compute Home and Away records & form specifically for the tracked team
+    const homeMatches = prev.filter(m => tracked && m.home_team?.toLowerCase().includes(tracked));
+    const awayMatches = prev.filter(m => tracked && m.away_team?.toLowerCase().includes(tracked));
+
+    const computeRecordAndForm = (matchList, isHomeSide) => {
+      const valid = [...matchList].reverse().map(m => {
+        const hs = parseInt(m.home_score, 10);
+        const as_ = parseInt(m.away_score, 10);
+        if (isNaN(hs) || isNaN(as_)) return null;
+        const myScore = isHomeSide ? hs : as_;
+        const oppScore = isHomeSide ? as_ : hs;
+        const res = myScore > oppScore ? 'W' : myScore < oppScore ? 'L' : 'D';
+        return res;
+      }).filter(Boolean);
+
+      const w = valid.filter(x => x === 'W').length;
+      const d = valid.filter(x => x === 'D').length;
+      const l = valid.filter(x => x === 'L').length;
+      const record = valid.length ? `${w}-${d}-${l}` : '';
+      const form = valid.slice(-5).join('');
+      return { record, form };
+    };
+
+    const homeData = computeRecordAndForm(homeMatches, true);
+    const awayData = computeRecordAndForm(awayMatches, false);
+
     const match0     = (attrs.matches || [])[0] || {};
-    const homeForm   = match0.last_five_home || match0.home_form || '';
-    const awayForm   = match0.last_five_away || match0.away_form || '';
-    const homeRecord = match0.home_record_summary || match0.home_record || '';
-    const awayRecord = match0.away_record_summary || match0.away_record || '';
+    const homeRecord = homeData.record || (trackedIsHome ? (match0.home_record_summary || match0.home_record) : (match0.away_record_summary || match0.away_record)) || '';
+    const homeForm   = homeData.form || (trackedIsHome ? (match0.last_five_home || match0.home_form) : (match0.last_five_away || match0.away_form)) || '';
+    const awayRecord = awayData.record || (trackedIsHome ? (match0.away_record_summary || match0.away_record) : (match0.home_record_summary || match0.home_record)) || '';
+    const awayForm   = awayData.form || (trackedIsHome ? (match0.last_five_away || match0.away_form) : (match0.last_five_home || match0.home_form)) || '';
 
     const maxGoals = Math.max(...goalData.map(g => Math.max(g.scored, g.conceded)), 1);
 
