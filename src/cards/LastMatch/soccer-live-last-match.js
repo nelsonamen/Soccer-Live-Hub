@@ -5,6 +5,7 @@ import { renderInfoState, renderSyncStatusOrEmpty } from "../card-error.js";
 import { OfflineCache } from "../offline-cache.js";
 import { displayCompetitionName, resolveCompetitionLogo } from "../shared-competition.js";
 import { scoreText } from "../shared-score.js";
+import { standingText } from "../shared-standing.js";
 import { pickLastMatch } from "../shared-last-match.js";
 import { renderPopupTimeline, renderPopupLineup, renderPopupSectionStyles } from "../shared-match-sections.js";
 import { pitchStyles } from "../shared-pitch.js";
@@ -15,9 +16,9 @@ import { renderSoccerHeader, renderSoccerBadge, soccerHeaderStyles } from "../sh
 
 /**
  * Soccer Live Last Match Card
- * Shows the most recent finished match for a team in a large premium layout:
- * competition header, big team side-by-side logos and score, venue meta,
- * plus a Details button that opens a full details popup.
+ * Shows the most recent finished match for a team in a large premium hero layout:
+ * competition header with status badge, big team side-by-side logos, score,
+ * record & form pills, venue meta, plus a Details button that opens a full details popup.
  */
 class SoccerLiveLastMatchCard extends LitElement {
   static get properties() {
@@ -86,6 +87,46 @@ class SoccerLiveLastMatchCard extends LitElement {
     );
   }
 
+  _renderStatusBadge(match) {
+    return html`<span class="status-badge finished">${this._t('status.finished')}</span>`;
+  }
+
+  _renderClock(match) {
+    return html`<div class="clock finished">${this._t('status.full_time')}</div>`;
+  }
+
+  _renderRecord(record) {
+    if (!record || record === 'N/A') return '';
+    const parts = String(record).split('-');
+    if (parts.length === 3) {
+      if (parts.every(p => parseInt(p, 10) === 0)) return '';
+      return html`<div class="record">
+        <span class="rec rec-w">${parts[0]}${this._t('form.W')}</span>
+        <span class="rec rec-d">${parts[1]}${this._t('form.D')}</span>
+        <span class="rec rec-l">${parts[2]}${this._t('form.L')}</span>
+      </div>`;
+    }
+    return html`<div class="record"><span class="rec">${record}</span></div>`;
+  }
+
+  _renderStandingSummary(match, side) {
+    const text = standingText(match, side, (k) => this._t(k));
+    return text ? html`<div class="standing-summary">${text}</div>` : '';
+  }
+
+  _renderForm(formStr) {
+    if (!formStr || formStr === 'N/A') return '';
+    const letters = String(formStr).replace(/[^WLDwld]/g, '').toUpperCase();
+    if (letters.length < 2) return '';
+    const recent = letters.slice(-5).split('');
+    const labelOf = (l) => this._t('form.' + l);
+    return html`
+      <div class="form-pills">
+        ${recent.map(l => html`<div class="form-pill ${l}">${labelOf(l)}</div>`)}
+      </div>
+    `;
+  }
+
   _renderMatch(match) {
     const lang = resolveLang(this.hass, this._config);
     const leagueName = match.league_name && match.league_name !== "N/A" ? match.league_name : "";
@@ -102,6 +143,11 @@ class SoccerLiveLastMatchCard extends LitElement {
     const homeWin = Number.isFinite(homeGoals) && Number.isFinite(awayGoals) && homeGoals > awayGoals;
     const awayWin = Number.isFinite(homeGoals) && Number.isFinite(awayGoals) && awayGoals > homeGoals;
 
+    const attrs = this._attrs() || {};
+    const myTeam = (this._config.my_team || this._config.team_name || attrs.team_name || "").toLowerCase();
+    const homeIsMyTeam = myTeam && match.home_team && match.home_team.toLowerCase().includes(myTeam);
+    const awayIsMyTeam = myTeam && match.away_team && match.away_team.toLowerCase().includes(myTeam);
+
     const logoEl = (logo, abbrev) => logo
       ? html`<img class="team-logo-big" src="${logo}" alt="" loading="lazy">`
       : html`<div class="team-logo-fallback">${abbrev || "?"}</div>`;
@@ -110,7 +156,7 @@ class SoccerLiveLastMatchCard extends LitElement {
       ${renderSoccerHeader({
         logo: leagueLogo,
         title: competition,
-        badge: renderSoccerBadge(this._t("status.ft"), "ft"),
+        badge: this._renderStatusBadge(match),
       })}
 
       <div class="scoreboard">
@@ -118,7 +164,10 @@ class SoccerLiveLastMatchCard extends LitElement {
           <div class="team-logo-wrap">
             ${logoEl(match.home_logo, match.home_abbrev)}
           </div>
-          <div class="team-name-big">${match.home_team || match.home_abbrev || "?"}</div>
+          <div class="team-name-big ${homeIsMyTeam ? "my-team" : ""}">${match.home_team || match.home_abbrev || "?"}</div>
+          ${this._renderStandingSummary(match, "home")}
+          ${this._renderRecord(match.home_record)}
+          ${this._renderForm(match.last_five_home || match.home_form)}
         </div>
 
         <div class="score-center">
@@ -127,23 +176,26 @@ class SoccerLiveLastMatchCard extends LitElement {
             <span class="dash">-</span>
             <span class="${awayWin ? "win" : ""}">${scoreText(match.away_score, "–")}</span>
           </div>
-          <div class="score-status">${this._t("status.full_time")}</div>
+          ${this._renderClock(match)}
         </div>
 
         <div class="team-side away">
           <div class="team-logo-wrap">
             ${logoEl(match.away_logo, match.away_abbrev)}
           </div>
-          <div class="team-name-big">${match.away_team || match.away_abbrev || "?"}</div>
+          <div class="team-name-big ${awayIsMyTeam ? "my-team" : ""}">${match.away_team || match.away_abbrev || "?"}</div>
+          ${this._renderStandingSummary(match, "away")}
+          ${this._renderRecord(match.away_record)}
+          ${this._renderForm(match.last_five_away || match.away_form)}
         </div>
       </div>
 
-      ${this._config.hide_meta !== true ? renderMatchMeta(match, { lang, t: (k, vars) => this._t(k, vars), showDate: true, hideBroadcasts: true }) : ""}
+      ${this._config.hide_meta !== true ? renderMatchMeta(match, { lang, t: (k, vars) => this._t(k, vars), showDate: true, hideBroadcasts: false }) : ""}
 
       ${this._hasDetails(match) ? html`
         <div class="lm-actions">
           <button class="lm-details-btn" @click=${() => { this._showDetails = true; }}>
-            ${this._t("last_match.details")} ›
+            ${this._t("team.details")} ›
           </button>
         </div>` : ""}
     `;
@@ -388,6 +440,21 @@ class SoccerLiveLastMatchCard extends LitElement {
     return [skinStyles, soccerCardShellStyles, soccerHeaderStyles, matchMetaStyles, css`
       :host { display: block; }
       ha-card { padding: 16px 18px; overflow: hidden; background: var(--cl-bg); color: var(--cl-text); border-radius: 20px; }
+      .status-badge { font-size: 10px; font-weight: 800; padding: 5px 12px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.06em; display: inline-flex; align-items: center; gap: 5px; }
+      .status-badge.finished { background: var(--cl-green, #10b981); color: #fff; }
+      .clock.finished { font-size: 11px; font-weight: 700; color: var(--cl-text-2); background: var(--cl-surface, rgba(255,255,255,0.06)); padding: 4px 10px; border-radius: 99px; text-transform: uppercase; letter-spacing: 0.05em; }
+      .record { display: flex; gap: 4px; font-size: 10px; font-weight: 800; justify-content: center; }
+      .rec { padding: 2px 6px; border-radius: 4px; }
+      .rec-w { background: #22c55e; color: #fff; }
+      .rec-d { background: var(--cl-text-2, #64748b); color: #fff; }
+      .rec-l { background: #ef4444; color: #fff; }
+      .standing-summary { font-size: 11px; font-weight: 700; color: var(--cl-accent); text-align: center; }
+      .form-pills { display: flex; gap: 3px; justify-content: center; }
+      .form-pill { width: 18px; height: 18px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; }
+      .form-pill.W, .form-pill.w { background: #22c55e; color: #fff; }
+      .form-pill.D, .form-pill.d { background: var(--cl-text-2, #64748b); color: #fff; }
+      .form-pill.L, .form-pill.l { background: #ef4444; color: #fff; }
+      .my-team { font-weight: 800; color: var(--cl-accent); }
       .scoreboard { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; padding: 16px 12px 14px; }
       .team-side { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; min-width: 0; }
       .team-logo-wrap { width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; }
@@ -411,5 +478,5 @@ class SoccerLiveLastMatchCard extends LitElement {
 }
 
 if (!customElements.get("soccer-live-last-match")) {
-  customElements.define("soccer-live-last-match", SoccerLiveLastMatchCard);
+  customElements.define("soccer-live-last-match",SoccerLiveLastMatchCard);
 }
