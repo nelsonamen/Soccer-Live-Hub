@@ -191,34 +191,6 @@ class SoccerLiveTeamCardEditor extends LitElement {
           <label>${this._t('editor.hide_meta')}</label>
           <ha-switch .checked=${this._config.hide_meta === true} data-config-value="hide_meta" @change=${this._switchChanged}></ha-switch>
         </div>
-        <div class="option">
-          <label>${this._t('editor.compact')}</label>
-          <div class="tri" role="radiogroup" aria-label=${this._t('editor.compact')} @keydown=${this._triKeydown}>
-            <button type="button" role="radio" class=${compactVal === undefined ? 'sel' : ''} aria-checked=${compactVal === undefined} tabindex=${compactVal === undefined ? '0' : '-1'}
-              @click=${() => { const c = { ...this._config }; delete c.compact; this._fireConfigChanged(c); }}>
-              ${this._t('editor.inherit')}${sharedCompact !== undefined ? ` (${sharedCompact ? this._t('editor.on') : this._t('editor.off')})` : ''}
-            </button>
-            <button type="button" role="radio" class=${compactVal === true ? 'sel' : ''} aria-checked=${compactVal === true} tabindex=${compactVal === true ? '0' : '-1'}
-              @click=${() => this._fireConfigChanged({ ...this._config, compact: true })}>${this._t('editor.on')}</button>
-            <button type="button" role="radio" class=${compactVal === false ? 'sel' : ''} aria-checked=${compactVal === false} tabindex=${compactVal === false ? '0' : '-1'}
-              @click=${() => this._fireConfigChanged({ ...this._config, compact: false })}>${this._t('editor.off')}</button>
-          </div>
-        </div>
-        <h3>${this._t('editor.appearance')}</h3>
-        <div>
-          ${renderSkinControls(this, this._config, (k) => (this._t ? this._t(k) : k))}
-        </div>
-        <div>
-          <label class="field-label">${this._t('editor.score_size')}</label>
-          <select data-config-value="score_size" @change=${this._selectChanged}>
-            <option value="normal" ?selected=${(this._config.score_size || 'normal') === 'normal'}>${this._t('editor.size_normal')}</option>
-            <option value="big" ?selected=${this._config.score_size === 'big'}>${this._t('editor.size_big')}</option>
-            <option value="huge" ?selected=${this._config.score_size === 'huge'}>${this._t('editor.size_huge')}</option>
-          </select>
-        </div>
-        <div>
-          ${renderLanguageControl(this, this._config, (k) => (this._t ? this._t(k) : k))}
-        </div>
       </div>
     `;
   }

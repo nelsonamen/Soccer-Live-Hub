@@ -56,8 +56,6 @@ class SoccerLiveInsightsEditor extends LitElement {
           @change=${event => this._set('show_season_report', event.target.checked)}
         ></ha-switch></label>
       ` : ''}
-      <h3>${this._t('editor.appearance')}</h3>
-      ${renderSkinControls(this, this._config, key => this._t(key))}
     </div>`;
   }
 

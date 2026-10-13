@@ -114,11 +114,6 @@ class SoccerLiveDiagnosticsEditor extends LitElement {
           <label class="field-label">${this._t("editor.card_title")}</label>
           <input type="text" .value=${this._config.title || ""} data-config-value="title" @input=${this._textChanged} placeholder="${this._t("editor.diag_title_placeholder")}">
         </div>
-        <h3>${this._t("editor.appearance")}</h3>
-        <div>
-          <label class="field-label">${this._t("editor.theme")}</label>
-          ${renderSkinControls(this, this._config, (k) => (this._t ? this._t(k) : k))}
-        </div>
       </div>
     `;
   }

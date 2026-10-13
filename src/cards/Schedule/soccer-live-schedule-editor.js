@@ -114,10 +114,6 @@ class SoccerLiveScheduleEditor extends LitElement {
           <label>${this._t("editor.hide_header")}</label>
           <ha-switch .checked=${this._config.hide_header === true} data-config-value="hide_header" @change=${this._toggleChanged}></ha-switch>
         </div>
-
-        <h3>${this._t("editor.appearance")}</h3>
-        <div>${renderSkinControls(this, this._config, (k) => (this._t ? this._t(k) : k))}</div>
-        <div>${renderLanguageControl(this, this._config, (k) => (this._t ? this._t(k) : k))}</div>
       </div>
     `;
   }
