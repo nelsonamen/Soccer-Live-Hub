@@ -15,9 +15,9 @@ import { renderSoccerHeader, renderSoccerBadge, soccerHeaderStyles } from "../sh
 
 /**
  * Soccer Live Last Match Card
- * Shows the most recent finished match for a team in a premium hero layout:
- * competition header with surface container icon, large team logos, final score,
- * venue/broadcast meta, plus a Details button that opens a full details popup.
+ * Shows the most recent finished match for a team in a large premium layout:
+ * competition header, big team side-by-side logos and score, venue meta,
+ * plus a Details button that opens a full details popup.
  */
 class SoccerLiveLastMatchCard extends LitElement {
   static get properties() {
@@ -51,7 +51,7 @@ class SoccerLiveLastMatchCard extends LitElement {
     this._removeDetailsPortal();
   }
 
-  getCardSize() { return 4; }
+  getCardSize() { return 5; }
 
   _t(key, vars) { return t(key, resolveLang(this.hass, this._config), vars); }
 
@@ -97,42 +97,47 @@ class SoccerLiveLastMatchCard extends LitElement {
     });
     const competition = displayCompetitionName(leagueName, lang);
 
-    const dateObj = parseMatchDate(match.date_iso || match.date);
-    const dateStr = dateObj ? dateObj.toLocaleDateString(lang, { day: "numeric", month: "short" }) : (match.date || "");
-
     const homeGoals = Number(match.home_score);
     const awayGoals = Number(match.away_score);
     const homeWin = Number.isFinite(homeGoals) && Number.isFinite(awayGoals) && homeGoals > awayGoals;
     const awayWin = Number.isFinite(homeGoals) && Number.isFinite(awayGoals) && awayGoals > homeGoals;
 
-    const logoEl = (logo) => logo
-      ? html`<img class="lm-logo" src="${logo}" alt="" loading="lazy">`
-      : html`<div class="lm-logo placeholder">⚽</div>`;
+    const logoEl = (logo, abbrev) => logo
+      ? html`<img class="team-logo-big" src="${logo}" alt="" loading="lazy">`
+      : html`<div class="team-logo-fallback">${abbrev || "?"}</div>`;
 
     return html`
       ${renderSoccerHeader({
-        logo: leagueLogo,
         title: competition,
-        badge: dateStr ? renderSoccerBadge(dateStr, "date") : null,
+        badge: renderSoccerBadge(this._t("status.ft"), "ft"),
       })}
 
-      <div class="lm-score-row">
-        <div class="lm-side home">
-          ${logoEl(match.home_logo)}
-          <span class="lm-team">${(match.home_team || match.home_abbrev) || "?"}</span>
+      <div class="scoreboard">
+        <div class="team-side home">
+          <div class="team-logo-wrap">
+            ${logoEl(match.home_logo, match.home_abbrev)}
+          </div>
+          <div class="team-name-big">${match.home_team || match.home_abbrev || "?"}</div>
         </div>
-        <div class="lm-scoreline">
-          <span class="lm-score ${homeWin ? "win" : ""}">${scoreText(match.home_score, "–")}</span>
-          <span class="lm-sep">–</span>
-          <span class="lm-score ${awayWin ? "win" : ""}">${scoreText(match.away_score, "–")}</span>
+
+        <div class="score-center">
+          <div class="score-numbers">
+            <span class="${homeWin ? "win" : ""}">${scoreText(match.home_score, "–")}</span>
+            <span class="dash">-</span>
+            <span class="${awayWin ? "win" : ""}">${scoreText(match.away_score, "–")}</span>
+          </div>
+          <div class="score-status">${this._t("status.full_time")}</div>
         </div>
-        <div class="lm-side away">
-          <span class="lm-team">${(match.away_team || match.away_abbrev) || "?"}</span>
-          ${logoEl(match.away_logo)}
+
+        <div class="team-side away">
+          <div class="team-logo-wrap">
+            ${logoEl(match.away_logo, match.away_abbrev)}
+          </div>
+          <div class="team-name-big">${match.away_team || match.away_abbrev || "?"}</div>
         </div>
       </div>
 
-      ${this._config.hide_meta !== true ? renderMatchMeta(match, { lang, t: (k, vars) => this._t(k, vars), showDate: false, hideBroadcasts: true }) : ""}
+      ${this._config.hide_meta !== true ? renderMatchMeta(match, { lang, t: (k, vars) => this._t(k, vars), showDate: true, hideBroadcasts: true }) : ""}
 
       ${this._hasDetails(match) ? html`
         <div class="lm-actions">
@@ -382,17 +387,18 @@ class SoccerLiveLastMatchCard extends LitElement {
     return [skinStyles, soccerCardShellStyles, soccerHeaderStyles, matchMetaStyles, css`
       :host { display: block; }
       ha-card { padding: 16px 18px; overflow: hidden; background: var(--cl-bg); color: var(--cl-text); border-radius: 20px; }
-      .lm-score-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; margin: 16px 0 12px; }
-      .lm-side { display: flex; align-items: center; gap: 10px; min-width: 0; }
-      .lm-side.away { justify-content: flex-end; }
-      .lm-logo { width: 44px; height: 44px; object-fit: contain; flex: 0 0 auto; }
-      .lm-logo.placeholder { display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
-      .lm-team { font-weight: 700; font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--cl-text); }
-      .lm-scoreline { display: flex; align-items: center; gap: 10px; }
-      .lm-score { font-size: 2rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--cl-text-2); }
-      .lm-score.win { color: var(--cl-text); }
-      .lm-sep { font-size: 1.4rem; color: var(--cl-text-2); font-weight: 300; }
-      .lm-actions { display: flex; justify-content: center; margin-top: 14px; }
+      .scoreboard { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; padding: 16px 12px 14px; }
+      .team-side { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; min-width: 0; }
+      .team-logo-wrap { width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; }
+      .team-logo-big { width: 48px; height: 48px; object-fit: contain; }
+      .team-logo-fallback { width: 44px; height: 44px; border-radius: 50%; background: var(--cl-surface-2); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; }
+      .team-name-big { font-weight: 700; font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; color: var(--cl-text); }
+      .score-center { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 0 8px; }
+      .score-numbers { font-size: 2.2rem; font-weight: 800; font-variant-numeric: tabular-nums; display: flex; align-items: center; gap: 8px; color: var(--cl-text-2); }
+      .score-numbers > span.win { color: var(--cl-text); }
+      .dash { font-weight: 300; font-size: 1.8rem; color: var(--cl-text-2); }
+      .score-status { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--cl-text-2); }
+      .lm-actions { display: flex; justify-content: center; margin-top: 10px; padding-bottom: 4px; }
       .lm-details-btn {
         border: 0; cursor: pointer; font-weight: 700; font-size: 0.85rem;
         padding: 8px 20px; border-radius: 99px;
