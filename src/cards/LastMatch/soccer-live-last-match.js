@@ -9,12 +9,14 @@ import { pickLastMatch } from "../shared-last-match.js";
 import { renderPopupTimeline, renderPopupLineup, renderPopupSectionStyles } from "../shared-match-sections.js";
 import { pitchStyles } from "../shared-pitch.js";
 import { matchStatRows, translateStatKey } from "../shared-stat-labels.js";
+import { renderMatchMeta, matchMetaStyles } from "../shared-match-meta.js";
+import { soccerCardShellStyles } from "../card-shell.js";
 
 /**
  * Soccer Live Last Match Card
- * Shows the most recent finished match for a team: competition, teams and the
- * final score, plus a Details button that opens a popup with the full available
- * detail (stats, timeline with goalscorers, ratings, lineup, H2H).
+ * Shows the most recent finished match for a team in a premium hero layout:
+ * competition header, large team logos, final score, venue/broadcast meta,
+ * plus a Details button that opens a popup with full match details.
  */
 class SoccerLiveLastMatchCard extends LitElement {
   static get properties() {
@@ -48,7 +50,7 @@ class SoccerLiveLastMatchCard extends LitElement {
     this._removeDetailsPortal();
   }
 
-  getCardSize() { return 3; }
+  getCardSize() { return 4; }
 
   _t(key, vars) { return t(key, resolveLang(this.hass, this._config), vars); }
 
@@ -95,7 +97,7 @@ class SoccerLiveLastMatchCard extends LitElement {
     const competition = displayCompetitionName(leagueName, lang);
 
     const dateObj = parseMatchDate(match.date_iso || match.date);
-    const dateStr = dateObj ? dateObj.toLocaleDateString(lang, { day: "numeric", month: "short" }) : "";
+    const dateStr = dateObj ? dateObj.toLocaleDateString(lang, { day: "numeric", month: "short" }) : (match.date || "");
 
     const homeGoals = Number(match.home_score);
     const awayGoals = Number(match.away_score);
@@ -107,12 +109,12 @@ class SoccerLiveLastMatchCard extends LitElement {
       : html`<div class="lm-logo placeholder">⚽</div>`;
 
     return html`
-      <div class="lm-head">
-        <span class="lm-comp">
+      <div class="top-bar">
+        <div class="lm-comp">
           ${leagueLogo ? html`<img src="${leagueLogo}" alt="">` : html`<span>⚽</span>`}
           ${competition || html`<span>&nbsp;</span>`}
-        </span>
-        <span class="lm-label">${this._t("last_match.label")}</span>
+        </div>
+        ${dateStr ? html`<div class="badge">${dateStr}</div>` : ""}
       </div>
 
       <div class="lm-score-row">
@@ -131,7 +133,7 @@ class SoccerLiveLastMatchCard extends LitElement {
         </div>
       </div>
 
-      ${dateStr || competition ? html`<div class="lm-meta">${[competition, dateStr].filter(Boolean).join(" · ")}</div>` : ""}
+      ${this._config.hide_meta !== true ? renderMatchMeta(match, { lang, t: (k, vars) => this._t(k, vars), showDate: false }) : ""}
 
       ${this._hasDetails(match) ? html`
         <div class="lm-actions">
@@ -153,9 +155,6 @@ class SoccerLiveLastMatchCard extends LitElement {
       this._portal.className = "soccer-live-last-match-portal";
       this._cancel = (e) => { e.preventDefault(); this._showDetails = false; };
       this._backdrop = (e) => { if (e.target === this._portal) this._showDetails = false; };
-      // A document-level Escape handler as well, so ESC closes the popup even
-      // when focus isn't inside the dialog (and if showModal fell back to a
-      // non-modal open, where the dialog's own cancel event never fires).
       this._escape = (e) => { if (e.key === "Escape") this._showDetails = false; };
       this._portal.addEventListener("cancel", this._cancel);
       this._portal.addEventListener("click", this._backdrop);
@@ -252,7 +251,6 @@ class SoccerLiveLastMatchCard extends LitElement {
       </div>`;
   }
 
-  // FotMob-style rating colour: strong green (8+), green (7+), amber (6+), red.
   _ratingChip(rating) {
     const n = parseFloat(rating);
     if (!Number.isFinite(n)) return "";
@@ -289,7 +287,6 @@ class SoccerLiveLastMatchCard extends LitElement {
   _renderH2H(match, translate) {
     const h2h = Array.isArray(match.head_to_head) ? match.head_to_head : [];
     if (!h2h.length) return "";
-    // Colour each result from the followed team's perspective (win/draw/loss).
     const attrs = this._attrs() || {};
     const tracked = (this._config.my_team || this._config.team_name || attrs.team_name
       || match.home_team || "").toLowerCase();
@@ -383,29 +380,28 @@ class SoccerLiveLastMatchCard extends LitElement {
   }
 
   static get styles() {
-    return [skinStyles, css`
+    return [skinStyles, soccerCardShellStyles, matchMetaStyles, css`
       :host { display: block; }
-      ha-card { padding: 14px 16px; overflow: hidden; background: var(--cl-bg); color: var(--cl-text); }
-      .lm-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-      .lm-comp { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--cl-text-2); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      ha-card { padding: 16px 18px; overflow: hidden; background: var(--cl-bg); color: var(--cl-text); border-radius: 20px; }
+      .top-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+      .lm-comp { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 700; color: var(--cl-text-2); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       .lm-comp img { width: 18px; height: 18px; object-fit: contain; }
-      .lm-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--cl-accent); white-space: nowrap; }
-      .lm-score-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; margin: 12px 0 6px; }
-      .lm-side { display: flex; align-items: center; gap: 8px; min-width: 0; }
+      .badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 99px; background: var(--cl-surface-2, rgba(255,255,255,0.1)); color: var(--cl-text-2); white-space: nowrap; }
+      .lm-score-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; margin: 16px 0 12px; }
+      .lm-side { display: flex; align-items: center; gap: 10px; min-width: 0; }
       .lm-side.away { justify-content: flex-end; }
-      .lm-logo { width: 34px; height: 34px; object-fit: contain; flex: 0 0 auto; }
-      .lm-logo.placeholder { display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
-      .lm-team { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--cl-text); }
-      .lm-scoreline { display: flex; align-items: center; gap: 8px; }
-      .lm-score { font-size: 1.6rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--cl-text-2); }
+      .lm-logo { width: 44px; height: 44px; object-fit: contain; flex: 0 0 auto; }
+      .lm-logo.placeholder { display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+      .lm-team { font-weight: 700; font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--cl-text); }
+      .lm-scoreline { display: flex; align-items: center; gap: 10px; }
+      .lm-score { font-size: 2rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--cl-text-2); }
       .lm-score.win { color: var(--cl-text); }
-      .lm-sep { font-size: 1.1rem; color: var(--cl-text-2); }
-      .lm-meta { text-align: center; font-size: 0.8rem; color: var(--cl-text-2); }
+      .lm-sep { font-size: 1.4rem; color: var(--cl-text-2); font-weight: 300; }
       .lm-actions { display: flex; justify-content: center; margin-top: 14px; }
       .lm-details-btn {
-        border: 0; cursor: pointer; font-weight: 700; font-size: 0.8rem;
-        padding: 6px 16px; border-radius: 99px;
-        background: var(--cl-accent); color: #fff;
+        border: 0; cursor: pointer; font-weight: 700; font-size: 0.85rem;
+        padding: 8px 20px; border-radius: 99px;
+        background: var(--cl-accent, #0284c7); color: #fff;
       }
       .lm-details-btn:hover { filter: brightness(1.08); }
     `];
