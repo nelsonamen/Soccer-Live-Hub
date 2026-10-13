@@ -1,4 +1,5 @@
 import { parseMatchTimestamp } from '../i18n.js';
+import { isFinishedMatch } from './shared-match-order.js';
 
 // Sortable timestamp from either `date_iso` or `date`
 function _dateKey(match) {
@@ -14,8 +15,8 @@ function _dateKey(match) {
 export function pickLastMatch(attributes) {
   const matches = Array.isArray(attributes?.matches) ? attributes.matches : [];
   const previous = Array.isArray(attributes?.previous_matches) ? attributes.previous_matches : [];
-  const finished = matches.filter(m => m && m.state === 'post');
-  const compact = previous.filter(m => m && (m.state === 'post' || m.state == null));
+  const finished = matches.filter(m => m && isFinishedMatch(m));
+  const compact = previous.filter(m => m && isFinishedMatch(m));
   const pool = [...finished, ...compact];
   if (!pool.length) return null;
 

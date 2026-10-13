@@ -1,9 +1,13 @@
 import { parseMatchTimestamp } from '../i18n.js';
 
 export function isFinishedMatch(match) {
-  if (match?.state) return match.state === 'post';
-  return ['full time', 'finished', 'final', 'einde wedstrijd']
-    .includes(String(match?.status || '').trim().toLowerCase());
+  if (match?.state) {
+    const s = String(match.state).trim().toLowerCase();
+    return ['post', 'finished', 'ft', 'complete', 'completed', 'ended'].includes(s);
+  }
+  const status = String(match?.status || match?.status_detail || '').trim().toLowerCase();
+  return ['full time', 'finished', 'final', 'ft', 'einde wedstrijd', 'encerrado', 'terminado']
+    .some(term => status.includes(term));
 }
 
 export function matchTimestamp(match) {
@@ -21,7 +25,13 @@ export function matchIdentity(match) {
 }
 
 export function sortMatchesByStateAndDate(matches) {
-  const rank = state => state === 'in' ? 0 : state === 'pre' ? 1 : state === 'post' ? 2 : 3;
+  const rank = state => {
+    const s = String(state || '').trim().toLowerCase();
+    if (s === 'in') return 0;
+    if (s === 'pre' || s === 'scheduled') return 1;
+    if (['post', 'finished', 'ft', 'complete', 'completed', 'ended'].includes(s)) return 2;
+    return 3;
+  };
   return [...(Array.isArray(matches) ? matches : [])].sort((a, b) => {
     const stateDiff = rank(a?.state) - rank(b?.state);
     if (stateDiff) return stateDiff;
@@ -30,6 +40,6 @@ export function sortMatchesByStateAndDate(matches) {
     if (aTime === null && bTime === null) return 0;
     if (aTime === null) return 1;
     if (bTime === null) return -1;
-    return a?.state === 'post' ? bTime - aTime : aTime - bTime;
+    return isFinishedMatch(a) ? bTime - aTime : aTime - bTime;
   });
 }
