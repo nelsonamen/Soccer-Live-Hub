@@ -2,7 +2,7 @@ import { html, css } from 'lit';
 
 /**
  * Shared header component matching the Standings & Team card design contract.
- * Renders a unified top banner with gradient background, competition logo icon,
+ * Renders a 100% unified top banner with gradient background, competition logo icon,
  * title, subtitle, status badge, and league logo watermark on the right.
  *
  * @param {string|null} logo         - URL of logo shown in comp-icon & watermark
@@ -44,10 +44,10 @@ export const soccerHeaderStyles = css`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 20px;
-    min-height: 64px;
+    padding: 18px 20px 16px;
+    min-height: 68px;
     box-sizing: border-box;
-    background: linear-gradient(135deg, rgba(var(--cl-accent-rgb, 2, 132, 199), 0.12), rgba(var(--cl-accent-2-rgb, 236, 72, 153), 0.06) 60%, transparent);
+    background: linear-gradient(135deg, rgba(var(--cl-accent-rgb, 2, 132, 199), 0.14), rgba(var(--cl-accent-2-rgb, 236, 72, 153), 0.08) 60%, transparent);
     border-bottom: 1px solid var(--cl-divider, rgba(0,0,0,0.08));
     overflow: hidden;
   }
@@ -99,7 +99,7 @@ export const soccerHeaderStyles = css`
     min-width: 0;
   }
   .comp-name {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 800;
     white-space: nowrap;
     overflow: hidden;

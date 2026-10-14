@@ -153,7 +153,7 @@ class SoccerLiveLastMatchCard extends LitElement {
       ${renderSoccerHeader({
         logo: leagueLogo,
         title: competition,
-        subtitle: `${this._t("card.last_match") || "Último Jogo"}${match.season_info ? ` · ${match.season_info}` : ""}`,
+        subtitle: `${this._t("last_match.label") || "Último resultado"}${match.season_info ? ` · ${match.season_info}` : ""}`,
         badge: this._renderStatusBadge(match),
       })}
 
