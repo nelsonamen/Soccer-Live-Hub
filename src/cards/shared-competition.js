@@ -64,8 +64,7 @@ export function resolveCompetitionLogo({ competitionName, competitionLogo, fallb
 // `league_info` can list several of a team's competitions (e.g. a friendly
 // alongside the league), so naively taking the first entry can grab an
 // unrelated one and mislabel the match. Match by name; only fall back to the
-// sole entry when there's exactly one, so a multi-entry list never silently
-// resolves to the wrong competition.
+// sole entry, so a multi-entry list never silently resolves to the wrong competition.
 export function pickLeagueInfo(leagueList, leagueName) {
   const list = Array.isArray(leagueList) ? leagueList : [];
   const name = leagueName && leagueName !== 'N/A' ? String(leagueName).toLowerCase() : '';
@@ -87,6 +86,7 @@ const COMPETITION_ALIASES = {
   'italian serie a': 'Serie A',
   'french ligue 1': 'Ligue 1',
   'portuguese liga portugal': 'Liga Portugal',
+  'portuguese primeira liga': 'Primeira Liga',
 };
 
 export function displayCompetitionName(name, lang = 'en') {

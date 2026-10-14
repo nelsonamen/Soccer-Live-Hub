@@ -3,7 +3,7 @@ import { t, resolveLang, parseMatchDate } from "../../i18n.js";
 import { skinStyles, applySkin } from "../../skins.js";
 import { renderInfoState, renderSyncStatusOrEmpty } from "../card-error.js";
 import { OfflineCache } from "../offline-cache.js";
-import { displayCompetitionName, resolveCompetitionLogo } from "../shared-competition.js";
+import { displayCompetitionName, resolveCompetitionLogo, pickLeagueInfo } from "../shared-competition.js";
 import { scoreText } from "../shared-score.js";
 import { standingText } from "../shared-standing.js";
 import { pickLastMatch } from "../shared-last-match.js";
@@ -123,10 +123,14 @@ class SoccerLiveLastMatchCard extends LitElement {
 
   _renderMatch(match) {
     const lang = resolveLang(this.hass, this._config);
-    const leagueName = match.league_name && match.league_name !== "N/A" ? match.league_name : "";
+    const attrs = this._attrs() || {};
+    const leagueName = (match.league_name && match.league_name !== "N/A" ? match.league_name : "") || attrs.league_name || "";
+    const leagueInfo = pickLeagueInfo(attrs.league_info, leagueName);
     const leagueLogo = resolveCompetitionLogo({
-      competitionName: leagueName,
-      competitionLogo: match.league_logo,
+      competitionName: leagueName || (leagueInfo && leagueInfo.name) || '',
+      competitionLogo: (match.league_logo && match.league_logo !== 'N/A')
+        ? match.league_logo
+        : ((leagueInfo && leagueInfo.logo_href) || attrs.league_logo || (attrs.league_info && attrs.league_info[0]?.logo_href)),
       fallbackLogo: null,
       isFriendly: match.is_friendly,
     });
@@ -137,7 +141,6 @@ class SoccerLiveLastMatchCard extends LitElement {
     const homeWin = Number.isFinite(homeGoals) && Number.isFinite(awayGoals) && homeGoals > awayGoals;
     const awayWin = Number.isFinite(homeGoals) && Number.isFinite(awayGoals) && awayGoals > homeGoals;
 
-    const attrs = this._attrs() || {};
     const myTeam = (this._config.my_team || this._config.team_name || attrs.team_name || "").toLowerCase();
     const homeIsMyTeam = myTeam && match.home_team && match.home_team.toLowerCase().includes(myTeam);
     const awayIsMyTeam = myTeam && match.away_team && match.away_team.toLowerCase().includes(myTeam);
