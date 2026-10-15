@@ -104,7 +104,7 @@ class SoccerLiveTeamCompetitionsCard extends LitElement {
   _renderForm(form) {
     if (!form.length) return '';
     const cls = { W: 'form-w', D: 'form-d', L: 'form-l' };
-    return html`<div class="form-row">${form.map(r => html`<span class="form-dot ${cls[r]}">${r}</span>`)}</div>`;
+    return html`<div class="form-row" title="${this._t('team.form')}">${form.map(r => html`<span class="form-dot ${cls[r]}">${this._t('form.' + r)}</span>`)}</div>`;
   }
 
   _renderMatch(m, label) {
@@ -240,7 +240,7 @@ class SoccerLiveTeamCompetitionsCard extends LitElement {
             </div>
           ` : ''}
 
-          ${form.length ? this._renderForm(form) : ''}
+          ${this._config.show_form !== false && form.length ? this._renderForm(form) : ''}
 
           ${prevMatch && !upcomingMatches.length ? html`
             <div class="divider"></div>

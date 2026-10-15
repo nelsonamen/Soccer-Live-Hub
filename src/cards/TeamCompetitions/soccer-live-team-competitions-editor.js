@@ -65,6 +65,10 @@ class SoccerLiveTeamCompetitionsEditor extends LitElement {
           <label>${this._t('editor.hide_header')}</label>
           <ha-switch .checked=${this._config.hide_header === true} data-config-value="hide_header" @change=${this._switchChanged}></ha-switch>
         </div>
+        <div class="option">
+          <label>${this._t('editor.show_form') || 'Mostrar forma recente'}</label>
+          <ha-switch .checked=${this._config.show_form !== false} data-config-value="show_form" @change=${this._switchChanged}></ha-switch>
+        </div>
 
         ${renderSkinControls(this, this._config, (k) => (this._t ? this._t(k) : k))}
       </div>
