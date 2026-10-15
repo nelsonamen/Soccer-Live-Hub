@@ -1102,6 +1102,13 @@ class SoccerLiveCard extends HTMLElement {
 
   _createModuleElement(mod) {
     const type = mod.type || 'team';
+    const allowed = new Set(CARD_REGISTRY.map(c => c.value));
+    if (!allowed.has(type)) {
+      const err = document.createElement('div');
+      err.textContent = `Módulo removido ou inválido: ${type}`;
+      err.style.cssText = 'padding:16px;color:#ef4444;font-weight:700;text-align:center;background:rgba(239,68,68,0.1);border-radius:12px;';
+      return err;
+    }
     const elementName = resolveElement(type);
     if (!elementName || !customElements.get(elementName)) {
       return this._errorCard(`Módulo desconhecido: ${type}`);
