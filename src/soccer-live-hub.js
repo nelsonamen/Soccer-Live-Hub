@@ -27,7 +27,6 @@ import './cards/Standings/soccer-live-standings.js';
 import './cards/LastMatch/soccer-live-last-match.js';
 import './cards/Tutte/soccer-live-matches.js';
 import './cards/Countdown/soccer-live-countdown.js';
-import './cards/News/soccer-live-news.js';
 import './cards/Bracket/soccer-live-bracket.js';
 import './cards/MiniStandings/soccer-live-mini-standings.js';
 import './cards/Scorers/soccer-live-scorers.js';
@@ -35,42 +34,22 @@ import './cards/MultiTeam/soccer-live-multi-team.js';
 import './cards/TeamCompetitions/soccer-live-team-competitions.js';
 import './cards/MatchCenter/soccer-live-match-center.js';
 import './cards/TeamForm/soccer-live-team-form.js';
-import './cards/Club/soccer-live-club.js';
-import './cards/Diagnostics/soccer-live-diagnostics.js';
-import './cards/Ticker/soccer-live-ticker.js';
-import './cards/Lineup/soccer-live-lineup.js';
-import './cards/Timeline/soccer-live-timeline.js';
-import './cards/Schedule/soccer-live-schedule.js';
-import './cards/Matchday/soccer-live-matchday.js';
-import './cards/Archive/soccer-live-archive.js';
 
 // ─── Card type registry (All Modules) ─────────────────────────────────────────
 
 const CARD_MODULES = {
   team: { editor: () => import('./cards/Team/soccer-live-team-editor.js') },
   standings: { editor: () => import('./cards/Standings/soccer-live-standings-editor.js') },
+  'mini-standings': { editor: () => import('./cards/MiniStandings/soccer-live-mini-standings-editor.js') },
   'last-match': { editor: () => import('./cards/LastMatch/soccer-live-last-match-editor.js') },
   matches: { editor: () => import('./cards/Tutte/soccer-live-matches-editor.js') },
   countdown: { editor: () => import('./cards/Countdown/soccer-live-countdown-editor.js') },
-  news: { editor: () => import('./cards/News/soccer-live-news-editor.js') },
-  bracket: { editor: () => import('./cards/Bracket/soccer-live-bracket-editor.js') },
-  'mini-standings': { editor: () => import('./cards/MiniStandings/soccer-live-mini-standings-editor.js') },
-  scorers: { editor: () => import('./cards/Scorers/soccer-live-scorers-editor.js') },
-  'multi-team': { editor: () => import('./cards/MultiTeam/soccer-live-multi-team-editor.js') },
-  'team-competitions': { editor: () => import('./cards/TeamCompetitions/soccer-live-team-competitions-editor.js') },
   'match-center': { editor: () => import('./cards/MatchCenter/soccer-live-match-center-editor.js') },
-  hub: { editor: () => import('./cards/MatchCenter/soccer-live-match-center-editor.js') },
-  race: { editor: () => import('./cards/Standings/soccer-live-standings-editor.js') },
+  scorers: { editor: () => import('./cards/Scorers/soccer-live-scorers-editor.js') },
   'team-form': { editor: () => import('./cards/TeamForm/soccer-live-team-form-editor.js') },
-  club: { editor: () => import('./cards/Club/soccer-live-club-editor.js') },
-  diagnostics: { editor: () => import('./cards/Diagnostics/soccer-live-diagnostics-editor.js') },
-  ticker: { editor: () => import('./cards/Ticker/soccer-live-ticker-editor.js') },
-  lineup: { editor: () => import('./cards/Lineup/soccer-live-lineup-editor.js') },
-  timeline: { editor: () => import('./cards/Timeline/soccer-live-timeline-editor.js') },
-  minimal: { editor: () => import('./cards/Schedule/soccer-live-schedule-editor.js') },
-  schedule: { editor: () => import('./cards/Schedule/soccer-live-schedule-editor.js') },
-  matchday: { editor: () => import('./cards/Insights/soccer-live-insights-editor.js') },
-  archive: { editor: () => import('./cards/Insights/soccer-live-insights-editor.js') },
+  'team-competitions': { editor: () => import('./cards/TeamCompetitions/soccer-live-team-competitions-editor.js') },
+  bracket: { editor: () => import('./cards/Bracket/soccer-live-bracket-editor.js') },
+  'multi-team': { editor: () => import('./cards/MultiTeam/soccer-live-multi-team-editor.js') },
 };
 
 const MODULE_PROMISES = new Map();
@@ -98,20 +77,7 @@ const CARD_REGISTRY = [
   { value: 'multi-team',        element: 'soccer-live-multi-team',        editor: 'soccer-live-multi-team-editor',        label: 'Múltiplas Equipas',      description: 'Várias equipas num só cartão compacto' },
 ];
 
-const CARD_TYPE_ALIASES = {
-  schedule: 'matches',
-  minimal: 'matches',
-  hub: 'match-center',
-  race: 'standings',
-  lineup: 'match-center',
-  timeline: 'match-center',
-  ticker: 'matches',
-  news: 'matches',
-  club: 'team-competitions',
-  matchday: 'matches',
-  archive: 'last-match',
-  diagnostics: 'team',
-};
+const CARD_TYPE_ALIASES = {};
 function normalizeCardType(cardType) {
   return CARD_TYPE_ALIASES[cardType] || cardType;
 }
