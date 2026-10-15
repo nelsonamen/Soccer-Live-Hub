@@ -475,10 +475,6 @@
           <label>${this._t("editor.hide_header")}</label>
           <ha-switch .checked=${!0===this._config.hide_header} data-config-value="hide_header" @change=${this._switchChanged}></ha-switch>
         </div>
-        <div class="option">
-          <label>${this._t("editor.show_form")||"Mostrar forma recente"}</label>
-          <ha-switch .checked=${!1!==this._config.show_form} data-config-value="show_form" @change=${this._switchChanged}></ha-switch>
-        </div>
 
         ${(0,s.m)(this,this._config,e=>this._t?this._t(e):e)}
       </div>
