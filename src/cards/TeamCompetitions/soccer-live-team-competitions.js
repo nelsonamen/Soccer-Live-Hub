@@ -23,7 +23,7 @@ class SoccerLiveTeamCompetitionsCard extends LitElement {
   getCardSize() { return 5; }
   _t(key, vars) { return t(key, resolveLang(this.hass, this._config), vars); }
   static getConfigElement() { return document.createElement("soccer-live-team-competitions-editor"); }
-  static getStubConfig() { return { entity: "sensor.soccer_live_all_mixed_" }; }
+  static getStubConfig() { return { entity: "sensor.soccer_live_all_mixed_", max_matches: 4 }; }
 
   _selectComp(key) { this._selectedComp = key; this.requestUpdate(); }
 
@@ -170,7 +170,9 @@ class SoccerLiveTeamCompetitionsCard extends LitElement {
     const form       = this._computeForm(active.all, teamName);
     const standing   = this._getStanding(active.last || featured, teamName);
     const prevMatch  = active.last;
-    const nextMatch  = active.upcoming[0];
+
+    const maxMatches = this._config.max_matches ? Math.max(1, parseInt(this._config.max_matches, 10)) : 4;
+    const upcomingMatches = active.upcoming.slice(0, maxMatches);
 
     return html`
       <ha-card>
@@ -206,20 +208,27 @@ class SoccerLiveTeamCompetitionsCard extends LitElement {
             </div>
           ` : ''}
 
-          ${featured.state === 'in' || featured.state === 'post'
-            ? this._renderMatch(featured, null)
-            : this._renderMatch(featured, this._t('team.next_match'))}
+          ${featured.state === 'in' ? html`
+            <div class="match-list">
+              ${this._renderMatch(featured, this._t('status.live'))}
+            </div>
+          ` : ''}
+
+          ${upcomingMatches.length ? html`
+            <div class="match-list">
+              <span class="match-label">${this._t('team.next_match')}</span>
+              ${upcomingMatches.map((m, idx) => html`
+                ${idx > 0 ? html`<div class="divider"></div>` : ''}
+                ${this._renderMatch(m, null)}
+              `)}
+            </div>
+          ` : ''}
 
           ${form.length ? this._renderForm(form) : ''}
 
-          ${(featured.state === 'in' || featured.state === 'pre') && prevMatch ? html`
+          ${prevMatch && !upcomingMatches.length ? html`
             <div class="divider"></div>
             ${this._renderMatch(prevMatch, this._t('status.finished'))}
-          ` : ''}
-
-          ${(featured.state === 'post' || featured.state === 'in') && nextMatch ? html`
-            <div class="divider"></div>
-            ${this._renderMatch(nextMatch, this._t('team.next_match'))}
           ` : ''}
         </div>
         </div>
@@ -258,8 +267,9 @@ class SoccerLiveTeamCompetitionsCard extends LitElement {
         border-radius: 99px; background: var(--cl-surface); color: var(--cl-text-2);
       }
 
+      .match-list { display: flex; flex-direction: column; gap: 6px; }
       .match-row { display: flex; flex-direction: column; gap: 4px; }
-      .match-label { font-size: 10px; font-weight: 700; color: var(--cl-text-2); text-transform: uppercase; letter-spacing: 0.05em; }
+      .match-label { font-size: 10px; font-weight: 700; color: var(--cl-text-2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
       .match-teams { display: flex; align-items: center; gap: 8px; }
       .team-side { display: flex; align-items: center; gap: 5px; flex: 1; min-width: 0; }
       .team-side.right { flex-direction: row-reverse; }
@@ -279,7 +289,7 @@ class SoccerLiveTeamCompetitionsCard extends LitElement {
       .form-d { background: var(--cl-draw, #94a3b8); color: #fff; }
       .form-l { background: var(--cl-loss, #ef4444); color: #fff; }
 
-      .divider { height: 1px; background: var(--cl-divider); margin: 0 -4px; }
+      .divider { height: 1px; background: var(--cl-divider); margin: 2px -4px; }
     `];
   }
 }
