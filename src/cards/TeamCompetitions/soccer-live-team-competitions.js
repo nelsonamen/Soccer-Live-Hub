@@ -23,7 +23,7 @@ class SoccerLiveTeamCompetitionsCard extends LitElement {
   getCardSize() { return 5; }
   _t(key, vars) { return t(key, resolveLang(this.hass, this._config), vars); }
   static getConfigElement() { return document.createElement("soccer-live-team-competitions-editor"); }
-  static getStubConfig() { return { entity: "sensor.soccer_live_all_mixed_", max_matches: 3 }; }
+  static getStubConfig() { return { entity: "sensor.soccer_live_all_mixed_", max_matches: 4 }; }
 
   _selectComp(key) { this._selectedComp = key; this.requestUpdate(); }
 
@@ -155,7 +155,23 @@ class SoccerLiveTeamCompetitionsCard extends LitElement {
       OfflineCache.set(entityId, attrs);
     }
 
-    const matches = attrs.matches || [];
+    const rawMatches = [
+      ...(attrs.matches || []),
+      ...(attrs.upcoming_matches || []),
+      ...(attrs.previous_matches || []),
+      ...(attrs.schedule_recent_matches || []),
+      ...(attrs.match_archive || []),
+    ];
+
+    const seen = new Set();
+    const matches = rawMatches.filter(m => {
+      if (!m || typeof m !== 'object') return false;
+      const id = matchIdentity(m);
+      if (seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
+
     if (!matches.length) {
       return renderSyncStatusOrEmpty(attrs, (k) => this._t(k),
         () => renderInfoState('🗂️', this._t('ui.no_competition_data'), this._t('ui.no_competition_hint'), ''));
@@ -171,7 +187,7 @@ class SoccerLiveTeamCompetitionsCard extends LitElement {
     const standing   = this._getStanding(active.last || featured, teamName);
     const prevMatch  = active.last;
 
-    const maxMatches = this._config.max_matches ? Math.max(1, parseInt(this._config.max_matches, 10)) : 3;
+    const maxMatches = this._config.max_matches ? Math.max(1, parseInt(this._config.max_matches, 10)) : 4;
     const upcomingMatches = active.upcoming.slice(0, maxMatches);
 
     return html`

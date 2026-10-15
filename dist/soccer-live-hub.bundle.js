@@ -2498,7 +2498,7 @@
         ${e.map(e=>this._renderMatch(e))}
         </div>
       </ha-card>
-    `}}customElements.get("soccer-live-multi-team")||customElements.define("soccer-live-multi-team",Lt);class Dt extends i.WF{static get properties(){return{hass:{},_config:{},_selectedComp:{type:String}}}setConfig(e){if(!e.entity)throw new Error("Entity required");this._config=e,this._selectedComp=e.default_comp||null,q(this,e)}getCardSize(){return 5}_t(e,t){return(0,s.t)(e,(0,s.$c)(this.hass,this._config),t)}static getConfigElement(){return document.createElement("soccer-live-team-competitions-editor")}static getStubConfig(){return{entity:"sensor.soccer_live_all_mixed_",max_matches:3}}_selectComp(e){this._selectedComp=e,this.requestUpdate()}_validText(e){if(null==e)return"";const t=String(e).trim();return/^(?:n\/?a|unknown|none|null|undefined|-)$/i.test(t)?"":t}_sortByDateAsc(e,t){return(ot(e)??1/0)-(ot(t)??1/0)}_groupByCompetition(e){const t={};for(const a of e){const e=this._validText(a.league_name)||this._validText(a.competition_name)||"Other";t[e]||(t[e]={key:e,name:ze(e,(0,s.$c)(this.hass,this._config)),logo:ke({competitionName:e,competitionLogo:this._validText(a.league_logo)||this._validText(a.competition_logo),fallbackLogo:null,isFriendly:a.is_friendly}),all:[]});const i=rt(a);t[e].all.some(e=>rt(e)===i)||t[e].all.push(a)}return Object.values(t).map(e=>{const t=e.all.find(e=>"in"===e.state),a=e.all.filter(e=>"pre"===e.state).sort((e,t)=>this._sortByDateAsc(e,t))[0],i=e.all.filter(e=>"post"===e.state).sort((e,t)=>this._sortByDateAsc(e,t)),s=[...i].reverse().find(e=>null!==ot(e))||i[i.length-1],o=t||a||s||e.all[0],r=e.all.filter(e=>"pre"===e.state).sort((e,t)=>this._sortByDateAsc(e,t));return{...e,featured:o,previous:i,last:s,upcoming:r}}).filter(e=>e.featured).sort((e,t)=>{const a=e=>"in"===e.featured.state?0:"pre"===e.featured.state?1:2;return a(e)-a(t)})}_computeForm(e,t){if(!t)return[];const a=t.toLowerCase();return e.filter(e=>"post"===e.state).sort((e,t)=>this._sortByDateAsc(e,t)).slice(-5).map(e=>{const t=e.home_team?.toLowerCase().includes(a)||e.home_team?.toLowerCase()===a,i=Number.parseInt(e.home_score,10),s=Number.parseInt(e.away_score,10);return Number.isFinite(i)&&Number.isFinite(s)?t?i>s?"W":i<s?"L":"D":s>i?"W":s<i?"L":"D":null}).filter(Boolean)}_getStanding(e,t){if(!e||!t)return"";const a=t.toLowerCase(),i=e.home_team?.toLowerCase().includes(a);return _e(e,i?"home":"away",e=>this._t(e))}_renderForm(e){if(!e.length)return"";const t={W:"form-w",D:"form-d",L:"form-l"};return i.qy`<div class="form-row">${e.map(e=>i.qy`<span class="form-dot ${t[e]}">${e}</span>`)}</div>`}_renderMatch(e,t){if(!e)return"";const a="in"===e.state,s="post"===e.state;return i.qy`
+    `}}customElements.get("soccer-live-multi-team")||customElements.define("soccer-live-multi-team",Lt);class Dt extends i.WF{static get properties(){return{hass:{},_config:{},_selectedComp:{type:String}}}setConfig(e){if(!e.entity)throw new Error("Entity required");this._config=e,this._selectedComp=e.default_comp||null,q(this,e)}getCardSize(){return 5}_t(e,t){return(0,s.t)(e,(0,s.$c)(this.hass,this._config),t)}static getConfigElement(){return document.createElement("soccer-live-team-competitions-editor")}static getStubConfig(){return{entity:"sensor.soccer_live_all_mixed_",max_matches:4}}_selectComp(e){this._selectedComp=e,this.requestUpdate()}_validText(e){if(null==e)return"";const t=String(e).trim();return/^(?:n\/?a|unknown|none|null|undefined|-)$/i.test(t)?"":t}_sortByDateAsc(e,t){return(ot(e)??1/0)-(ot(t)??1/0)}_groupByCompetition(e){const t={};for(const a of e){const e=this._validText(a.league_name)||this._validText(a.competition_name)||"Other";t[e]||(t[e]={key:e,name:ze(e,(0,s.$c)(this.hass,this._config)),logo:ke({competitionName:e,competitionLogo:this._validText(a.league_logo)||this._validText(a.competition_logo),fallbackLogo:null,isFriendly:a.is_friendly}),all:[]});const i=rt(a);t[e].all.some(e=>rt(e)===i)||t[e].all.push(a)}return Object.values(t).map(e=>{const t=e.all.find(e=>"in"===e.state),a=e.all.filter(e=>"pre"===e.state).sort((e,t)=>this._sortByDateAsc(e,t))[0],i=e.all.filter(e=>"post"===e.state).sort((e,t)=>this._sortByDateAsc(e,t)),s=[...i].reverse().find(e=>null!==ot(e))||i[i.length-1],o=t||a||s||e.all[0],r=e.all.filter(e=>"pre"===e.state).sort((e,t)=>this._sortByDateAsc(e,t));return{...e,featured:o,previous:i,last:s,upcoming:r}}).filter(e=>e.featured).sort((e,t)=>{const a=e=>"in"===e.featured.state?0:"pre"===e.featured.state?1:2;return a(e)-a(t)})}_computeForm(e,t){if(!t)return[];const a=t.toLowerCase();return e.filter(e=>"post"===e.state).sort((e,t)=>this._sortByDateAsc(e,t)).slice(-5).map(e=>{const t=e.home_team?.toLowerCase().includes(a)||e.home_team?.toLowerCase()===a,i=Number.parseInt(e.home_score,10),s=Number.parseInt(e.away_score,10);return Number.isFinite(i)&&Number.isFinite(s)?t?i>s?"W":i<s?"L":"D":s>i?"W":s<i?"L":"D":null}).filter(Boolean)}_getStanding(e,t){if(!e||!t)return"";const a=t.toLowerCase(),i=e.home_team?.toLowerCase().includes(a);return _e(e,i?"home":"away",e=>this._t(e))}_renderForm(e){if(!e.length)return"";const t={W:"form-w",D:"form-d",L:"form-l"};return i.qy`<div class="form-row">${e.map(e=>i.qy`<span class="form-dot ${t[e]}">${e}</span>`)}</div>`}_renderMatch(e,t){if(!e)return"";const a="in"===e.state,s="post"===e.state;return i.qy`
       <div class="match-row">
         ${t?i.qy`<span class="match-label">${t}</span>`:""}
         <div class="match-teams">
@@ -2517,17 +2517,17 @@
           </div>
         </div>
       </div>
-    `}render(){if(q(this,this._config),!this.hass||!this._config)return i.qy``;const e=this._config.entity,t=this.hass.states[e];let a=null;if(t)if("unavailable"===t.state){const t=X.get(e);if(!t?.data?.matches)return H("📡",this._t("ui.sensor_unavailable"),this._t("ui.sensor_unavailable_hint"),this._t("ui.restart_ha"));a=t.data}else a=t.attributes,X.set(e,a);else{const t=X.get(e);if(!t?.data?.matches)return H("⚠️",this._t("ui.entity_not_found"),e,this._t("ui.check_entity_config"));a=t.data}const s=a.matches||[];if(!s.length)return U(a,e=>this._t(e),()=>K("🗂️",this._t("ui.no_competition_data"),this._t("ui.no_competition_hint"),""));const o=this._groupByCompetition(s),r=o.find(e=>e.key===this._selectedComp)||o[0],n=this._config.team_name||a.team_name||"",l=a.team_logo&&"N/A"!==a.team_logo?a.team_logo:null,c=r.featured,d=this._computeForm(r.all,n),p=this._getStanding(r.last||c,n),u=r.last,h=this._config.max_matches?Math.max(1,parseInt(this._config.max_matches,10)):3,m=r.upcoming.slice(0,h);return i.qy`
+    `}render(){if(q(this,this._config),!this.hass||!this._config)return i.qy``;const e=this._config.entity,t=this.hass.states[e];let a=null;if(t)if("unavailable"===t.state){const t=X.get(e);if(!t?.data?.matches)return H("📡",this._t("ui.sensor_unavailable"),this._t("ui.sensor_unavailable_hint"),this._t("ui.restart_ha"));a=t.data}else a=t.attributes,X.set(e,a);else{const t=X.get(e);if(!t?.data?.matches)return H("⚠️",this._t("ui.entity_not_found"),e,this._t("ui.check_entity_config"));a=t.data}const s=[...a.matches||[],...a.upcoming_matches||[],...a.previous_matches||[],...a.schedule_recent_matches||[],...a.match_archive||[]],o=new Set,r=s.filter(e=>{if(!e||"object"!=typeof e)return!1;const t=rt(e);return!o.has(t)&&(o.add(t),!0)});if(!r.length)return U(a,e=>this._t(e),()=>K("🗂️",this._t("ui.no_competition_data"),this._t("ui.no_competition_hint"),""));const n=this._groupByCompetition(r),l=n.find(e=>e.key===this._selectedComp)||n[0],c=this._config.team_name||a.team_name||"",d=a.team_logo&&"N/A"!==a.team_logo?a.team_logo:null,p=l.featured,u=this._computeForm(l.all,c),h=this._getStanding(l.last||p,c),m=l.last,_=this._config.max_matches?Math.max(1,parseInt(this._config.max_matches,10)):4,g=l.upcoming.slice(0,_);return i.qy`
       <ha-card>
-        ${vt(c.home_logo,c.away_logo)}
+        ${vt(p.home_logo,p.away_logo)}
         <div class="card-content">
-        ${this._config.hide_header?"":Y({logo:l,title:n||"Team",badge:o.length>1?ee(`${o.length}`,"neutral"):null,fallbackIcon:"🗂️"})}
+        ${this._config.hide_header?"":Y({logo:d,title:c||"Team",badge:n.length>1?ee(`${n.length}`,"neutral"):null,fallbackIcon:"🗂️"})}
 
-        ${o.length>1?i.qy`
+        ${n.length>1?i.qy`
           <div class="comp-tabs" role="tablist">
-            ${o.map(e=>i.qy`
-              <span class="comp-tab ${e.key===r.key?"active":""}"
-                    role="tab" tabindex="0" aria-selected="${e.key===r.key}"
+            ${n.map(e=>i.qy`
+              <span class="comp-tab ${e.key===l.key?"active":""}"
+                    role="tab" tabindex="0" aria-selected="${e.key===l.key}"
                     @click=${()=>this._selectComp(e.key)}
                     @keydown=${t=>{"Enter"!==t.key&&" "!==t.key||(t.preventDefault(),this._selectComp(e.key))}}>
                 ${e.logo?i.qy`<img class="tab-logo" src="${e.logo}" alt="" @error=${e=>e.target.style.display="none"}>`:""}
@@ -2538,35 +2538,35 @@
         `:""}
 
         <div class="comp-body">
-          ${"Other"!==r.name||r.logo||p?i.qy`
+          ${"Other"!==l.name||l.logo||h?i.qy`
             <div class="comp-header">
-              ${r.logo?i.qy`<img class="comp-icon" src="${r.logo}" alt="">`:""}
-              ${"Other"!==r.name?i.qy`<span class="comp-name">${r.name}</span>`:""}
-              ${p?i.qy`<span class="standing-pill">${p}</span>`:""}
+              ${l.logo?i.qy`<img class="comp-icon" src="${l.logo}" alt="">`:""}
+              ${"Other"!==l.name?i.qy`<span class="comp-name">${l.name}</span>`:""}
+              ${h?i.qy`<span class="standing-pill">${h}</span>`:""}
             </div>
           `:""}
 
-          ${"in"===c.state?i.qy`
+          ${"in"===p.state?i.qy`
             <div class="match-list">
-              ${this._renderMatch(c,this._t("status.live"))}
+              ${this._renderMatch(p,this._t("status.live"))}
             </div>
           `:""}
 
-          ${m.length?i.qy`
+          ${g.length?i.qy`
             <div class="match-list">
               <span class="match-label">${this._t("team.next_match")}</span>
-              ${m.map((e,t)=>i.qy`
+              ${g.map((e,t)=>i.qy`
                 ${t>0?i.qy`<div class="divider"></div>`:""}
                 ${this._renderMatch(e,null)}
               `)}
             </div>
           `:""}
 
-          ${d.length?this._renderForm(d):""}
+          ${u.length?this._renderForm(u):""}
 
-          ${u&&!m.length?i.qy`
+          ${m&&!g.length?i.qy`
             <div class="divider"></div>
-            ${this._renderMatch(u,this._t("status.finished"))}
+            ${this._renderMatch(m,this._t("status.finished"))}
           `:""}
         </div>
         </div>
