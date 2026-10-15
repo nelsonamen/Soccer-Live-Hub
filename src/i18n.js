@@ -6510,7 +6510,7 @@ const TRANSLATIONS = {
     'editor.show_injuries': 'Mostrar desfalques',
     'editor.show_event_toasts': 'Mostrar notificações de eventos',
     'editor.my_team': 'A minha equipa (destaque)',
-    'editor.my_team_hint': 'ex. Benfica',
+    'editor.my_team_hint': 'ex. FC Porto',
     'editor.skin': 'Tema',
     'editor.language': 'Idioma',
     'editor.score_size': 'Tamanho do marcador',
