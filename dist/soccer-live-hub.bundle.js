@@ -710,6 +710,10 @@
           <label class="field-label">${this._t("editor.default_competition")}</label>
           <input type="text" .value=${this._config.default_comp||""} data-config-value="default_comp" @input=${this._textChanged} placeholder="${this._t("editor.default_competition_hint")}">
         </div>
+        <div>
+          <label class="field-label">${this._t("editor.max_matches")||"Número máximo de jogos"}</label>
+          <input type="number" min="1" max="10" .value=${this._config.max_matches||4} data-config-value="max_matches" @change=${this._numberChanged}>
+        </div>
         <div class="option">
           <label>${this._t("editor.hide_header")}</label>
           <ha-switch .checked=${!0===this._config.hide_header} data-config-value="hide_header" @change=${this._switchChanged}></ha-switch>
