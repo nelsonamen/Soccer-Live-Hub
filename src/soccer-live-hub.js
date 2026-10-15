@@ -86,30 +86,32 @@ function loadCardModule(type, kind) {
 const CARD_REGISTRY = [
   { value: 'team',              element: 'soccer-live-team',              editor: 'soccer-live-team-editor',              label: 'Próximo Jogo / Ao Vivo', description: 'Placar ao vivo, relógio, alinhamento e tempo' },
   { value: 'standings',         element: 'soccer-live-standings',         editor: 'soccer-live-standings-editor',         label: 'Classificação',          description: 'Tabela classificativa da liga com zonas' },
+  { value: 'mini-standings',    element: 'soccer-live-mini-standings',    editor: 'soccer-live-mini-standings-editor',    label: 'Mini Classificação',     description: 'Classificação compacta por grupos ou tabela resumida' },
   { value: 'last-match',        element: 'soccer-live-last-match',        editor: 'soccer-live-last-match-editor',        label: 'Último Jogo',            description: 'Resultado e marcadores do último jogo terminado' },
   { value: 'matches',           element: 'soccer-live-matches',           editor: 'soccer-live-matches-editor',           label: 'Jogos / Calendário',     description: 'Lista de jogos agrupados por data com destaque ao vivo' },
-  { value: 'countdown',         element: 'soccer-live-countdown',         editor: 'soccer-live-countdown-editor',         label: 'Contagem Decrescente',   description: 'Contador regressivo para o próximo jogo com placar ao vivo' },
-  { value: 'match-center',      element: 'soccer-live-match-center',      editor: 'soccer-live-match-center-editor',      label: 'Centro de Jogo',         description: 'Resumo, estatísticas, cronologia, alinhamento e H2H' },
+  { value: 'team-competitions', element: 'soccer-live-team-competitions', editor: 'soccer-live-team-competitions-editor', label: 'Competições da Equipa',  description: 'Todas as competições da equipa com abas e jogos' },
   { value: 'scorers',           element: 'soccer-live-scorers',           editor: 'soccer-live-scorers-editor',           label: 'Melhores Marcadores',    description: 'Lista de marcadores com foto e número de golos' },
   { value: 'team-form',         element: 'soccer-live-team-form',         editor: 'soccer-live-team-form-editor',         label: 'Forma da Equipa',        description: 'Tendência de forma, histórico V/E/D e golos' },
-  { value: 'lineup',            element: 'soccer-live-lineup',            editor: 'soccer-live-lineup-editor',            label: 'Onze Inicial',           description: 'Alinhamento titular de ambas as equipas' },
-  { value: 'timeline',          element: 'soccer-live-timeline',          editor: 'soccer-live-timeline-editor',          label: 'Cronologia / Eventos',   description: 'Eventos minuto a minuto da partida' },
-  { value: 'mini-standings',    element: 'soccer-live-mini-standings',    editor: 'soccer-live-mini-standings-editor',    label: 'Mini Classificação',     description: 'Classificação compacta com número de linhas configurável' },
-  { value: 'team-competitions', element: 'soccer-live-team-competitions', editor: 'soccer-live-team-competitions-editor', label: 'Competições da Equipa',  description: 'Todas as competições da equipa com abas' },
-  { value: 'multi-team',        element: 'soccer-live-multi-team',        editor: 'soccer-live-multi-team-editor',        label: 'Múltiplas Equipas',      description: 'Várias equipas num só cartão compacto' },
-  { value: 'news',              element: 'soccer-live-news',              editor: 'soccer-live-news-editor',              label: 'Notícias',               description: 'Feed de artigos com imagens e datas' },
+  { value: 'countdown',         element: 'soccer-live-countdown',         editor: 'soccer-live-countdown-editor',         label: 'Contagem Decrescente',   description: 'Contador regressivo para o próximo jogo com placar ao vivo' },
+  { value: 'match-center',      element: 'soccer-live-match-center',      editor: 'soccer-live-match-center-editor',      label: 'Centro de Jogo',         description: 'Resumo, estatísticas, cronologia, alinhamento e H2H' },
   { value: 'bracket',           element: 'soccer-live-bracket',           editor: 'soccer-live-bracket-editor',           label: 'Eliminatórias / Taça',   description: 'Quadro da fase a eliminar ou árvore do torneio' },
-  { value: 'club',              element: 'soccer-live-club',              editor: 'soccer-live-club-editor',              label: 'Perfil do Clube',        description: 'Perfil do clube, plantel, transferências e época' },
-  { value: 'ticker',            element: 'soccer-live-ticker',            editor: 'soccer-live-ticker-editor',            label: 'Ticker de Jogos',        description: 'Faixa horizontal com os jogos de hoje' },
-  { value: 'minimal',           element: 'soccer-live-schedule',          editor: 'soccer-live-schedule-editor',          label: 'Vista Minimalista',      description: 'Vista minimalista em texto: jogos, próximo jogo ou forma' },
-  { value: 'matchday',          element: 'soccer-live-matchday',          editor: 'soccer-live-insights-editor',          label: 'Jornada',                description: 'Uma jornada com estado, jogos e dados' },
-  { value: 'archive',           element: 'soccer-live-archive',           editor: 'soccer-live-insights-editor',          label: 'Arquivo',                description: 'Histórico pessoal de jogos terminados' },
-  { value: 'diagnostics',       element: 'soccer-live-diagnostics',       editor: 'soccer-live-diagnostics-editor',       label: 'Diagnóstico',            description: 'Estado de saúde dos sensores e agendamento' },
-  { value: 'hub',               element: 'soccer-live-match-center',      editor: 'soccer-live-match-center-editor',      label: 'Match Hub',              description: 'Vista dinâmica adaptada à fase (pré-jogo, ao vivo, pós-jogo)' },
-  { value: 'race',              element: 'soccer-live-standings',         editor: 'soccer-live-standings-editor',         label: 'Corrida ao Título',      description: 'Diferença de pontos para título, vagas europeias e descida' },
+  { value: 'multi-team',        element: 'soccer-live-multi-team',        editor: 'soccer-live-multi-team-editor',        label: 'Múltiplas Equipas',      description: 'Várias equipas num só cartão compacto' },
 ];
 
-const CARD_TYPE_ALIASES = { schedule: 'minimal' };
+const CARD_TYPE_ALIASES = {
+  schedule: 'matches',
+  minimal: 'matches',
+  hub: 'match-center',
+  race: 'standings',
+  lineup: 'match-center',
+  timeline: 'match-center',
+  ticker: 'matches',
+  news: 'matches',
+  club: 'team-competitions',
+  matchday: 'matches',
+  archive: 'last-match',
+  diagnostics: 'team',
+};
 function normalizeCardType(cardType) {
   return CARD_TYPE_ALIASES[cardType] || cardType;
 }
