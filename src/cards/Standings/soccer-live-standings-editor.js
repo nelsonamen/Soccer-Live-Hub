@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
 import { t, resolveLang } from '../../i18n.js';
-import { editorStyles, renderLanguageControl } from '../editor-helper.js';
+import { editorStyles, renderLanguageControl, soccerEntityIds } from '../editor-helper.js';
 import { renderSkinControls } from '../skin-editor.js';
 
 class SoccerLiveStandingsEditor extends LitElement {
@@ -106,9 +106,10 @@ class SoccerLiveStandingsEditor extends LitElement {
 
   _fetchEntities() {
     if (!this.hass) return;
-    this.entities = Object.keys(this.hass.states)
-      .filter((entityId) => entityId.includes('soccerlive_standings') || entityId.includes('soccer_live_standings'))
-      .sort();
+    this.entities = soccerEntityIds(this.hass, {
+      sensorTypes: ['standings'],
+      includes: ['standings', 'classifica', 'classificação', 'tabela', 'liga', 'league'],
+    });
   }
 
   _fetchGroups() {

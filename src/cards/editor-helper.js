@@ -49,13 +49,33 @@ export function setEditorConfigValue(host, key, value, { removeEmpty = false } =
   fireEditorConfig(host, next);
 }
 
-export function soccerEntityIds(hass, { sensorTypes = [], includes = [] } = {}) {
+export function soccerEntityIds(hass, { sensorTypes = [], includes = [], excludes = [] } = {}) {
   if (!hass?.states) return [];
   const types = new Set(sensorTypes);
+  const inc = includes.map(i => i.toLowerCase());
+  const exc = excludes.map(e => e.toLowerCase());
+
   return Object.keys(hass.states).filter(entityId => {
     if (!entityId.startsWith('sensor.')) return false;
-    const sensorType = hass.states[entityId]?.attributes?.sensor_type;
-    return types.has(sensorType) || includes.some(part => entityId.includes(part));
+    if (!entityId.includes('soccer_live_') && !entityId.includes('soccerlive_') && !entityId.includes('soccer_')) return false;
+
+    const lowerId = entityId.toLowerCase();
+    if (exc.length && exc.some(part => lowerId.includes(part))) return false;
+
+    const stateObj = hass.states[entityId];
+    const attrs = stateObj?.attributes || {};
+    const sensorType = attrs.sensor_type || '';
+
+    if (types.has(sensorType)) return true;
+    if (inc.length && inc.some(part => lowerId.includes(part))) return true;
+
+    // Attribute fallback checks
+    if (types.has('standings') && (attrs.standings_groups || attrs.standings)) return true;
+    if (types.has('team_match') && (attrs.matches || attrs.match || attrs.next_match)) return true;
+    if (types.has('top_scorers') && (attrs.top_scorers || attrs.scorers)) return true;
+    if (types.has('bracket') && (attrs.rounds || attrs.bracket)) return true;
+
+    return false;
   }).sort();
 }
 
