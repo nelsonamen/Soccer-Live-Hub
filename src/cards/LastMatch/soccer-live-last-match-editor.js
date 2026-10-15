@@ -30,8 +30,8 @@ class SoccerLiveLastMatchEditor extends LitElement {
   _fetchEntities() {
     if (!this.hass) return;
     this.entities = soccerEntityIds(this.hass, {
-      sensorTypes: ['team_match', 'team_matches', 'team_matches_mixed'],
-      includes: ['soccerlive_next', 'soccer_live_next', 'soccerlive_all', 'soccer_live_all'],
+      sensorTypes: ['last_match', 'team_match', 'team_matches', 'team_matches_mixed'],
+      includes: ['last', 'ultimo', 'último', 'next', 'proximo', 'próximo', 'all', 'todos', 'archive', 'arquivo'],
     });
   }
 

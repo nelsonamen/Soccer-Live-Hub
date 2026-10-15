@@ -19,7 +19,10 @@ class SoccerLiveTeamCompetitionsEditor extends LitElement {
 
   _fetchEntities() {
     if (!this.hass) return;
-    this.entities = soccerEntityIds(this.hass, { includes: ['all_mixed'] });
+    this.entities = soccerEntityIds(this.hass, {
+      sensorTypes: ['team_matches_mixed'],
+      includes: ['all_mixed', 'todas_as_competicoes', 'todas_competicoes', 'competicoes', 'competições'],
+    });
   }
 
   _entityChanged(ev) { setEditorConfigValue(this, 'entity', ev.target.value); }
