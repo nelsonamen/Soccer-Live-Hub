@@ -76,35 +76,11 @@ class SoccerLiveTeamCompetitionsCard extends LitElement {
     });
   }
 
-  _computeForm(matches, teamName) {
-    if (!teamName) return [];
-    const tn = teamName.toLowerCase();
-    return matches
-      .filter(m => m.state === 'post')
-      .sort((a, b) => this._sortByDateAsc(a, b))
-      .slice(-5)
-      .map(m => {
-        const isHome = m.home_team?.toLowerCase().includes(tn) || m.home_team?.toLowerCase() === tn;
-        const hs = Number.parseInt(m.home_score, 10);
-        const as_ = Number.parseInt(m.away_score, 10);
-        if (!Number.isFinite(hs) || !Number.isFinite(as_)) return null;
-        if (isHome) return hs > as_ ? 'W' : hs < as_ ? 'L' : 'D';
-        return as_ > hs ? 'W' : as_ < hs ? 'L' : 'D';
-      })
-      .filter(Boolean);
-  }
-
   _getStanding(m, teamName) {
     if (!m || !teamName) return '';
     const tn = teamName.toLowerCase();
     const isHome = m.home_team?.toLowerCase().includes(tn);
     return standingText(m, isHome ? 'home' : 'away', k => this._t(k));
-  }
-
-  _renderForm(form) {
-    if (!form.length) return '';
-    const cls = { W: 'form-w', D: 'form-d', L: 'form-l' };
-    return html`<div class="form-row" title="${this._t('team.form')}">${form.map(r => html`<span class="form-dot ${cls[r]}">${this._t('form.' + r)}</span>`)}</div>`;
   }
 
   _renderMatch(m, label) {
@@ -183,7 +159,6 @@ class SoccerLiveTeamCompetitionsCard extends LitElement {
     const teamLogo   = attrs.team_logo && attrs.team_logo !== 'N/A' ? attrs.team_logo : null;
 
     const featured   = active.featured;
-    const form       = this._computeForm(active.all, teamName);
     const standing   = this._getStanding(active.last || featured, teamName);
     const prevMatch  = active.last;
 
@@ -239,8 +214,6 @@ class SoccerLiveTeamCompetitionsCard extends LitElement {
               `)}
             </div>
           ` : ''}
-
-          ${this._config.show_form !== false && form.length ? this._renderForm(form) : ''}
 
           ${prevMatch && !upcomingMatches.length ? html`
             <div class="divider"></div>
@@ -298,12 +271,6 @@ class SoccerLiveTeamCompetitionsCard extends LitElement {
       .live-badge { font-size: 9px; font-weight: 700; color: var(--cl-live, #ef4444); display: flex; align-items: center; gap: 3px; }
       .live-dot { width: 5px; height: 5px; background: var(--cl-live, #ef4444); border-radius: 50%; animation: pulse 1s infinite; }
       @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-      .form-row { display: flex; gap: 4px; justify-content: center; }
-      .form-dot { width: 22px; height: 22px; border-radius: 50%; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
-      .form-w { background: var(--cl-win, #22c55e); color: #fff; }
-      .form-d { background: var(--cl-draw, #94a3b8); color: #fff; }
-      .form-l { background: var(--cl-loss, #ef4444); color: #fff; }
 
       .divider { height: 1px; background: var(--cl-divider); margin: 2px -4px; }
     `];
