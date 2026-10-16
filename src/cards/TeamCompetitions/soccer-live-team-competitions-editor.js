@@ -66,7 +66,7 @@ class SoccerLiveTeamCompetitionsEditor extends LitElement {
           <ha-switch .checked=${this._config.hide_header === true} data-config-value="hide_header" @change=${this._switchChanged}></ha-switch>
         </div>
         <div class="option">
-          <label>${this._t('editor.show_last_match') || 'Mostrar último resultado'}</label>
+          <label>${this._t('editor.show_last_match')}</label>
           <ha-switch .checked=${this._config.show_last_match !== false} data-config-value="show_last_match" @change=${this._switchChanged}></ha-switch>
         </div>
 

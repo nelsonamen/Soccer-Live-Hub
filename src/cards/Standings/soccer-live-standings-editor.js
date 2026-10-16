@@ -2,6 +2,7 @@ import { LitElement, html } from 'lit';
 import { t, resolveLang } from '../../i18n.js';
 import { editorStyles, renderLanguageControl, soccerEntityIds } from '../editor-helper.js';
 import { renderSkinControls } from '../skin-editor.js';
+import { displayCompetitionName } from '../shared-competition.js';
 
 class SoccerLiveStandingsEditor extends LitElement {
   static get properties() {
@@ -61,7 +62,8 @@ class SoccerLiveStandingsEditor extends LitElement {
       const attrs = this.hass.states[value].attributes || {};
       const leagueName = attrs.league_name || attrs.competition_name || '';
       const compDisplay = displayCompetitionName(leagueName, resolveLang(this.hass, this._config)) || (attrs.league_abbreviation && attrs.league_abbreviation !== 'N/A' ? attrs.league_abbreviation : null);
-      if (compDisplay && (!nextConfig.title || nextConfig.title === 'Classificação' || nextConfig.title === 'Standings')) {
+      const genericTitles = ['classificação', 'standings', 'stand', 'classifica', 'classement', 'clasificación', 'tabelle'];
+      if (compDisplay && (!nextConfig.title || genericTitles.includes(nextConfig.title.trim().toLowerCase()))) {
         nextConfig.title = compDisplay;
       }
     }

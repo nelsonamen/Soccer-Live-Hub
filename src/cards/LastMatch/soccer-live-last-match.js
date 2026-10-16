@@ -266,19 +266,19 @@ class SoccerLiveLastMatchCard extends LitElement {
     return html`
       ${goals.length ? html`
         <div class="lmp-event-group goal">
-          <h5 class="lmp-event-title">${this._t('popup.goals') || 'Golos'}</h5>
+          <h5 class="lmp-event-title">${this._t('popup.goals')}</h5>
           <ul class="lmp-event-list">${goals.map(i => html`<li>${i}</li>`)}</ul>
         </div>
       ` : ''}
       ${yellowCards.length ? html`
         <div class="lmp-event-group yellow">
-          <h5 class="lmp-event-title">${this._t('popup.yellow_cards') || 'Cartões Amarelos'}</h5>
+          <h5 class="lmp-event-title">${this._t('popup.yellow_cards')}</h5>
           <ul class="lmp-event-list">${yellowCards.map(i => html`<li>${i}</li>`)}</ul>
         </div>
       ` : ''}
       ${redCards.length ? html`
         <div class="lmp-event-group red">
-          <h5 class="lmp-event-title">${this._t('popup.red_cards') || 'Cartões Vermelhos'}</h5>
+          <h5 class="lmp-event-title">${this._t('popup.red_cards')}</h5>
           <ul class="lmp-event-list">${redCards.map(i => html`<li>${i}</li>`)}</ul>
         </div>
       ` : ''}
