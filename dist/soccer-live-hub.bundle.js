@@ -469,11 +469,15 @@
         </div>
         <div>
           <label class="field-label">${this._t("editor.max_matches")||"Número máximo de jogos"}</label>
-          <input type="number" min="1" max="10" .value=${this._config.max_matches||3} data-config-value="max_matches" @change=${this._numberChanged}>
+          <input type="number" min="1" max="10" .value=${this._config.max_matches||4} data-config-value="max_matches" @change=${this._numberChanged}>
         </div>
         <div class="option">
           <label>${this._t("editor.hide_header")}</label>
           <ha-switch .checked=${!0===this._config.hide_header} data-config-value="hide_header" @change=${this._switchChanged}></ha-switch>
+        </div>
+        <div class="option">
+          <label>${this._t("editor.show_last_match")||"Mostrar último resultado"}</label>
+          <ha-switch .checked=${!1!==this._config.show_last_match} data-config-value="show_last_match" @change=${this._switchChanged}></ha-switch>
         </div>
 
         ${(0,s.m)(this,this._config,e=>this._t?this._t(e):e)}
@@ -2498,7 +2502,7 @@
         ${e.map(e=>this._renderMatch(e))}
         </div>
       </ha-card>
-    `}}customElements.get("soccer-live-multi-team")||customElements.define("soccer-live-multi-team",Lt);class Dt extends i.WF{static get properties(){return{hass:{},_config:{},_selectedComp:{type:String}}}setConfig(e){if(!e.entity)throw new Error("Entity required");this._config=e,this._selectedComp=e.default_comp||null,q(this,e)}getCardSize(){return 5}_t(e,t){return(0,s.t)(e,(0,s.$c)(this.hass,this._config),t)}static getConfigElement(){return document.createElement("soccer-live-team-competitions-editor")}static getStubConfig(){return{entity:"sensor.soccer_live_all_mixed_",max_matches:4}}_selectComp(e){this._selectedComp=e,this.requestUpdate()}_validText(e){if(null==e)return"";const t=String(e).trim();return/^(?:n\/?a|unknown|none|null|undefined|-)$/i.test(t)?"":t}_sortByDateAsc(e,t){return(ot(e)??1/0)-(ot(t)??1/0)}_groupByCompetition(e){const t={};for(const a of e){const e=this._validText(a.league_name)||this._validText(a.competition_name)||"Other";t[e]||(t[e]={key:e,name:ze(e,(0,s.$c)(this.hass,this._config)),logo:ke({competitionName:e,competitionLogo:this._validText(a.league_logo)||this._validText(a.competition_logo),fallbackLogo:null,isFriendly:a.is_friendly}),all:[]});const i=rt(a);t[e].all.some(e=>rt(e)===i)||t[e].all.push(a)}return Object.values(t).map(e=>{const t=e.all.find(e=>"in"===e.state),a=e.all.filter(e=>"pre"===e.state).sort((e,t)=>this._sortByDateAsc(e,t))[0],i=e.all.filter(e=>"post"===e.state).sort((e,t)=>this._sortByDateAsc(e,t)),s=[...i].reverse().find(e=>null!==ot(e))||i[i.length-1],o=t||a||s||e.all[0],r=e.all.filter(e=>"pre"===e.state).sort((e,t)=>this._sortByDateAsc(e,t));return{...e,featured:o,previous:i,last:s,upcoming:r}}).filter(e=>e.featured).sort((e,t)=>{const a=e=>"in"===e.featured.state?0:"pre"===e.featured.state?1:2;return a(e)-a(t)})}_getStanding(e,t){if(!e||!t)return"";const a=t.toLowerCase(),i=e.home_team?.toLowerCase().includes(a);return _e(e,i?"home":"away",e=>this._t(e))}_renderMatch(e,t){if(!e)return"";const a="in"===e.state,s="post"===e.state;return i.qy`
+    `}}customElements.get("soccer-live-multi-team")||customElements.define("soccer-live-multi-team",Lt);class Dt extends i.WF{static get properties(){return{hass:{},_config:{},_selectedComp:{type:String}}}setConfig(e){if(!e.entity)throw new Error("Entity required");this._config=e,this._selectedComp=e.default_comp||null,q(this,e)}getCardSize(){return 5}_t(e,t){return(0,s.t)(e,(0,s.$c)(this.hass,this._config),t)}static getConfigElement(){return document.createElement("soccer-live-team-competitions-editor")}static getStubConfig(){return{entity:"sensor.soccer_live_all_mixed_",max_matches:4,show_last_match:!0}}_selectComp(e){this._selectedComp=e,this.requestUpdate()}_validText(e){if(null==e)return"";const t=String(e).trim();return/^(?:n\/?a|unknown|none|null|undefined|-)$/i.test(t)?"":t}_sortByDateAsc(e,t){return(ot(e)??1/0)-(ot(t)??1/0)}_groupByCompetition(e){const t={};for(const a of e){const e=this._validText(a.league_name)||this._validText(a.competition_name)||"Other";t[e]||(t[e]={key:e,name:ze(e,(0,s.$c)(this.hass,this._config)),logo:ke({competitionName:e,competitionLogo:this._validText(a.league_logo)||this._validText(a.competition_logo),fallbackLogo:null,isFriendly:a.is_friendly}),all:[]});const i=rt(a);t[e].all.some(e=>rt(e)===i)||t[e].all.push(a)}return Object.values(t).map(e=>{const t=e.all.find(e=>"in"===e.state),a=e.all.filter(e=>"pre"===e.state).sort((e,t)=>this._sortByDateAsc(e,t))[0],i=e.all.filter(e=>"post"===e.state).sort((e,t)=>this._sortByDateAsc(e,t)),s=[...i].reverse().find(e=>null!==ot(e))||i[i.length-1],o=t||a||s||e.all[0],r=e.all.filter(e=>"pre"===e.state).sort((e,t)=>this._sortByDateAsc(e,t));return{...e,featured:o,previous:i,last:s,upcoming:r}}).filter(e=>e.featured).sort((e,t)=>{const a=e=>"in"===e.featured.state?0:"pre"===e.featured.state?1:2;return a(e)-a(t)})}_getStanding(e,t){if(!e||!t)return"";const a=t.toLowerCase(),i=e.home_team?.toLowerCase().includes(a);return _e(e,i?"home":"away",e=>this._t(e))}_renderMatch(e,t){if(!e)return"";const a="in"===e.state,s="post"===e.state;return i.qy`
       <div class="match-row">
         ${t?i.qy`<span class="match-label">${t}</span>`:""}
         <div class="match-teams">
@@ -2562,9 +2566,12 @@
             </div>
           `:""}
 
-          ${h&&!_.length?i.qy`
+          ${!1!==this._config.show_last_match&&h?i.qy`
             <div class="divider"></div>
-            ${this._renderMatch(h,this._t("status.finished"))}
+            <div class="match-list">
+              <span class="match-label">${this._t("last_match.label")||"Último Resultado"}</span>
+              ${this._renderMatch(h,null)}
+            </div>
           `:""}
         </div>
         </div>

@@ -23,7 +23,7 @@ class SoccerLiveTeamCompetitionsCard extends LitElement {
   getCardSize() { return 5; }
   _t(key, vars) { return t(key, resolveLang(this.hass, this._config), vars); }
   static getConfigElement() { return document.createElement("soccer-live-team-competitions-editor"); }
-  static getStubConfig() { return { entity: "sensor.soccer_live_all_mixed_", max_matches: 4 }; }
+  static getStubConfig() { return { entity: "sensor.soccer_live_all_mixed_", max_matches: 4, show_last_match: true }; }
 
   _selectComp(key) { this._selectedComp = key; this.requestUpdate(); }
 
@@ -215,9 +215,12 @@ class SoccerLiveTeamCompetitionsCard extends LitElement {
             </div>
           ` : ''}
 
-          ${prevMatch && !upcomingMatches.length ? html`
+          ${this._config.show_last_match !== false && prevMatch ? html`
             <div class="divider"></div>
-            ${this._renderMatch(prevMatch, this._t('status.finished'))}
+            <div class="match-list">
+              <span class="match-label">${this._t('last_match.label') || 'Último Resultado'}</span>
+              ${this._renderMatch(prevMatch, null)}
+            </div>
           ` : ''}
         </div>
         </div>

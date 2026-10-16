@@ -59,11 +59,15 @@ class SoccerLiveTeamCompetitionsEditor extends LitElement {
         </div>
         <div>
           <label class="field-label">${this._t('editor.max_matches') || 'Número máximo de jogos'}</label>
-          <input type="number" min="1" max="10" .value=${this._config.max_matches || 3} data-config-value="max_matches" @change=${this._numberChanged}>
+          <input type="number" min="1" max="10" .value=${this._config.max_matches || 4} data-config-value="max_matches" @change=${this._numberChanged}>
         </div>
         <div class="option">
           <label>${this._t('editor.hide_header')}</label>
           <ha-switch .checked=${this._config.hide_header === true} data-config-value="hide_header" @change=${this._switchChanged}></ha-switch>
+        </div>
+        <div class="option">
+          <label>${this._t('editor.show_last_match') || 'Mostrar último resultado'}</label>
+          <ha-switch .checked=${this._config.show_last_match !== false} data-config-value="show_last_match" @change=${this._switchChanged}></ha-switch>
         </div>
 
         ${renderSkinControls(this, this._config, (k) => (this._t ? this._t(k) : k))}
