@@ -3,6 +3,7 @@ import { t, resolveLang } from './i18n.js';
 import { blendHassSources } from "./cards/shared-source-blend.js";
 import { discoverSoccerModels, discoverSoccerTeams, renderAppearanceControl } from './cards/editor-helper.js';
 import { applySkin } from './skins.js';
+import { displayCompetitionName } from './cards/shared-competition.js';
 
 console.info(
   '%c SOCCER-LIVE-HUB %c Loaded successfully ',
@@ -530,6 +531,16 @@ class SoccerLiveCardEditor extends LitElement {
             >
           </div>
 
+          <div class="field-group">
+            <label class="field-label">Categoria / Competição (opcional)</label>
+            <input
+              type="text"
+              placeholder="ex. Primeira Liga, UEFA Champions League, Taça..."
+              .value=${selectedMod.category || ''}
+              @change=${e => this._updateSelectedModule('category', e.target.value)}
+            >
+          </div>
+
           ${['team', 'countdown', 'matches', 'ticker', 'match-center', 'hub', 'team-competitions'].includes(normalizeCardType(selectedMod.type)) ? html`
             <div class="field-group">
               <label class="field-label">Sensor de Canal / Transmissão (Broadcast Sensor)</label>
@@ -815,6 +826,59 @@ class SoccerLiveCard extends HTMLElement {
     return groups;
   }
 
+  _getModuleCategory(mod) {
+    if (!mod) return 'Geral';
+    if (mod.category && mod.category.trim()) return mod.category.trim();
+
+    if (mod.entity && this._hass?.states?.[mod.entity]) {
+      const attrs = this._hass.states[mod.entity].attributes || {};
+      const leagueAbbr = attrs.league_abbreviation && attrs.league_abbreviation !== 'N/A' ? attrs.league_abbreviation : null;
+      const leagueName = attrs.league_name || attrs.competition_name || null;
+      const compDisplay = leagueAbbr || (leagueName ? displayCompetitionName(leagueName, resolveLang(this._hass, this._config)) : null);
+      if (compDisplay) return compDisplay;
+    }
+    return 'Geral';
+  }
+
+  _getCategoryGroupedModules(teamModules) {
+    const categoriesMap = new Map();
+    for (const mod of (teamModules || [])) {
+      if (!mod) continue;
+      const cat = this._getModuleCategory(mod);
+      if (!categoriesMap.has(cat)) categoriesMap.set(cat, []);
+      categoriesMap.get(cat).push(mod);
+    }
+    return categoriesMap;
+  }
+
+  _getModuleDisplayTitle(mod) {
+    if (!mod) return '';
+    const rawTitle = (mod.title || '').trim();
+
+    const modules = this._getModules();
+    const sameTitleCount = modules.filter(m => (m.title || '').trim() === rawTitle).length;
+
+    if (rawTitle && rawTitle !== 'Classificação' && rawTitle !== 'Standings' && sameTitleCount <= 1) {
+      return rawTitle;
+    }
+
+    if (mod.entity && this._hass?.states?.[mod.entity]) {
+      const attrs = this._hass.states[mod.entity].attributes || {};
+      const leagueAbbr = attrs.league_abbreviation && attrs.league_abbreviation !== 'N/A' ? attrs.league_abbreviation : null;
+      const leagueName = attrs.league_name || attrs.competition_name || null;
+      const compDisplay = leagueAbbr || (leagueName ? displayCompetitionName(leagueName, resolveLang(this._hass, this._config)) : null);
+
+      if (compDisplay) {
+        if (!rawTitle || rawTitle === 'Classificação' || rawTitle === 'Standings') {
+          return `${compDisplay}`;
+        }
+        return `${rawTitle} (${compDisplay})`;
+      }
+    }
+
+    return rawTitle || mod.type || 'Módulo';
+  }
+
   _resolveModuleEntity(mod) {
     if (mod.entity && this._hass?.states?.[mod.entity]) {
       return mod.entity;
@@ -1069,35 +1133,90 @@ class SoccerLiveCard extends HTMLElement {
       this._tabBar.appendChild(teamsRow);
     }
 
-    // ─── TIER 2: Modules Selector (Bottom Row for Active Team) ────────────────
-    const modulesRow = document.createElement('div');
-    modulesRow.style.cssText = `display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px;background:${isDark ? 'rgba(255,255,255,0.01)' : 'rgba(0,0,0,0.01)'};align-items:center;`;
-    for (const mod of teamModules) {
-      const isModActive = mod.id === this._activeModuleId;
-      const btn = document.createElement('button');
-      btn.style.cssText = `
-        background: var(--card-background-color, #ffffff);
-        color: var(--primary-text-color);
-        border: ${isModActive ? '2px solid var(--primary-text-color, #111111)' : '1px solid var(--divider-color, rgba(0,0,0,0.15))'};
-        border-radius: 10px;
-        padding: ${isModActive ? '7px 13px' : '8px 14px'};
-        font-size: 12px;
-        font-weight: ${isModActive ? '700' : '500'};
-        text-transform: uppercase;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        box-shadow: ${isModActive ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' : 'none'};
-        transition: all 0.2s ease;
-      `;
-      btn.textContent = mod.title || mod.type;
-      btn.addEventListener('click', () => {
-        this._activeModuleId = mod.id;
-        this._renderCard();
-      });
-      modulesRow.appendChild(btn);
+    // ─── TIER 2: Category / Competition Selector ─────────────────────────────────
+    const categoriesMap = this._getCategoryGroupedModules(teamModules);
+    const categories = [...categoriesMap.keys()];
+    const hasMultipleCategories = categories.length > 1 || (categories.length === 1 && categories[0] !== 'Geral');
+
+    if (hasMultipleCategories) {
+      if (!this._activeCategory || !categoriesMap.has(this._activeCategory)) {
+        const curMod = teamModules.find(m => m.id === this._activeModuleId);
+        this._activeCategory = curMod ? this._getModuleCategory(curMod) : categories[0];
+      }
+
+      const categoriesRow = document.createElement('div');
+      categoriesRow.style.cssText = `display:flex;gap:8px;padding:10px 16px;background:${isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)'};border-bottom:1px solid ${borderInactive};overflow-x:auto;scrollbar-width:none;align-items:center;`;
+
+      for (const cat of categories) {
+        const isCatActive = cat === this._activeCategory;
+        const btn = document.createElement('button');
+        btn.style.cssText = `
+          background: ${isCatActive ? 'var(--primary-color, #0284c7)' : 'var(--card-background-color, #ffffff)'};
+          color: ${isCatActive ? '#ffffff' : 'var(--primary-text-color)'};
+          border: 1px solid ${isCatActive ? 'var(--primary-color, #0284c7)' : 'var(--divider-color, rgba(0,0,0,0.15))'};
+          padding: 6px 14px;
+          font-size: 12px;
+          font-weight: 700;
+          text-transform: uppercase;
+          cursor: pointer;
+          border-radius: 999px;
+          white-space: nowrap;
+          box-shadow: ${isCatActive ? '0 2px 4px rgba(0,0,0,0.12)' : 'none'};
+          transition: all 0.2s ease;
+        `;
+        btn.textContent = cat;
+        btn.addEventListener('click', () => {
+          this._activeCategory = cat;
+          const firstOfCat = categoriesMap.get(cat)?.[0];
+          this._activeModuleId = firstOfCat?.id;
+          this._renderCard();
+        });
+        categoriesRow.appendChild(btn);
+      }
+      this._tabBar.appendChild(categoriesRow);
     }
-    this._tabBar.appendChild(modulesRow);
+
+    // ─── TIER 3: Modules Selector for Active Category ────────────────────────
+    const categoryModules = (hasMultipleCategories && this._activeCategory && categoriesMap.has(this._activeCategory))
+      ? categoriesMap.get(this._activeCategory)
+      : teamModules;
+
+    activeMod = categoryModules.find(m => m.id === this._activeModuleId);
+    if (!activeMod) {
+      activeMod = categoryModules[0];
+      this._activeModuleId = activeMod?.id;
+    }
+
+    if (categoryModules.length > 1) {
+      const modulesRow = document.createElement('div');
+      modulesRow.style.cssText = `display:flex;flex-wrap:wrap;gap:8px;padding:10px 16px;background:${isDark ? 'rgba(255,255,255,0.01)' : 'rgba(0,0,0,0.01)'};align-items:center;`;
+      for (const mod of categoryModules) {
+        const isModActive = mod.id === this._activeModuleId;
+        const btn = document.createElement('button');
+        btn.style.cssText = `
+          background: var(--card-background-color, #ffffff);
+          color: var(--primary-text-color);
+          border: ${isModActive ? '2px solid var(--primary-text-color, #111111)' : '1px solid var(--divider-color, rgba(0,0,0,0.15))'};
+          border-radius: 10px;
+          padding: ${isModActive ? '6px 12px' : '7px 13px'};
+          font-size: 11px;
+          font-weight: ${isModActive ? '700' : '500'};
+          text-transform: uppercase;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          box-shadow: ${isModActive ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' : 'none'};
+          transition: all 0.2s ease;
+        `;
+        btn.textContent = this._getModuleDisplayTitle(mod);
+        btn.addEventListener('click', () => {
+          this._activeModuleId = mod.id;
+          this._renderCard();
+        });
+        modulesRow.appendChild(btn);
+      }
+      this._tabBar.appendChild(modulesRow);
+    }
   }
 
   _createModuleElement(mod) {

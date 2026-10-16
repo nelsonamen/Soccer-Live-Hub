@@ -54,7 +54,19 @@ class SoccerLiveStandingsEditor extends LitElement {
     if (!this._config) return;
     const value = ev.target.value;
     if (value === this._config.entity) return;
-    this._fireConfigChanged({ ...this._config, entity: value });
+    const nextConfig = { ...this._config, entity: value };
+
+    // Auto-update module title with competition name if generic
+    if (this.hass?.states?.[value]) {
+      const attrs = this.hass.states[value].attributes || {};
+      const leagueName = attrs.league_name || attrs.competition_name || '';
+      const compDisplay = displayCompetitionName(leagueName, resolveLang(this.hass, this._config)) || (attrs.league_abbreviation && attrs.league_abbreviation !== 'N/A' ? attrs.league_abbreviation : null);
+      if (compDisplay && (!nextConfig.title || nextConfig.title === 'Classificação' || nextConfig.title === 'Standings')) {
+        nextConfig.title = compDisplay;
+      }
+    }
+
+    this._fireConfigChanged(nextConfig);
   }
 
   _groupChanged(ev) {
