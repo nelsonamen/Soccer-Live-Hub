@@ -997,6 +997,61 @@ class SoccerLiveCard extends HTMLElement {
     }
   }
 
+  _getActiveTeamLogo(teamName) {
+    if (!teamName || teamName === 'Geral') return null;
+    const cleanTeam = teamName.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+    for (const [id, st] of Object.entries(this._hass?.states || {})) {
+      if (!id.startsWith('sensor.')) continue;
+      const attrs = st?.attributes || {};
+      const attrTeam = (attrs.team_name || attrs.team || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      const cleanId = id.toLowerCase();
+
+      if (cleanTeam && (attrTeam.includes(cleanTeam) || cleanId.includes(cleanTeam))) {
+        if (attrs.team_logo && attrs.team_logo !== 'N/A') return attrs.team_logo;
+
+        const matchPool = [...(attrs.matches || []), ...(attrs.upcoming_matches || []), ...(attrs.previous_matches || [])];
+        for (const m of matchPool) {
+          if (!m || typeof m !== 'object') continue;
+          if (m.home_team && m.home_team.toLowerCase().replace(/[^a-z0-9]/g, '').includes(cleanTeam) && m.home_logo) {
+            return m.home_logo;
+          }
+          if (m.away_team && m.away_team.toLowerCase().replace(/[^a-z0-9]/g, '').includes(cleanTeam) && m.away_logo) {
+            return m.away_logo;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  _updateHeader(wrapper) {
+    if (!wrapper) return;
+    let header = wrapper.querySelector('.soccer-live-card-title');
+    if (!header) {
+      header = document.createElement('div');
+      header.className = 'soccer-live-card-title';
+      wrapper.insertBefore(header, wrapper.firstChild);
+    }
+
+    header.style.cssText = 'position:relative;padding:16px 18px 8px;overflow:hidden;';
+    const teamLogo = this._getActiveTeamLogo(this._activeTeam);
+    const titleText = this._config.title || 'DESPORTO';
+    const subtitleText = this._config.subtitle || (this._activeTeam && this._activeTeam !== 'Geral' ? this._activeTeam : 'Futebol');
+
+    header.innerHTML = `
+      <div style="position:relative;z-index:2;">
+        <div style="font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--primary-text-color);">${titleText}</div>
+        <div style="font-size: 12px; color: var(--secondary-text-color); margin-top: 2px; font-weight: 500;">${subtitleText}</div>
+      </div>
+      <div style="position:absolute;right:-10px;top:-10px;width:110px;height:110px;pointer-events:none;z-index:1;overflow:hidden;">
+        ${teamLogo
+          ? `<img src="${teamLogo}" style="width:100%;height:100%;object-fit:contain;opacity:0.10;transform:rotate(12deg);filter:grayscale(15%);" />`
+          : `<div style="font-size:90px;opacity:0.06;transform:rotate(15deg);line-height:1;text-align:center;">⚽</div>`}
+      </div>
+    `;
+  }
+
   _renderCard() {
     const modules = this._getModules();
     const layout = this._config.layout || 'tabs';
@@ -1009,14 +1064,7 @@ class SoccerLiveCard extends HTMLElement {
       wrapper.style.cssText = 'border-radius: 20px; overflow: hidden; padding: 0;';
       this._applyWrapperTheme(wrapper);
 
-      const header = document.createElement('div');
-      header.className = 'soccer-live-card-title';
-      header.style.cssText = 'padding: 16px 18px 8px;';
-      header.innerHTML = `
-        <div style="font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--primary-text-color);">${this._config.title || 'Desporto'}</div>
-        <div style="font-size: 12px; color: var(--secondary-text-color); margin-top: 2px; font-weight: 500;">${this._config.subtitle || 'Soccer Live Hub'}</div>
-      `;
-      wrapper.appendChild(header);
+      this._updateHeader(wrapper);
 
       const placeholderWrap = document.createElement('div');
       placeholderWrap.style.cssText = 'padding: 0 16px 16px;';
@@ -1049,16 +1097,7 @@ class SoccerLiveCard extends HTMLElement {
       wrapper.style.cssText = 'border-radius: 20px; overflow: hidden; padding: 0; border-top: 4px solid #0284c7;';
       this._applyWrapperTheme(wrapper);
 
-      if (this._config.title) {
-        const header = document.createElement('div');
-        header.className = 'soccer-live-card-title';
-        header.style.cssText = 'padding: 16px 18px 8px;';
-        header.innerHTML = `
-          <div style="font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--primary-text-color);">${this._config.title}</div>
-          <div style="font-size: 12px; color: var(--secondary-text-color); margin-top: 2px; font-weight: 500;">${this._config.subtitle || 'Soccer Live Hub'}</div>
-        `;
-        wrapper.appendChild(header);
-      }
+      this._updateHeader(wrapper);
 
       this._tabBar = document.createElement('div');
       this._tabBar.className = 'soccer-live-hub-tab-bar';
@@ -1072,7 +1111,10 @@ class SoccerLiveCard extends HTMLElement {
       this.appendChild(wrapper);
     } else {
       const wrapper = this.querySelector('.soccer-live-hub-wrapper');
-      if (wrapper) this._applyWrapperTheme(wrapper);
+      if (wrapper) {
+        this._applyWrapperTheme(wrapper);
+        this._updateHeader(wrapper);
+      }
     }
 
     const groups = this._getGroupedModules();
