@@ -85,8 +85,11 @@ const COMPETITION_ALIASES = {
   'german bundesliga': 'Bundesliga',
   'italian serie a': 'Serie A',
   'french ligue 1': 'Ligue 1',
-  'portuguese liga portugal': 'Liga Portugal',
+  'portuguese liga portugal': 'Primeira Liga',
   'portuguese primeira liga': 'Primeira Liga',
+  'portuguese liga': 'Primeira Liga',
+  'liga portugal': 'Primeira Liga',
+  'primeira liga': 'Primeira Liga',
 };
 
 export function displayCompetitionName(name, lang = 'en') {

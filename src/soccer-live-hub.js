@@ -878,9 +878,8 @@ class SoccerLiveCard extends HTMLElement {
     const entityId = this._resolveModuleEntity(mod);
     if (entityId && this._hass?.states?.[entityId]) {
       const attrs = this._hass.states[entityId].attributes || {};
-      const leagueAbbr = attrs.league_abbreviation && attrs.league_abbreviation !== 'N/A' ? attrs.league_abbreviation : null;
       const leagueName = attrs.league_name || attrs.competition_name || (attrs.matches?.[0]?.league_name && attrs.matches[0].league_name !== 'N/A' ? attrs.matches[0].league_name : null) || (attrs.league_info?.[0]?.name && attrs.league_info[0].name !== 'N/A' ? attrs.league_info[0].name : null) || null;
-      const compDisplay = leagueAbbr || (leagueName ? displayCompetitionName(leagueName, resolveLang(this._hass, this._config)) : null);
+      const compDisplay = leagueName ? displayCompetitionName(leagueName, resolveLang(this._hass, this._config)) : (attrs.league_abbreviation && attrs.league_abbreviation !== 'N/A' ? attrs.league_abbreviation : null);
       if (compDisplay) return compDisplay;
     }
     return 'Geral';
@@ -900,34 +899,9 @@ class SoccerLiveCard extends HTMLElement {
   _getModuleDisplayTitle(mod) {
     if (!mod) return '';
     const rawTitle = (mod.title || '').trim();
-
-    const modules = this._getModules();
-    const sameTitleCount = modules.filter(m => (m.title || '').trim().toLowerCase() === rawTitle.toLowerCase()).length;
-    const isGenericTitle = !rawTitle || [
-      'classificação', 'standings', 'stand', 'classifica', 'classement', 'clasificación', 'tabelle',
-      'mini classificação', 'mini standings', 'mini-standings'
-    ].includes(rawTitle.toLowerCase());
-
-    if (!isGenericTitle && sameTitleCount <= 1) {
-      return rawTitle;
-    }
-
-    const entityId = this._resolveModuleEntity(mod);
-    if (entityId && this._hass?.states?.[entityId]) {
-      const attrs = this._hass.states[entityId].attributes || {};
-      const leagueAbbr = attrs.league_abbreviation && attrs.league_abbreviation !== 'N/A' ? attrs.league_abbreviation : null;
-      const leagueName = attrs.league_name || attrs.competition_name || (attrs.matches?.[0]?.league_name && attrs.matches[0].league_name !== 'N/A' ? attrs.matches[0].league_name : null) || (attrs.league_info?.[0]?.name && attrs.league_info[0].name !== 'N/A' ? attrs.league_info[0].name : null) || null;
-      const compDisplay = leagueAbbr || (leagueName ? displayCompetitionName(leagueName, resolveLang(this._hass, this._config)) : null);
-
-      if (compDisplay) {
-        if (isGenericTitle) {
-          return `${compDisplay}`;
-        }
-        return `${rawTitle} (${compDisplay})`;
-      }
-    }
-
-    return rawTitle || mod.type || 'Módulo';
+    if (rawTitle) return rawTitle;
+    const meta = CARD_REGISTRY.find(c => c.value === mod.type);
+    return meta?.label || mod.type || 'Módulo';
   }
 
   _resolveModuleEntity(mod) {
