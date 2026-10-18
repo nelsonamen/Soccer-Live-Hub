@@ -106,6 +106,25 @@ const IGNORED_TEAM_NAMES = new Set([
   'todos os jogos', 'diagnosticos', 'resultados', 'noticias', 'standings', 'scorers', 'news'
 ]);
 
+const UTILITY_PATTERNS = [
+  'sincronizac', 'sincronizacao', 'pontape', 'kickoff', 'configurac', 'configuracao',
+  'diagnostico', 'status', 'sync', 'noticia', 'marcador', 'marcadores', 'classifica', 'classificacao',
+  'standings', 'scorers', 'news', 'bracket', 'quadro', 'resultado', 'resultados', 'todos os jogos'
+];
+
+function isUtilityTeamName(name) {
+  if (!name) return true;
+  const clean = name.toLowerCase().replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+  const normalizedWithoutNumbers = clean.replace(/\s+\d+$/, '').trim();
+
+  if (IGNORED_TEAM_NAMES.has(clean) || IGNORED_TEAM_NAMES.has(normalizedWithoutNumbers)) return true;
+
+  for (const pat of UTILITY_PATTERNS) {
+    if (clean.includes(pat)) return true;
+  }
+  return false;
+}
+
 /**
  * Auto-discovers all teams/countries configured in the soccerlive integration in Home Assistant.
  */
@@ -125,7 +144,7 @@ export function discoverSoccerTeams(hass) {
     let extractedName = attrs.team_name || attrs.team || '';
     if (!extractedName && attrs.friendly_name) {
       const parts = attrs.friendly_name.split(' - ');
-      if (parts.length > 1 && !parts[0].toLowerCase().includes('classifica')) extractedName = parts[0];
+      if (parts.length > 1 && !isUtilityTeamName(parts[0])) extractedName = parts[0];
     }
 
     if (!extractedName) {
@@ -133,7 +152,7 @@ export function discoverSoccerTeams(hass) {
       const segments = clean.split('_');
       if (segments.length >= 3) {
         const potential = segments.slice(2).join(' ');
-        if (!potential.includes('standings') && !potential.includes('scorers') && !potential.includes('news')) {
+        if (!isUtilityTeamName(potential)) {
           extractedName = segments.slice(2).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
         }
       }
@@ -142,7 +161,7 @@ export function discoverSoccerTeams(hass) {
     if (extractedName && extractedName.length >= 2) {
       const formatted = extractedName.trim();
       const key = formatted.toLowerCase();
-      if (!IGNORED_TEAM_NAMES.has(key) && !key.includes('classifica') && !key.includes('marcador') && !key.includes('configuracao')) {
+      if (!isUtilityTeamName(formatted)) {
         if (!teamsMap.has(key)) {
           teamsMap.set(key, {
             name: formatted,
