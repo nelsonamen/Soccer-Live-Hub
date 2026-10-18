@@ -145,7 +145,7 @@ class SoccerLiveStandingsCard extends LitElement {
     this._config = config;
     applySkin(this, config);
     this.maxTeamsVisible = config.max_teams_visible ? config.max_teams_visible : 10;
-    this.hideHeader = config.hide_header || false;
+    this.hideHeader = config.hide_header !== false;
     this.selectedGroup = config.selected_group || '';
     this.showEventToasts = config.show_event_toasts === true;
     this.highlightTeam = (config.highlight_team || config.my_team || '').toLowerCase();

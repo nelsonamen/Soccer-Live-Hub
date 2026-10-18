@@ -93,6 +93,10 @@ class SoccerLiveTeamCard extends LitElement {
     if (!this._animationTimers) this._animationTimers = [];
   }
 
+  get hideHeader() {
+    return this._config.hide_header !== false;
+  }
+
   _t(key, vars) {
     return t(key, resolveLang(this.hass, this._config), vars);
   }
@@ -628,15 +632,17 @@ class SoccerLiveTeamCard extends LitElement {
           <div class="event-toast variant-${this._toastVariant}" .textContent=${this._toastMessage}></div>
         ` : ''}
 
-        <div class="top-bar">
-          <div class="competition">
-            <span class="comp-icon">
-              ${leagueLogo ? html`<img src="${leagueLogo}" alt="" />` : '⚽'}
-            </span>
-            <span class="comp-name">${competitionLabel || ' '}</span>
+        ${this.hideHeader ? '' : html`
+          <div class="top-bar">
+            <div class="competition">
+              <span class="comp-icon">
+                ${leagueLogo ? html`<img src="${leagueLogo}" alt="" />` : '⚽'}
+              </span>
+              <span class="comp-name">${competitionLabel || ' '}</span>
+            </div>
+            ${this._renderStatusBadge(match)}
           </div>
-          ${this._renderStatusBadge(match)}
-        </div>
+        `}
 
         <div class="scoreboard">
           <div class="team-side home">

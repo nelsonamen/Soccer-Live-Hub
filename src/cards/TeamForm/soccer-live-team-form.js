@@ -109,7 +109,7 @@ class SoccerLiveTeamFormCard extends LitElement {
       || next?.home_logo || '';
     const standingSide = trackedIsAway ? 'away' : 'home';
     const standingSummary = standingText(next, standingSide, k => this._t(k));
-    const hideHeader = this._config.hide_header === true;
+    const hideHeader = this._config.hide_header !== false;
 
     // Compute W/D/L per previous match (oldest → newest)
     const results = [...prev].reverse().map(m => {

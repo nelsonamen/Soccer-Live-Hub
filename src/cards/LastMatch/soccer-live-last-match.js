@@ -150,7 +150,7 @@ class SoccerLiveLastMatchCard extends LitElement {
       : html`<div class="team-logo-fallback">${abbrev || "?"}</div>`;
 
     return html`
-      ${renderSoccerHeader({
+      ${this._config.hide_header !== false ? '' : renderSoccerHeader({
         logo: leagueLogo,
         title: competition,
         subtitle: `${this._t("last_match.label") || "Último resultado"}${match.season_info ? ` · ${match.season_info}` : ""}`,
