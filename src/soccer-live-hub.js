@@ -28,12 +28,9 @@ import './cards/Standings/soccer-live-standings.js';
 import './cards/LastMatch/soccer-live-last-match.js';
 import './cards/Tutte/soccer-live-matches.js';
 import './cards/Countdown/soccer-live-countdown.js';
-import './cards/Bracket/soccer-live-bracket.js';
 import './cards/MiniStandings/soccer-live-mini-standings.js';
 import './cards/Scorers/soccer-live-scorers.js';
-import './cards/MultiTeam/soccer-live-multi-team.js';
 import './cards/TeamCompetitions/soccer-live-team-competitions.js';
-import './cards/MatchCenter/soccer-live-match-center.js';
 import './cards/TeamForm/soccer-live-team-form.js';
 
 // ─── Card type registry (All Modules) ─────────────────────────────────────────
@@ -45,12 +42,9 @@ const CARD_MODULES = {
   'last-match': { editor: () => import('./cards/LastMatch/soccer-live-last-match-editor.js') },
   matches: { editor: () => import('./cards/Tutte/soccer-live-matches-editor.js') },
   countdown: { editor: () => import('./cards/Countdown/soccer-live-countdown-editor.js') },
-  'match-center': { editor: () => import('./cards/MatchCenter/soccer-live-match-center-editor.js') },
   scorers: { editor: () => import('./cards/Scorers/soccer-live-scorers-editor.js') },
   'team-form': { editor: () => import('./cards/TeamForm/soccer-live-team-form-editor.js') },
   'team-competitions': { editor: () => import('./cards/TeamCompetitions/soccer-live-team-competitions-editor.js') },
-  bracket: { editor: () => import('./cards/Bracket/soccer-live-bracket-editor.js') },
-  'multi-team': { editor: () => import('./cards/MultiTeam/soccer-live-multi-team-editor.js') },
 };
 
 const MODULE_PROMISES = new Map();
@@ -73,9 +67,6 @@ const CARD_REGISTRY = [
   { value: 'scorers',           element: 'soccer-live-scorers',           editor: 'soccer-live-scorers-editor',           label: 'Melhores Marcadores',    description: 'Lista de marcadores com foto e número de golos' },
   { value: 'team-form',         element: 'soccer-live-team-form',         editor: 'soccer-live-team-form-editor',         label: 'Forma da Equipa',        description: 'Tendência de forma, histórico V/E/D e golos' },
   { value: 'countdown',         element: 'soccer-live-countdown',         editor: 'soccer-live-countdown-editor',         label: 'Contagem Decrescente',   description: 'Contador regressivo para o próximo jogo com placar ao vivo' },
-  { value: 'match-center',      element: 'soccer-live-match-center',      editor: 'soccer-live-match-center-editor',      label: 'Centro de Jogo',         description: 'Resumo, estatísticas, cronologia, alinhamento e H2H' },
-  { value: 'bracket',           element: 'soccer-live-bracket',           editor: 'soccer-live-bracket-editor',           label: 'Eliminatórias / Taça',   description: 'Quadro da fase a eliminar ou árvore do torneio' },
-  { value: 'multi-team',        element: 'soccer-live-multi-team',        editor: 'soccer-live-multi-team-editor',        label: 'Múltiplas Equipas',      description: 'Várias equipas num só cartão compacto' },
 ];
 
 const CARD_TYPE_ALIASES = {};
