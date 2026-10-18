@@ -809,6 +809,10 @@ class SoccerLiveCard extends HTMLElement {
 
   set hass(hass) {
     this._hass = hass;
+    const wrapper = this.querySelector('.soccer-live-hub-wrapper');
+    if (wrapper) {
+      this._updateHeader(wrapper);
+    }
     for (const [id, child] of this._childElements.entries()) {
       const mod = this._getModules().find(m => m.id === id);
       if (mod && child) {
@@ -1060,8 +1064,8 @@ class SoccerLiveCard extends HTMLElement {
       </div>
       <div style="position:absolute;right:-10px;top:-10px;width:110px;height:110px;pointer-events:none;z-index:1;overflow:hidden;">
         ${teamLogo
-          ? `<img src="${teamLogo}" style="width:100%;height:100%;object-fit:contain;opacity:0.10;transform:rotate(12deg);filter:grayscale(15%);" />`
-          : `<div style="font-size:90px;opacity:0.06;transform:rotate(15deg);line-height:1;text-align:center;">⚽</div>`}
+          ? `<img src="${teamLogo}" style="width:100%;height:100%;object-fit:contain;opacity:0.22;transform:rotate(12deg);filter:grayscale(10%);" />`
+          : `<div style="font-size:90px;opacity:0.12;transform:rotate(15deg);line-height:1;text-align:center;">⚽</div>`}
       </div>
     `;
   }
