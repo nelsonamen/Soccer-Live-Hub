@@ -472,6 +472,13 @@ class SoccerLiveCardEditor extends LitElement {
 
         <div class="field-group" style="margin-top: 16px; border-top: 1px solid var(--divider-color, rgba(0,0,0,0.1)); padding-top: 12px;">
           ${renderAppearanceControl(this, this._config, k => this._t(k))}
+          <div class="option" style="margin-top: 12px; display: flex; align-items: center; justify-content: space-between;">
+            <label class="field-label" style="margin:0;">Mostrar logótipos nas abas de navegação</label>
+            <ha-switch
+              .checked=${this._config.show_tab_logos !== false}
+              @change=${e => this._dispatch({ ...this._config, show_tab_logos: e.target.checked })}
+            ></ha-switch>
+          </div>
         </div>
       </div>
 
@@ -888,6 +895,21 @@ class SoccerLiveCard extends HTMLElement {
     return categoriesMap;
   }
 
+  _getCategoryLogo(catName, catModules) {
+    if (!catModules || !Array.isArray(catModules)) return null;
+    for (const mod of catModules) {
+      const entityId = this._resolveModuleEntity(mod);
+      if (entityId && this._hass?.states?.[entityId]) {
+        const attrs = this._hass.states[entityId].attributes || {};
+        if (attrs.league_logo && attrs.league_logo !== 'N/A') return attrs.league_logo;
+        if (attrs.competition_logo && attrs.competition_logo !== 'N/A') return attrs.competition_logo;
+        if (attrs.matches?.[0]?.league_logo && attrs.matches[0].league_logo !== 'N/A') return attrs.matches[0].league_logo;
+        if (attrs.league_info?.[0]?.logo_href && attrs.league_info[0].logo_href !== 'N/A') return attrs.league_info[0].logo_href;
+      }
+    }
+    return null;
+  }
+
   _getModuleDisplayTitle(mod) {
     if (!mod) return '';
     const rawTitle = (mod.title || '').trim();
@@ -1159,23 +1181,38 @@ class SoccerLiveCard extends HTMLElement {
       teamsRow.style.cssText = `display:flex;gap:10px;padding:12px 16px;background:${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'};border-bottom:1px solid ${borderInactive};overflow-x:auto;scrollbar-width:none;align-items:center;`;
       for (const team of teams) {
         const isTeamActive = team === this._activeTeam;
+        const teamLogo = this._config.show_tab_logos !== false ? this._getActiveTeamLogo(team) : null;
+
         const btn = document.createElement('button');
         btn.style.cssText = `
           background: var(--card-background-color, #ffffff);
           color: var(--primary-text-color);
           border: ${isTeamActive ? `2px solid ${borderActive}` : `1px solid ${borderInactive}`};
-          padding: ${isTeamActive ? '7px 15px' : '8px 16px'};
+          padding: ${isTeamActive ? '6px 14px' : '7px 15px'};
           font-size: 13px;
           font-weight: ${isTeamActive ? '700' : '500'};
           letter-spacing: 0.05em;
           text-transform: uppercase;
           cursor: pointer;
           border-radius: 10px;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
           box-shadow: ${isTeamActive ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' : 'none'};
           transition: all 0.2s ease;
           white-space: nowrap;
         `;
-        btn.textContent = team;
+        if (teamLogo) {
+          const img = document.createElement('img');
+          img.src = teamLogo;
+          img.style.cssText = 'width:16px;height:16px;object-fit:contain;flex-shrink:0;';
+          img.onerror = () => { img.style.display = 'none'; };
+          btn.appendChild(img);
+        }
+        const textSpan = document.createElement('span');
+        textSpan.textContent = team;
+        btn.appendChild(textSpan);
+
         btn.addEventListener('click', () => {
           this._activeTeam = team;
           this._activeCategory = null;
@@ -1204,6 +1241,8 @@ class SoccerLiveCard extends HTMLElement {
 
       for (const cat of categories) {
         const isCatActive = cat === this._activeCategory;
+        const catLogo = this._config.show_tab_logos !== false ? this._getCategoryLogo(cat, categoriesMap.get(cat)) : null;
+
         const btn = document.createElement('button');
         btn.style.cssText = `
           background: ${isCatActive ? 'var(--primary-color, #0284c7)' : 'var(--card-background-color, #ffffff)'};
@@ -1216,10 +1255,23 @@ class SoccerLiveCard extends HTMLElement {
           cursor: pointer;
           border-radius: 999px;
           white-space: nowrap;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
           box-shadow: ${isCatActive ? '0 2px 4px rgba(0,0,0,0.12)' : 'none'};
           transition: all 0.2s ease;
         `;
-        btn.textContent = cat;
+        if (catLogo) {
+          const img = document.createElement('img');
+          img.src = catLogo;
+          img.style.cssText = 'width:15px;height:15px;object-fit:contain;flex-shrink:0;';
+          img.onerror = () => { img.style.display = 'none'; };
+          btn.appendChild(img);
+        }
+        const textSpan = document.createElement('span');
+        textSpan.textContent = cat;
+        btn.appendChild(textSpan);
+
         btn.addEventListener('click', () => {
           this._activeCategory = cat;
           const firstOfCat = categoriesMap.get(cat)?.[0];
