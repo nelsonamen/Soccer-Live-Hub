@@ -11,7 +11,7 @@
         <h3>${this._t("editor.settings")}</h3>
         <div class="option">
           <label>${this._t("editor.hide_header")}</label>
-          <ha-switch .checked=${!0===this._config.hide_header} data-config-value="hide_header" @change=${this._switchChanged}></ha-switch>
+          <ha-switch .checked=${!1!==this._config.hide_header} data-config-value="hide_header" @change=${this._switchChanged}></ha-switch>
         </div>
         <div class="option">
           <label>${this._t("editor.hide_broadcasts")}</label>
@@ -33,6 +33,11 @@
             ${this.entities.map(t=>i.qy`<option value="${t}" ?selected=${t===e}>${t}</option>`)}
           </select>
           <div class="hint" style="margin-top: 4px;">${this._t("last_match.editor_hint")}</div>
+        </div>
+
+        <div class="option">
+          <label>${this._t("editor.hide_header")}</label>
+          <ha-switch .checked=${!1!==this._config.hide_header} data-config-value="hide_header" @change=${e=>(0,s.vD)(this,"hide_header",e.target.checked)}></ha-switch>
         </div>
 
         ${(0,r.m)(this,this._config,e=>this._t?this._t(e):e)}
@@ -66,7 +71,7 @@
         </div>
         <div class="option">
           <label>${this._t("editor.hide_header")}</label>
-          <ha-switch .checked=${!0===this._config.hide_header} data-config-value="hide_header" @change=${this._switchChanged}></ha-switch>
+          <ha-switch .checked=${!1!==this._config.hide_header} data-config-value="hide_header" @change=${this._switchChanged}></ha-switch>
         </div>
       </div>
     `}}customElements.get("soccer-live-mini-standings-editor")||customElements.define("soccer-live-mini-standings-editor",r)},379(e,t,a){a.r(t);var i=a(957),o=a(7),s=a(738),r=a(759);class n extends i.WF{static get properties(){return{_config:{type:Object},hass:{type:Object},entities:{type:Array}}}constructor(){super(),this.entities=[]}static get styles(){return o.yj}setConfig(e){if(!e)throw new Error("Invalid configuration");this._config={...e}}_t(e){return(0,r.t)(e,(0,r.$c)(this.hass,this._config))}updated(e){e.has("hass")&&this._fetchEntities()}_fetchEntities(){this.hass&&(this.entities=(0,o.J)(this.hass,{includes:["soccerlive_scorers","soccer_live_scorers"]}))}_entityChanged(e){(0,o.vD)(this,"entity",e.target.value)}_selectChanged(e){const{configValue:t}=e.target.dataset;t&&(0,o.vD)(this,t,e.target.value,{removeEmpty:!0})}_numberChanged(e){const{configValue:t}=e.target.dataset;if(!t)return;const a=parseInt(e.target.value,10);isNaN(a)||(0,o.vD)(this,t,a)}_switchChanged(e){const{configValue:t}=e.target.dataset;t&&(0,o.vD)(this,t,e.target.checked)}render(){if(!this._config||!this.hass)return i.qy``;const e=this._config.entity||"",t=e&&this.entities.includes(e);return i.qy`
@@ -101,7 +106,7 @@
         <div class="option">
           <label>${this._t("editor.hide_header")}</label>
           <ha-switch
-            .checked=${!0===this._config.hide_header}
+            .checked=${!1!==this._config.hide_header}
             data-config-value="hide_header"
             @change=${this._switchChanged}>
           </ha-switch>
@@ -143,7 +148,7 @@
         <div class="option">
           <label>${this._t("editor.hide_header")}</label>
           <ha-switch
-            .checked=${!0===this._config.hide_header}
+            .checked=${!1!==this._config.hide_header}
             data-config-value="hide_header"
             @change=${this._switchChanged}
           ></ha-switch>
@@ -310,7 +315,7 @@
         </div>
         <div class="option">
           <label>${this._t("editor.hide_header")}</label>
-          <ha-switch .checked=${!0===this._config.hide_header} data-config-value="hide_header" @change=${this._switchChanged}></ha-switch>
+          <ha-switch .checked=${!1!==this._config.hide_header} data-config-value="hide_header" @change=${this._switchChanged}></ha-switch>
         </div>
         <div class="option">
           <label>${this._t("editor.show_last_match")}</label>
@@ -338,7 +343,7 @@
         </div>
         <div class="option">
           <label>${this._t("editor.hide_header")}</label>
-          <ha-switch .checked=${!0===this._config.hide_header} data-config-value="hide_header" @change=${this._toggleChanged}></ha-switch>
+          <ha-switch .checked=${!1!==this._config.hide_header} data-config-value="hide_header" @change=${this._toggleChanged}></ha-switch>
         </div>
 
         ${(0,o.m)(this,this._config,e=>this._t?this._t(e):e)}
@@ -450,7 +455,7 @@
         <div class="option">
           <label>${this._t("editor.hide_header")}</label>
           <ha-switch
-            .checked=${!0===this._config.hide_header}
+            .checked=${!1!==this._config.hide_header}
             data-config-value="hide_header"
             @change=${this._switchChanged}
           ></ha-switch>

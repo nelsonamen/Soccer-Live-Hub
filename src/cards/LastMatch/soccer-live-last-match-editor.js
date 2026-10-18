@@ -51,6 +51,11 @@ class SoccerLiveLastMatchEditor extends LitElement {
           <div class="hint" style="margin-top: 4px;">${this._t('last_match.editor_hint')}</div>
         </div>
 
+        <div class="option">
+          <label>${this._t('editor.hide_header')}</label>
+          <ha-switch .checked=${this._config.hide_header !== false} data-config-value="hide_header" @change=${e => setEditorConfigValue(this, 'hide_header', e.target.checked)}></ha-switch>
+        </div>
+
         ${renderSkinControls(this, this._config, (k) => (this._t ? this._t(k) : k))}
       </div>
     `;
