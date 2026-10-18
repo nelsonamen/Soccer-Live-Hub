@@ -110,18 +110,19 @@ export function displayCompetitionName(name, lang = 'en') {
   if (!raw || raw === 'N/A') return '';
 
   const key = _normKey(raw);
+  const langKey = String(lang || 'en').split(/[-_]/)[0].toLowerCase();
 
-  if (LOCALIZED_COMPETITION_NAMES[key]?.[lang]) {
-    return LOCALIZED_COMPETITION_NAMES[key][lang];
+  if (LOCALIZED_COMPETITION_NAMES[key]?.[langKey]) {
+    return LOCALIZED_COMPETITION_NAMES[key][langKey];
   }
 
   if (['friendlies clubs', 'friendlies club', 'friendly clubs', 'friendly club',
        'club friendlies', 'club friendly'].includes(key)) {
-    return CLUB_FRIENDLY_LABELS[lang] || CLUB_FRIENDLY_LABELS.en;
+    return CLUB_FRIENDLY_LABELS[langKey] || CLUB_FRIENDLY_LABELS.en;
   }
 
   if (key === 'friendlies' || key === 'friendly') {
-    return FRIENDLY_LABELS[lang] || FRIENDLY_LABELS.en;
+    return FRIENDLY_LABELS[langKey] || FRIENDLY_LABELS.en;
   }
 
   if (COMPETITION_ALIASES[key]) return COMPETITION_ALIASES[key];
