@@ -338,7 +338,13 @@ class SoccerLiveStandingsCard extends LitElement {
       'regular season': this._t('phase.regular_season'),
       'group-stage': this._t('phase.group_stage'),
       'group stage': this._t('phase.group_stage'),
+      'league-phase': this._t('phase.league_phase') || 'Fase de Liga',
+      'league phase': this._t('phase.league_phase') || 'Fase de Liga',
       'playoffs': this._t('phase.playoffs'),
+      'knockout phase': 'Fase de Eliminação',
+      'quarter-finals': 'Quartos de Final',
+      'semi-finals': 'Meias Finais',
+      'final': 'Final',
     };
     return map[String(phase).toLowerCase()] || phase;
   }

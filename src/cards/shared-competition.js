@@ -92,11 +92,28 @@ const COMPETITION_ALIASES = {
   'primeira liga': 'Primeira Liga',
 };
 
+const LOCALIZED_COMPETITION_NAMES = {
+  'uefa champions league': { pt: 'Liga dos Campeões', es: 'Liga de Campeones', fr: 'Ligue des Champions', de: 'Champions League', it: 'Champions League', nl: 'Champions League' },
+  'champions league': { pt: 'Liga dos Campeões', es: 'Liga de Campeones', fr: 'Ligue des Champions', de: 'Champions League', it: 'Champions League', nl: 'Champions League' },
+  'uefa europa league': { pt: 'Liga Europa', es: 'Liga Europa', fr: 'Ligue Europa', de: 'Europa League', it: 'Europa League', nl: 'Europa League' },
+  'europa league': { pt: 'Liga Europa', es: 'Liga Europa', fr: 'Ligue Europa', de: 'Europa League', it: 'Europa League', nl: 'Europa League' },
+  'uefa conference league': { pt: 'Liga Conferência', es: 'Liga Conferencia', fr: 'Ligue Conférence', de: 'Conference League', it: 'Conference League', nl: 'Conference League' },
+  'conference league': { pt: 'Liga Conferência', es: 'Liga Conferencia', fr: 'Ligue Conférence', de: 'Conference League', it: 'Conference League', nl: 'Conference League' },
+  'taça de portugal': { pt: 'Taça de Portugal' },
+  'taca de portugal': { pt: 'Taça de Portugal' },
+  'taça da liga': { pt: 'Taça da Liga' },
+  'taca da liga': { pt: 'Taça da Liga' },
+};
+
 export function displayCompetitionName(name, lang = 'en') {
   const raw = String(name || '').trim();
   if (!raw || raw === 'N/A') return '';
 
   const key = _normKey(raw);
+
+  if (LOCALIZED_COMPETITION_NAMES[key]?.[lang]) {
+    return LOCALIZED_COMPETITION_NAMES[key][lang];
+  }
 
   if (['friendlies clubs', 'friendlies club', 'friendly clubs', 'friendly club',
        'club friendlies', 'club friendly'].includes(key)) {
