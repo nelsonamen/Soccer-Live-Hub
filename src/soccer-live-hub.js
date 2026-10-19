@@ -495,13 +495,23 @@ class SoccerLiveCardEditor extends LitElement {
           ${modules.map((mod, index) => {
             const isSelected = index === selectedIdx;
             const numStr = String(index + 1).padStart(2, '0');
+            const modMeta = CARD_REGISTRY.find(c => c.value === mod.type);
+            const titleStr = mod.title || modMeta?.label || mod.type;
+            const teamName = mod.team || this._config?.team || '';
+            const catName = this._getModuleCategory(mod);
+            const tagParts = [teamName, catName && catName !== 'Geral' ? catName : ''].filter(Boolean);
+            const tagStr = tagParts.join(' · ');
+
             return html`
               <div
                 class="module-item ${isSelected ? 'selected' : ''}"
                 @click=${() => { this._selectedModuleIndex = index; this.requestUpdate(); }}
               >
                 <span class="module-num">${numStr}</span>
-                <span class="module-title">${mod.title || mod.type}</span>
+                <div class="module-title-wrap" style="flex:1;min-width:0;display:flex;align-items:center;gap:6px;overflow:hidden;">
+                  <span class="module-title" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${titleStr}</span>
+                  ${tagStr ? html`<span class="module-tag" style="font-size:10px;font-weight:600;color:#0284c7;background:rgba(2,132,199,0.08);padding:2px 7px;border-radius:6px;white-space:nowrap;flex-shrink:0;">${tagStr}</span>` : ''}
+                </div>
                 <div class="module-arrows" @click=${e => e.stopPropagation()}>
                   <button
                     class="arrow-btn"

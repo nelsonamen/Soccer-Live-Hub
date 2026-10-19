@@ -2237,13 +2237,16 @@
         </div>
 
         <div class="modules-list">
-          ${e.map((a,o)=>{const s=o===t,r=String(o+1).padStart(2,"0");return i.qy`
+          ${e.map((a,o)=>{const s=o===t,r=String(o+1).padStart(2,"0"),n=ft.find(e=>e.value===a.type),l=a.title||n?.label||a.type,c=a.team||this._config?.team||"",d=this._getModuleCategory(a),p=[c,d&&"Geral"!==d?d:""].filter(Boolean).join(" · ");return i.qy`
               <div
                 class="module-item ${s?"selected":""}"
                 @click=${()=>{this._selectedModuleIndex=o,this.requestUpdate()}}
               >
                 <span class="module-num">${r}</span>
-                <span class="module-title">${a.title||a.type}</span>
+                <div class="module-title-wrap" style="flex:1;min-width:0;display:flex;align-items:center;gap:6px;overflow:hidden;">
+                  <span class="module-title" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l}</span>
+                  ${p?i.qy`<span class="module-tag" style="font-size:10px;font-weight:600;color:#0284c7;background:rgba(2,132,199,0.08);padding:2px 7px;border-radius:6px;white-space:nowrap;flex-shrink:0;">${p}</span>`:""}
+                </div>
                 <div class="module-arrows" @click=${e=>e.stopPropagation()}>
                   <button
                     class="arrow-btn"
