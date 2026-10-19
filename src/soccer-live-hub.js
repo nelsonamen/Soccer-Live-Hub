@@ -87,6 +87,20 @@ const WRAPPER_TYPE = 'custom:soccer-live-hub';
 
 // ─── Modular Visual Editor ─────────────────────────────────────────────────────
 
+function getModuleCategory(mod, hass, config = {}) {
+  if (!mod) return 'Geral';
+  if (mod.category && mod.category.trim()) return mod.category.trim();
+
+  const entityId = mod.entity;
+  if (entityId && hass?.states?.[entityId]) {
+    const attrs = hass.states[entityId].attributes || {};
+    const leagueName = attrs.league_name || attrs.competition_name || (attrs.matches?.[0]?.league_name && attrs.matches[0].league_name !== 'N/A' ? attrs.matches[0].league_name : null) || (attrs.league_info?.[0]?.name && attrs.league_info[0].name !== 'N/A' ? attrs.league_info[0].name : null) || null;
+    const compDisplay = leagueName ? displayCompetitionName(leagueName, resolveLang(hass, config)) : (attrs.league_abbreviation && attrs.league_abbreviation !== 'N/A' ? attrs.league_abbreviation : null);
+    if (compDisplay) return compDisplay;
+  }
+  return 'Geral';
+}
+
 class SoccerLiveCardEditor extends LitElement {
   static get properties() {
     return {
@@ -498,7 +512,7 @@ class SoccerLiveCardEditor extends LitElement {
             const modMeta = CARD_REGISTRY.find(c => c.value === mod.type);
             const titleStr = mod.title || modMeta?.label || mod.type;
             const teamName = mod.team || this._config?.team || '';
-            const catName = this._getModuleCategory(mod);
+            const catName = getModuleCategory(mod, this.hass, this._config);
             const tagParts = [teamName, catName && catName !== 'Geral' ? catName : ''].filter(Boolean);
             const tagStr = tagParts.join(' · ');
 
@@ -885,17 +899,7 @@ class SoccerLiveCard extends HTMLElement {
   }
 
   _getModuleCategory(mod) {
-    if (!mod) return 'Geral';
-    if (mod.category && mod.category.trim()) return mod.category.trim();
-
-    const entityId = this._resolveModuleEntity(mod);
-    if (entityId && this._hass?.states?.[entityId]) {
-      const attrs = this._hass.states[entityId].attributes || {};
-      const leagueName = attrs.league_name || attrs.competition_name || (attrs.matches?.[0]?.league_name && attrs.matches[0].league_name !== 'N/A' ? attrs.matches[0].league_name : null) || (attrs.league_info?.[0]?.name && attrs.league_info[0].name !== 'N/A' ? attrs.league_info[0].name : null) || null;
-      const compDisplay = leagueName ? displayCompetitionName(leagueName, resolveLang(this._hass, this._config)) : (attrs.league_abbreviation && attrs.league_abbreviation !== 'N/A' ? attrs.league_abbreviation : null);
-      if (compDisplay) return compDisplay;
-    }
-    return 'Geral';
+    return getModuleCategory(mod, this._hass, this._config);
   }
 
   _getCategoryGroupedModules(teamModules) {
