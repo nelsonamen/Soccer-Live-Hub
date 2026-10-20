@@ -153,27 +153,6 @@ class SoccerLiveTeamCardEditor extends LitElement {
           <ha-switch .checked=${this._config.show_weather !== false}
             data-config-value="show_weather" @change=${this._switchChanged}></ha-switch>
         </div>
-        <h3>${this._t('editor.section_prediction')}</h3>
-        <div class="option">
-          <label>${this._t('editor.show_prediction')}</label>
-          <ha-switch .checked=${this._config.show_prediction !== false}
-            data-config-value="show_prediction" @change=${this._switchChanged}></ha-switch>
-        </div>
-        <div class="option">
-          <label>${this._t('editor.show_prediction_details')}</label>
-          <ha-switch .checked=${this._config.show_prediction_details !== false}
-            data-config-value="show_prediction_details" @change=${this._switchChanged}></ha-switch>
-        </div>
-        <div class="option">
-          <label>${this._t('editor.show_odds')}</label>
-          <ha-switch .checked=${this._config.show_odds !== false}
-            data-config-value="show_odds" @change=${this._switchChanged}></ha-switch>
-        </div>
-        <div class="option">
-          <label>${this._t('editor.show_injuries')}</label>
-          <ha-switch .checked=${this._config.show_injuries !== false}
-            data-config-value="show_injuries" @change=${this._switchChanged}></ha-switch>
-        </div>
         <h3>${this._t('editor.section_display')}</h3>
         <div class="option">
           <label>${this._t('editor.show_event_toasts')}</label>

@@ -483,18 +483,6 @@ class SoccerLiveTeamCard extends LitElement {
     `;
   }
 
-  _renderPrediction(match) {
-    return renderPrediction(match, { t: (k) => this._t(k), lang: resolveLang(this.hass, this._config), showDetails: this._config.show_prediction_details !== false });
-  }
-
-  _renderOdds(match) {
-    return renderOdds(match, { t: (k, v) => this._t(k, v) });
-  }
-
-  _renderInjuries(match) {
-    return renderInjuries(match, { t: (k, v) => this._t(k, v) });
-  }
-
   _renderStatsRow(match) {
     const hs = match.home_statistics || {};
     const as = match.away_statistics || {};
@@ -695,9 +683,6 @@ class SoccerLiveTeamCard extends LitElement {
           </div>
         ` : ''}
 
-        ${!this.compact && this._config.show_prediction !== false ? this._renderPrediction(match) : ''}
-        ${!this.compact && this._config.show_odds !== false ? this._renderOdds(match) : ''}
-        ${!this.compact && this._config.show_injuries !== false ? this._renderInjuries(match) : ''}
         ${!this.compact && this.showFormTrend ? this._renderFormTrend(attributes.previous_matches, attributes.matches, this.myTeam || attributes.team_name) : ''}
         ${!this.compact && this.showPreviousMatches ? this._renderPreviousMatches(attributes.previous_matches, attributes.matches, this.myTeam || attributes.team_name) : ''}
         ${!this.compact ? this._renderH2H(match.head_to_head, this.myTeam || attributes.team_name || match.home_team) : ''}
