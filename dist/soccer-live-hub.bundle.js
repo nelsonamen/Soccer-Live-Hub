@@ -927,7 +927,6 @@
             <div class="team-name-big ${v?"my-team":""}">${s.home_team}</div>
             ${c?"":this._renderStandingSummary(s,"home")}
             ${this._renderRecord(s.home_record)}
-            ${c?this._renderForm(s.home_form):this._renderForm(s.last_five_home)||this._renderForm(s.home_form)}
             ${c?"":this._renderTopScorer(s.home_top_scorer)}
           </div>
 
@@ -943,7 +942,6 @@
             <div class="team-name-big ${y?"my-team":""}">${s.away_team}</div>
             ${c?"":this._renderStandingSummary(s,"away")}
             ${this._renderRecord(s.away_record)}
-            ${c?this._renderForm(s.away_form):this._renderForm(s.last_five_away)||this._renderForm(s.away_form)}
             ${c?"":this._renderTopScorer(s.away_top_scorer)}
           </div>
         </div>
