@@ -17,7 +17,10 @@ class SoccerLiveMiniStandingsEditor extends LitElement {
 
   _fetchEntities() {
     if (!this.hass) return;
-    this.entities = soccerEntityIds(this.hass, { includes: ['soccerlive_standings', 'soccer_live_standings'] });
+    this.entities = soccerEntityIds(this.hass, {
+      sensorTypes: ['standings', 'team_matches_mixed', 'team_match', 'team_matches'],
+      includes: ['standings', 'classifica', 'classificação', 'tabela', 'liga', 'league', 'todos', 'todas', 'por_1', 'ucl', 'champions'],
+    });
   }
 
   _entityChanged(ev) { setEditorConfigValue(this, 'entity', ev.target.value); }
