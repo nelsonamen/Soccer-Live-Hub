@@ -999,13 +999,13 @@
     `}_renderUpcomingList(e,t,a){const s=e&&e.length>0?e:t&&t.length>1?t.slice(1).filter(e=>"pre"===e.state||"in"===e.state).slice(0,4):[];if(0===s.length)return"";const r=(a||"").toLowerCase();return i.qy`
       <div class="upcoming-list">
         <div class="upcoming-list-title">${this._t("team.upcoming_matches")}</div>
-        ${s.map(e=>{const t=r&&e.home_team&&e.home_team.toLowerCase().includes(r),a=r&&e.away_team&&e.away_team.toLowerCase().includes(r),s="in"===e.state,n=e.head_to_head&&e.head_to_head.length>0,l=e=>e&&"N/A"!==e?e:"",c=t?l(e.away_form):a?l(e.home_form):"",d=(0,T.VR)(e.league_name&&"N/A"!==e.league_name?e.league_name:"",(0,o.$c)(this.hass,this._config));return i.qy`
+        ${s.map(e=>{const t=r&&e.home_team&&e.home_team.toLowerCase().includes(r),a=r&&e.away_team&&e.away_team.toLowerCase().includes(r),s="in"===e.state,n=e.head_to_head&&e.head_to_head.length>0,l=e=>e&&"N/A"!==e?e:"",c=(t?l(e.away_form):a&&l(e.home_form),(0,T.VR)(e.league_name&&"N/A"!==e.league_name?e.league_name:"",(0,o.$c)(this.hass,this._config)));return i.qy`
             <div class="upcoming-row ${n?"clickable":""}"
                  @click="${n?()=>this.showDetails(e):null}">
               <span class="upcoming-date">
                 ${e.date&&e.date.split(" ")[1]||""}
                 <span class="upcoming-date-day">${this._relativeDate(e.date)}</span>
-                ${d?i.qy`<span class="upl-comp-label">${d}</span>`:""}
+                ${c?i.qy`<span class="upl-comp-label">${c}</span>`:""}
               </span>
               <span class="upcoming-team home-side ${t?"tracked":""}">
                 ${e.home_logo?i.qy`<img src="${e.home_logo}" alt="" />`:""}
@@ -1016,11 +1016,8 @@
                 ${this._teamBadge(e.away_abbrev,e.away_color,e.away_team)}
                 ${e.away_logo?i.qy`<img src="${e.away_logo}" alt="" />`:""}
               </span>
-              ${p=c,u=t?"side-right":"side-left",p?i.qy`<div class="upl-opp-form ${u}">
-              ${p.split("").slice(-5).map(e=>{const t="W"===e?"w":"L"===e||"V"===e?"l":"d";return i.qy`<span class="upl-fd ${t}"></span>`})}
-            </div>`:""}
             </div>
-          `;var p,u})}
+          `})}
       </div>
     `}_renderH2H(e,t){if(!e||0===e.length)return"";const a=(t||"").toLowerCase();let s=0,r=0,n=0;e.forEach(e=>{const t=parseInt(e.home_score)||0,i=parseInt(e.away_score)||0;t!==i?((e.home_team||"").toLowerCase().includes(a)||a.includes((e.home_team||"").toLowerCase().split(" ")[0])?t>i:i>t)?s++:n++:r++});const l=s+r+n,c=l?Math.round(s/l*100):33,d=l?Math.round(r/l*100):34,p=100-c-d;return i.qy`
       <div class="h2h-section">

@@ -864,7 +864,6 @@ class SoccerLiveTeamCard extends LitElement {
                 ${this._teamBadge(m.away_abbrev, m.away_color, m.away_team)}
                 ${m.away_logo ? html`<img src="${m.away_logo}" alt="" />` : ''}
               </span>
-              ${renderOppDots(oppForm, homeTracked ? 'side-right' : 'side-left')}
             </div>
           `;
         })}
