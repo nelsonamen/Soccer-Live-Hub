@@ -5,88 +5,88 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Donate-yellow.svg)](https://www.buymeacoffee.com/nelsonamen)
 
-Cartão Lovelace modular, elegante e ultra-rápido para **Home Assistant** para acompanhar jogos em direto, classificações, últimos resultados, competições e tendências de forma das tuas equipas de futebol favoritas.
+A modular, sleek, and ultra-fast **Home Assistant** Lovelace card to track live football matches, standings, recent results, team competitions, and form guide for your favorite clubs and national teams.
 
 ---
 
-## 🌟 Principais Funcionalidades
+## 🌟 Key Features
 
-- **🏆 Deteção Automática de Ligas e Competições**: Agrupa os teus módulos por competição (ex: **Primeira Liga**, **Liga dos Campeões**, **Liga Europa**) sem repetições de nomes genéricos.
-- **🗂️ Navegação por Subcategorias**:
-  - **Nível 1 (Equipa)**: Alterna entre os teus clubes e seleções favoritas.
-  - **Nível 2 (Competição / Subcategoria)**: Agrupa os módulos por liga ou torneio.
-  - **Nível 3 (Módulos)**: Navegação simples entre Próximo Jogo, Classificação, Último Jogo, etc.
-- **🛡️ Marca d'Água Dinâmica do Emblema**: O canto superior direito exibe suavemente o emblema oficial do clube ou seleção selecionada.
-- **🎨 Editor Visual Completo**: Totalmente configurável pela interface do Home Assistant (sem necessidade de editar ficheiros YAML).
-- **🏷️ Identificação Clara no Editor**: Cada módulo na lista do editor exibe uma etiqueta identificadora com a Equipa e Competição correspondente.
-- **🌓 Temas e Aparência**: Suporte nativo para os temas do Home Assistant, modo Escuro e Claro.
-- **🌍 Multilingue**: Deteção automática do idioma do utilizador (Português, English, Español, Français, Deutsch, Italiano, Nederlands).
+- **🏆 Automatic League & Competition Detection**: Automatically groups modules by competition (e.g., **Primeira Liga**, **UEFA Champions League**, **Premier League**) without duplicate generic tabs.
+- **🗂️ 3-Tier Hierarchical Navigation**:
+  - **Tier 1 (Teams)**: Easily switch between your favorite clubs and national teams.
+  - **Tier 2 (Competitions & Subcategories)**: Group modules by league or tournament.
+  - **Tier 3 (Modules)**: Seamlessly toggle between Next Match, Standings, Last Match, etc.
+- **🛡️ Dynamic Crest Watermark**: Displays a subtle official crest watermark of the active team in the top-right header.
+- **🎨 Complete Visual UI Editor**: Fully configurable directly through the Home Assistant dashboard editor without touching YAML.
+- **🏷️ Clear Module Identification in Editor**: Each item in the editor list shows a badge with its Team and Competition name for effortless navigation.
+- **🌓 Theme & Style Adaptability**: Native Dark, Light, and Home Assistant theme support.
+- **🌍 Multilingual**: Automatic user language detection supporting **English**, **Português**, **Español**, **Français**, **Deutsch**, **Italiano**, and **Nederlands**.
 
 ---
 
-## 📋 Módulos Disponíveis
+## 📋 Available Modules
 
-| Módulo | Descrição |
+| Module | Description |
 |---|---|
-| **Próximo Jogo / Ao Vivo** | Placar ao vivo em tempo real, relógio, alinhamento, estádio e dados da transmissão TV. |
-| **Classificação** | Tabela classificativa da liga com zonas de qualificação/despromoção. |
-| **Mini Classificação** | Vista compacta centrada na tua equipa e rivais diretos. |
-| **Último Jogo** | Resultado final, marcadores e detalhes do jogo mais recente. |
-| **Competições da Equipa** | Vista agrupada das várias competições da equipa com abas e próximos encontros. |
-| **Forma da Equipa** | Tendência de forma recente com gráfico e histórico V/E/D. |
+| **Next Match / Live** | Real-time live scoreboard, clock, referee, venue, and TV broadcast details. |
+| **Standings** | Complete league table with points, goal difference, and promotion/qualification zones. |
+| **Mini Standings** | Compact standings view centered around your team and direct rivals. |
+| **Last Match** | Final score, goal scorers, and detailed match recap from the last completed fixture. |
+| **Team Competitions** | Tabbed overview of all tournaments your team is competing in. |
+| **Team Form** | Form guide trend chart and W/D/L statistics. |
 
 ---
 
-## 📦 Requisito Prévio
+## 📦 Prerequisites
 
-Este cartão utiliza os sensores criados pela seguinte integração do Home Assistant:
-- [Soccer Live Integration](https://github.com/rononline/soccerlive) por [@rononline](https://github.com/rononline)
+This card relies on sensor entities created by the following Home Assistant integration:
+- [Soccer Live Integration](https://github.com/rononline/soccerlive) by [@rononline](https://github.com/rononline)
 
 ---
 
-## 🚀 Instalação
+## 🚀 Installation
 
-### Via HACS (Recomendado)
+### Via HACS (Recommended)
 
-1. Abre o **HACS** no Home Assistant.
-2. Vai a **Frontend** > Menu superior (3 pontos) > **Repositórios personalizados**.
-3. Adiciona o repositório:
-   - **Repositório**: `https://github.com/nelsonamen/Soccer-Live-Hub`
-   - **Categoria**: `Dashboard` (ou `Lovelace`)
-4. Clica em **Adicionar**, pesquisa por **Soccer Live Hub** e clica em **Transferir**.
-5. Faz um *Hard Refresh* no navegador (`Ctrl + F5`).
+1. Open **HACS** in Home Assistant.
+2. Go to **Frontend** > Top right menu (3 dots) > **Custom repositories**.
+3. Add repository:
+   - **Repository**: `https://github.com/nelsonamen/Soccer-Live-Hub`
+   - **Category**: `Dashboard` (or `Lovelace`)
+4. Click **Add**, search for **Soccer Live Hub**, and click **Download**.
+5. Perform a *Hard Refresh* in your browser (`Ctrl + F5`).
 
-### Instalação Manual
+### Manual Installation
 
-1. Transfere o ficheiro `dist/soccer-live-hub.bundle.js` da [última versão](https://github.com/nelsonamen/Soccer-Live-Hub/releases).
-2. Copia o ficheiro para a pasta `www` do teu Home Assistant: `<config>/www/soccer-live-hub.bundle.js`.
-3. No Home Assistant, vai a **Definições** > **Painéis** > **Recursos** (menu superior direito).
-4. Clica em **Adicionar Recurso**:
+1. Download `dist/soccer-live-hub.bundle.js` from the [latest release](https://github.com/nelsonamen/Soccer-Live-Hub/releases).
+2. Copy the file into your Home Assistant directory: `<config>/www/soccer-live-hub.bundle.js`.
+3. In Home Assistant, go to **Settings** > **Dashboards** > **Resources** (top right menu).
+4. Click **Add Resource**:
    - **URL**: `/local/soccer-live-hub.bundle.js`
-   - **Tipo de Recurso**: `Módulo JavaScript`
-5. Atualiza a página do navegador (`Ctrl + F5`).
+   - **Resource Type**: `JavaScript Module`
+5. Refresh your browser page (`Ctrl + F5`).
 
 ---
 
-## ⚙️ Configuração na Interface (UI)
+## ⚙️ Configuration (UI Editor)
 
-1. Em qualquer painel do Home Assistant, clica em **Editar Painel** > **Adicionar Cartão** e escolhe **Soccer Live Hub**.
-2. **Definições Gerais do Cartão**:
-   - **Título do cartão**: Texto para o cabeçalho (opcional).
-   - **Modo de layout**: Escolhe entre *Abas (Barra de Navegação)* ou *Empilhado*.
-   - **Aparência**: Seleciona *Tema Home Assistant*, *Escuro* ou *Claro*.
-   - **Mostrar logótipos nas abas**: Ativa ou desativa os emblemas/ícones nas abas de navegação.
-3. **Adicionar Módulos**:
-   - Seleciona o conteúdo no menu **Escolher conteúdo...** (ex: *Próximo Jogo*, *Classificação*, *Último Jogo*).
-   - Escolhe a **Entidade** do sensor.
-   - Escreve a **Categoria / Competição (Opcional)** para agrupar o módulo sob uma aba específica (ex: *Primeira Liga*, *Liga dos Campeões*). Se deixares em branco, o cartão deteta a competição automaticamente!
+1. In any Home Assistant dashboard, click **Edit Dashboard** > **Add Card** and select **Soccer Live Hub**.
+2. **General Card Settings**:
+   - **Card Title**: Optional header title text.
+   - **Layout Mode**: Choose between *Tabs (Navigation Bar)* or *Stacked*.
+   - **Appearance**: Select *Home Assistant Theme*, *Dark*, or *Light*.
+   - **Show Tab Logos**: Toggle logos/crests on navigation tabs.
+3. **Adding & Editing Modules**:
+   - Select content from the **Add Module** dropdown (e.g., *Next Match*, *Standings*, *Last Match*).
+   - Select your sensor **Entity**.
+   - Set an optional **Category / Competition** to group the module under a specific tab (e.g., *Primeira Liga*, *UEFA Champions League*). If left blank, the card automatically detects the competition!
 
 ---
 
-## ☕ Apoiar o Desenvolvimento
+## ☕ Support Development
 
 <div align="center">
-  <p>Estes projetos são de código aberto e assim continuarão. Se quiseres pagar um café:</p>
+  <p>These projects are open source and free. If you'd like to support development with a coffee:</p>
   <a href="https://www.buymeacoffee.com/nelsonamen" target="_blank">
     <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;">
   </a>
