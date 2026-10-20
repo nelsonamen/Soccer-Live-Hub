@@ -122,7 +122,8 @@ class SoccerLiveStandingsEditor extends LitElement {
     if (!this.hass) return;
     this.entities = soccerEntityIds(this.hass, {
       sensorTypes: ['standings', 'team_matches_mixed', 'team_match', 'team_matches'],
-      includes: ['standings', 'classifica', 'classificação', 'tabela', 'liga', 'league', 'todos', 'todas', 'por_1', 'ucl', 'champions'],
+      includes: ['standings', 'classifica', 'classificação', 'tabela', 'liga', 'league', 'todos', 'todas'],
+      excludes: ['melhores_marcadores', 'scorers', 'top_scorers', 'quadro_eliminatorio', 'bracket', 'noticias', 'news'],
     });
   }
 

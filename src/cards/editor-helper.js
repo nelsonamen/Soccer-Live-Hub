@@ -49,11 +49,16 @@ export function setEditorConfigValue(host, key, value, { removeEmpty = false } =
   fireEditorConfig(host, next);
 }
 
+const DEFAULT_UTILITY_EXCLUDES = [
+  'estado_da_configuracao', 'estado_da_sincronizacao', 'configuracao', 'sincronizacao',
+  'diagnostico', 'diagnostics', 'status', 'sync', 'sync_status'
+];
+
 export function soccerEntityIds(hass, { sensorTypes = [], includes = [], excludes = [] } = {}) {
   if (!hass?.states) return [];
   const types = new Set(sensorTypes);
   const inc = includes.map(i => i.toLowerCase());
-  const exc = excludes.map(e => e.toLowerCase());
+  const exc = [...excludes, ...DEFAULT_UTILITY_EXCLUDES].map(e => e.toLowerCase());
 
   return Object.keys(hass.states).filter(entityId => {
     if (!entityId.startsWith('sensor.')) return false;

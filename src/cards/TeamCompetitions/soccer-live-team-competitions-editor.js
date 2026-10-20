@@ -22,6 +22,7 @@ class SoccerLiveTeamCompetitionsEditor extends LitElement {
     this.entities = soccerEntityIds(this.hass, {
       sensorTypes: ['team_matches_mixed'],
       includes: ['all_mixed', 'todas_as_competicoes', 'todas_competicoes', 'competicoes', 'competições'],
+      excludes: ['standings', 'classificacao', 'classificação', 'melhores_marcadores', 'scorers', 'top_scorers', 'bracket', 'noticias', 'news'],
     });
   }
 
