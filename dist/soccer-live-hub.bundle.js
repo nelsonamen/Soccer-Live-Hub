@@ -1413,7 +1413,6 @@
           <div class="team-name-big ${m?"my-team":""}">${e.home_team||e.home_abbrev||"?"}</div>
           ${this._renderStandingSummary(e,"home")}
           ${this._renderRecord(e.home_record)}
-          ${this._renderForm(e.last_five_home||e.home_form)}
         </div>
 
         <div class="score-center">
@@ -1432,7 +1431,6 @@
           <div class="team-name-big ${_?"my-team":""}">${e.away_team||e.away_abbrev||"?"}</div>
           ${this._renderStandingSummary(e,"away")}
           ${this._renderRecord(e.away_record)}
-          ${this._renderForm(e.last_five_away||e.away_form)}
         </div>
       </div>
 

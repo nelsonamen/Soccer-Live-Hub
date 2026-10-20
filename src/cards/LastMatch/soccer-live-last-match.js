@@ -165,7 +165,6 @@ class SoccerLiveLastMatchCard extends LitElement {
           <div class="team-name-big ${homeIsMyTeam ? "my-team" : ""}">${match.home_team || match.home_abbrev || "?"}</div>
           ${this._renderStandingSummary(match, "home")}
           ${this._renderRecord(match.home_record)}
-          ${this._renderForm(match.last_five_home || match.home_form)}
         </div>
 
         <div class="score-center">
@@ -184,7 +183,6 @@ class SoccerLiveLastMatchCard extends LitElement {
           <div class="team-name-big ${awayIsMyTeam ? "my-team" : ""}">${match.away_team || match.away_abbrev || "?"}</div>
           ${this._renderStandingSummary(match, "away")}
           ${this._renderRecord(match.away_record)}
-          ${this._renderForm(match.last_five_away || match.away_form)}
         </div>
       </div>
 
