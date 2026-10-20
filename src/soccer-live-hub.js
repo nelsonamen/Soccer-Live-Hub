@@ -269,6 +269,24 @@ class SoccerLiveCardEditor extends LitElement {
     this._dispatch({ ...this._config, modules });
   }
 
+  _selectModule(index) {
+    this._selectedModuleIndex = index;
+    const modules = this._config.modules || [];
+    const mod = modules[index];
+    if (mod) {
+      const team = mod.team || this._config.team || 'Geral';
+      const cat = getModuleCategory(mod, this.hass, this._config);
+      this._dispatch({
+        ...this._config,
+        _previewModuleId: mod.id,
+        _previewTeam: team,
+        _previewCategory: cat,
+      });
+    } else {
+      this.requestUpdate();
+    }
+  }
+
   _duplicateModule(index) {
     const modules = [...(this._config.modules || [])];
     const source = modules[index];
@@ -519,7 +537,7 @@ class SoccerLiveCardEditor extends LitElement {
             return html`
               <div
                 class="module-item ${isSelected ? 'selected' : ''}"
-                @click=${() => { this._selectedModuleIndex = index; this.requestUpdate(); }}
+                @click=${() => this._selectModule(index)}
               >
                 <span class="module-num">${numStr}</span>
                 <div class="module-title-wrap" style="flex:1;min-width:0;display:flex;align-items:center;gap:6px;overflow:hidden;">
@@ -998,7 +1016,20 @@ class SoccerLiveCard extends HTMLElement {
   }
 
   setConfig(config) {
-    this._config = config || {};
+    const prevActiveId = config?._previewModuleId || this._activeModuleId;
+    const prevActiveTeam = config?._previewTeam || this._activeTeam;
+    const prevActiveCat = config?._previewCategory || this._activeCategory;
+
+    const cleanConfig = { ...(config || {}) };
+    delete cleanConfig._previewModuleId;
+    delete cleanConfig._previewTeam;
+    delete cleanConfig._previewCategory;
+
+    this._config = cleanConfig;
+    if (prevActiveId) this._activeModuleId = prevActiveId;
+    if (prevActiveTeam) this._activeTeam = prevActiveTeam;
+    if (prevActiveCat) this._activeCategory = prevActiveCat;
+
     applySkin(this, this._config);
     this._renderCard();
   }
