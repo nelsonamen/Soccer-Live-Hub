@@ -26,10 +26,7 @@ if (!window.customCards.some(c => c.type === 'soccer-live-hub')) {
 import './cards/Team/soccer-live-team.js';
 import './cards/Standings/soccer-live-standings.js';
 import './cards/LastMatch/soccer-live-last-match.js';
-import './cards/Tutte/soccer-live-matches.js';
-import './cards/Countdown/soccer-live-countdown.js';
 import './cards/MiniStandings/soccer-live-mini-standings.js';
-import './cards/Scorers/soccer-live-scorers.js';
 import './cards/TeamCompetitions/soccer-live-team-competitions.js';
 import './cards/TeamForm/soccer-live-team-form.js';
 
@@ -40,9 +37,6 @@ const CARD_MODULES = {
   standings: { editor: () => import('./cards/Standings/soccer-live-standings-editor.js') },
   'mini-standings': { editor: () => import('./cards/MiniStandings/soccer-live-mini-standings-editor.js') },
   'last-match': { editor: () => import('./cards/LastMatch/soccer-live-last-match-editor.js') },
-  matches: { editor: () => import('./cards/Tutte/soccer-live-matches-editor.js') },
-  countdown: { editor: () => import('./cards/Countdown/soccer-live-countdown-editor.js') },
-  scorers: { editor: () => import('./cards/Scorers/soccer-live-scorers-editor.js') },
   'team-form': { editor: () => import('./cards/TeamForm/soccer-live-team-form-editor.js') },
   'team-competitions': { editor: () => import('./cards/TeamCompetitions/soccer-live-team-competitions-editor.js') },
 };
@@ -62,11 +56,8 @@ const CARD_REGISTRY = [
   { value: 'standings',         element: 'soccer-live-standings',         editor: 'soccer-live-standings-editor',         label: 'Classificação',          description: 'Tabela classificativa da liga com zonas' },
   { value: 'mini-standings',    element: 'soccer-live-mini-standings',    editor: 'soccer-live-mini-standings-editor',    label: 'Mini Classificação',     description: 'Classificação compacta por grupos ou tabela resumida' },
   { value: 'last-match',        element: 'soccer-live-last-match',        editor: 'soccer-live-last-match-editor',        label: 'Último Jogo',            description: 'Resultado e marcadores do último jogo terminado' },
-  { value: 'matches',           element: 'soccer-live-matches',           editor: 'soccer-live-matches-editor',           label: 'Jogos / Calendário',     description: 'Lista de jogos agrupados por data com destaque ao vivo' },
   { value: 'team-competitions', element: 'soccer-live-team-competitions', editor: 'soccer-live-team-competitions-editor', label: 'Competições da Equipa',  description: 'Todas as competições da equipa com abas e jogos' },
-  { value: 'scorers',           element: 'soccer-live-scorers',           editor: 'soccer-live-scorers-editor',           label: 'Melhores Marcadores',    description: 'Lista de marcadores com foto e número de golos' },
   { value: 'team-form',         element: 'soccer-live-team-form',         editor: 'soccer-live-team-form-editor',         label: 'Forma da Equipa',        description: 'Tendência de forma, histórico V/E/D e golos' },
-  { value: 'countdown',         element: 'soccer-live-countdown',         editor: 'soccer-live-countdown-editor',         label: 'Contagem Decrescente',   description: 'Contador regressivo para o próximo jogo com placar ao vivo' },
 ];
 
 const CARD_TYPE_ALIASES = {};
