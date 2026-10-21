@@ -139,11 +139,6 @@ class SoccerLiveTeamCardEditor extends LitElement {
             @change=${(e) => this._fireConfigChanged({...this._config, my_team: e.target.value})} />
         </div>
         <div class="option">
-          <label>${this._t('editor.show_form_trend')}</label>
-          <ha-switch .checked=${this._config.show_form_trend === true}
-            data-config-value="show_form_trend" @change=${this._switchChanged}></ha-switch>
-        </div>
-        <div class="option">
           <label>${this._t('editor.show_previous_matches')}</label>
           <ha-switch .checked=${this._config.show_previous_matches === true}
             data-config-value="show_previous_matches" @change=${this._switchChanged}></ha-switch>
@@ -154,14 +149,6 @@ class SoccerLiveTeamCardEditor extends LitElement {
             data-config-value="show_weather" @change=${this._switchChanged}></ha-switch>
         </div>
         <h3>${this._t('editor.section_display')}</h3>
-        <div class="option">
-          <label>${this._t('editor.show_event_toasts')}</label>
-          <ha-switch
-            .checked=${this._config.show_event_toasts === true}
-            data-config-value="show_event_toasts"
-            @change=${this._switchChanged}
-          ></ha-switch>
-        </div>
         <div class="option">
           <label>${this._t('editor.hide_broadcasts')}</label>
           <ha-switch .checked=${this._config.hide_broadcasts === true} data-config-value="hide_broadcasts" @change=${this._switchChanged}></ha-switch>

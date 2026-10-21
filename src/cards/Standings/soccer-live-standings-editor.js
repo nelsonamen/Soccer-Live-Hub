@@ -186,15 +186,6 @@ class SoccerLiveStandingsEditor extends LitElement {
           ></ha-switch>
         </div>
 
-        <div class="option">
-          <label>${this._t('editor.show_event_toasts')}</label>
-          <ha-switch
-            .checked=${this._config.show_event_toasts === true}
-            data-config-value="show_event_toasts"
-            @change=${this._switchChanged}
-          ></ha-switch>
-        </div>
-
         <div>
           <label class="field-label">${this._t('editor.max_teams')}</label>
           <input type="number" min="1" max="50"

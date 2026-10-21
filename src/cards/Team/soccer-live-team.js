@@ -81,15 +81,9 @@ class SoccerLiveTeamCard extends LitElement {
     this._lastWeatherVenue = null;
     this.showPopup = false;
     this.activeMatch = null;
-    this.showEventToasts = config.show_event_toasts === true;
     this.myTeam = (config.my_team || '').toLowerCase();
     this.showPreviousMatches = config.show_previous_matches === true;
-    this.showFormTrend = config.show_form_trend === true;
     this.compact = config.compact === true;
-    this._toastMessage = '';
-    this._toastVisible = false;
-    this._toastVariant = 'goal';
-    this._toastTimer = null;
     if (!this._animationTimers) this._animationTimers = [];
   }
 
@@ -683,7 +677,6 @@ class SoccerLiveTeamCard extends LitElement {
           </div>
         ` : ''}
 
-        ${!this.compact && this.showFormTrend ? this._renderFormTrend(attributes.previous_matches, attributes.matches, this.myTeam || attributes.team_name) : ''}
         ${!this.compact && this.showPreviousMatches ? this._renderPreviousMatches(attributes.previous_matches, attributes.matches, this.myTeam || attributes.team_name) : ''}
         ${!this.compact ? this._renderH2H(match.head_to_head, this.myTeam || attributes.team_name || match.home_team) : ''}
         ${!this.compact ? this._renderUpcomingList(attributes.upcoming_matches, attributes.matches, this.myTeam || attributes.team_name) : ''}
@@ -715,37 +708,6 @@ class SoccerLiveTeamCard extends LitElement {
     // so an empty abbrev doesn't leave just a coloured marker.
     const text = clean(abbrev) || clean(fallbackName) || '?';
     return html`<span class="abbrev-badge" style="--team-c:${c}"><span class="abbrev-name">${text}</span></span>`;
-  }
-
-  _renderFormTrend(previousMatches, fallbackMatches, trackedTeam) {
-    const tracked = (trackedTeam || '').toLowerCase();
-    // Gebruik previous_matches of filtered fallback
-    const finished = previousMatches && previousMatches.length > 0
-      ? previousMatches
-      : (fallbackMatches || []).filter(m => m.state === 'post').slice(-10).reverse();
-    if (finished.length === 0) return '';
-    const results = finished.map(m => {
-      const isHome = m.home_team && m.home_team.toLowerCase().includes(tracked);
-      const hs = parseInt(m.home_score), as_ = parseInt(m.away_score);
-      if (isNaN(hs) || isNaN(as_)) return null;
-      if (hs === as_) return 'D';
-      return ((isHome && hs > as_) || (!isHome && as_ > hs)) ? 'W' : 'L';
-    }).filter(Boolean).reverse(); // oudste → nieuwste
-    if (results.length < 2) return '';
-    const wins = results.filter(r => r === 'W').length;
-    const draws = results.filter(r => r === 'D').length;
-    const losses = results.filter(r => r === 'L').length;
-    return html`
-      <div class="form-trend-section">
-        <div class="upcoming-list-title">${this._t('team.form_trend') || 'Seizoenvorm'}</div>
-        <div class="form-trend-row">
-          <div class="form-trend-dots">
-            ${results.map(r => html`<span class="ft-dot ${r.toLowerCase()}">${this._t('form.' + r)}</span>`)}
-          </div>
-          <span class="form-trend-summary">${wins}${this._t('form.W')} ${draws}${this._t('form.D')} ${losses}${this._t('form.L')}</span>
-        </div>
-      </div>
-    `;
   }
 
   _renderPreviousMatches(previousMatches, fallbackMatches, trackedTeam) {
