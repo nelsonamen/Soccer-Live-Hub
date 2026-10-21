@@ -471,8 +471,6 @@ class SoccerLiveStandingsCard extends LitElement {
           <div class="event-toast variant-${this._toastVariant}" .textContent=${this._toastMessage}></div>
         ` : ''}
 
-        ${this.hideHeader ? '' : this._renderHeader(stateObj, seasonName, standingsGroup, standingsGroups, showAllGroups, highlightPos)}
-
         ${isPreSeason ? html`
           <div class="preseason-banner">
             <span class="preseason-icon">🗓️</span>

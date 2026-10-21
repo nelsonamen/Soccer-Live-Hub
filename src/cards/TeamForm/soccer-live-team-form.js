@@ -170,12 +170,6 @@ class SoccerLiveTeamFormCard extends LitElement {
       <ha-card>
         <div class="hero-bg"></div>
         <div class="card-content">
-        ${!hideHeader ? renderSoccerHeader({
-          logo,
-          title: team || this._t('card.team_form'),
-          badge: standingSummary ? renderSoccerBadge(standingSummary, 'neutral') : null,
-        }) : ''}
-
         <!-- Form dots -->
         <div class="section">
           <div class="section-label">${this._t('team.form_trend')} (${results.length})</div>

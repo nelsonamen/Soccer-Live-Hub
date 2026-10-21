@@ -169,12 +169,6 @@ class SoccerLiveTeamCompetitionsCard extends LitElement {
       <ha-card>
         ${renderCardHero(featured.home_logo, featured.away_logo)}
         <div class="card-content">
-        ${!this._config.hide_header ? renderSoccerHeader({
-          logo: teamLogo,
-          title: teamName || 'Team',
-          badge: groups.length > 1 ? renderSoccerBadge(`${groups.length}`, 'neutral') : null,
-          fallbackIcon: '🗂️',
-        }) : ''}
 
         ${groups.length > 1 ? html`
           <div class="comp-tabs" role="tablist">
@@ -191,13 +185,6 @@ class SoccerLiveTeamCompetitionsCard extends LitElement {
         ` : ''}
 
         <div class="comp-body">
-          ${active.name !== 'Other' || active.logo || standing ? html`
-            <div class="comp-header">
-              ${active.logo ? html`<img class="comp-icon" src="${active.logo}" alt="">` : ''}
-              ${active.name !== 'Other' ? html`<span class="comp-name">${active.name}</span>` : ''}
-              ${standing ? html`<span class="standing-pill">${standing}</span>` : ''}
-            </div>
-          ` : ''}
 
           ${featured.state === 'in' ? html`
             <div class="match-list">

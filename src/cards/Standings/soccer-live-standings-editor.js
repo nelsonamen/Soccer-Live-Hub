@@ -177,15 +177,6 @@ class SoccerLiveStandingsEditor extends LitElement {
           </select>
         </div>
 
-        <div class="option">
-          <label>${this._t('editor.hide_header')}</label>
-          <ha-switch
-            .checked=${this._config.hide_header !== false}
-            data-config-value="hide_header"
-            @change=${this._switchChanged}
-          ></ha-switch>
-        </div>
-
         <div>
           <label class="field-label">${this._t('editor.max_teams')}</label>
           <input type="number" min="1" max="50"

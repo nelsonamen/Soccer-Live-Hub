@@ -63,10 +63,6 @@ class SoccerLiveTeamCompetitionsEditor extends LitElement {
           <input type="number" min="1" max="10" .value=${this._config.max_matches || 4} data-config-value="max_matches" @change=${this._numberChanged}>
         </div>
         <div class="option">
-          <label>${this._t('editor.hide_header')}</label>
-          <ha-switch .checked=${this._config.hide_header !== false} data-config-value="hide_header" @change=${this._switchChanged}></ha-switch>
-        </div>
-        <div class="option">
           <label>${this._t('editor.show_last_match')}</label>
           <ha-switch .checked=${this._config.show_last_match !== false} data-config-value="show_last_match" @change=${this._switchChanged}></ha-switch>
         </div>

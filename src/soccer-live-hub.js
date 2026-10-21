@@ -858,7 +858,6 @@ class SoccerLiveCard extends HTMLElement {
           language: this._config.language,
           entity: resolvedEntity,
           card_type: mod.type,
-          hide_header: mod.hide_header !== false,
         };
         child.hass = blendHassSources(hass, modConfig);
         child._isLoading = false;
@@ -1397,7 +1396,6 @@ class SoccerLiveCard extends HTMLElement {
       language: this._config.language,
       entity: resolvedEntity,
       card_type: type,
-      hide_header: mod.hide_header !== false,
     };
 
     try {

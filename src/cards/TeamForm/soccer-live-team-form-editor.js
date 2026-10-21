@@ -43,10 +43,6 @@ class SoccerLiveTeamFormEditor extends LitElement {
           <label class="field-hint">${this._t('editor.my_team_hint')}</label>
           <input type="text" data-config-value="team_name" .value=${this._config.team_name || ''} @input=${this._inputChanged} placeholder=${this._t('editor.my_team_hint')}>
         </div>
-        <div class="option">
-          <label>${this._t('editor.hide_header')}</label>
-          <ha-switch .checked=${this._config.hide_header !== false} data-config-value="hide_header" @change=${this._toggleChanged}></ha-switch>
-        </div>
 
         ${renderSkinControls(this, this._config, (k) => (this._t ? this._t(k) : k))}
       </div>
