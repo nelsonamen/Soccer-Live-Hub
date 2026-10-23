@@ -53,10 +53,7 @@ class SoccerLiveMiniStandingsEditor extends LitElement {
           <label class="field-label">${this._t('editor.max_rows')}</label>
           <input type="number" min="1" max="20" .value=${this._config.max_rows ?? 5} data-config-value="max_rows" @change=${this._numberChanged}>
         </div>
-        <div>
-          <label class="field-label">${this._t('editor.highlight_team')}</label>
-          <input type="text" .value=${this._config.highlight_team || ''} data-config-value="highlight_team" @input=${this._textChanged}>
-        </div>
+
         <div class="option">
           <label>${this._t('editor.hide_wdlgd')}</label>
           <ha-switch .checked=${this._config.hide_stats === true} data-config-value="hide_stats" @change=${this._switchChanged}></ha-switch>

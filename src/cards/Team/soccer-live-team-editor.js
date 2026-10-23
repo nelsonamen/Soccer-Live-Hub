@@ -132,12 +132,7 @@ class SoccerLiveTeamCardEditor extends LitElement {
         </div>
 
         <h3>${this._t('editor.section_match')}</h3>
-        <div>
-          <label class="field-label">${this._t('editor.my_team')}</label>
-          <input type="text" placeholder="${this._t('editor.my_team_hint')}"
-            .value=${this._config.my_team || ''}
-            @change=${(e) => this._fireConfigChanged({...this._config, my_team: e.target.value})} />
-        </div>
+
         <div class="option">
           <label>${this._t('editor.show_previous_matches')}</label>
           <ha-switch .checked=${this._config.show_previous_matches === true}

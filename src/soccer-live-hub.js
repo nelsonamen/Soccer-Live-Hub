@@ -908,8 +908,13 @@ class SoccerLiveCard extends HTMLElement {
       const mod = this._getModules().find(m => m.id === id);
       if (mod && child) {
         const resolvedEntity = this._resolveModuleEntity(mod);
+        const effectiveTeam = (mod.team && mod.team !== 'Geral') ? mod.team : ((this._config.team && this._config.team !== 'Geral') ? this._config.team : '');
         const modConfig = {
           ...mod,
+          team: effectiveTeam || mod.team,
+          team_name: effectiveTeam || mod.team_name,
+          my_team: effectiveTeam || mod.my_team,
+          highlight_team: effectiveTeam || mod.highlight_team,
           skin: this._config.skin,
           appearance: this._config.appearance || 'ha',
           palette: this._config.palette || 'purple',
@@ -1455,8 +1460,13 @@ class SoccerLiveCard extends HTMLElement {
 
     const resolvedEntity = this._resolveModuleEntity(mod);
 
+    const effectiveTeam = (mod.team && mod.team !== 'Geral') ? mod.team : ((this._config.team && this._config.team !== 'Geral') ? this._config.team : '');
     const modConfig = {
       ...mod,
+      team: effectiveTeam || mod.team,
+      team_name: effectiveTeam || mod.team_name,
+      my_team: effectiveTeam || mod.my_team,
+      highlight_team: effectiveTeam || mod.highlight_team,
       skin: this._config.skin,
       appearance: this._config.appearance || 'ha',
       palette: this._config.palette || 'purple',

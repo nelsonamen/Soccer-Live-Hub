@@ -184,12 +184,7 @@ class SoccerLiveStandingsEditor extends LitElement {
             data-config-value="max_teams_visible" @change=${this._numberChanged} />
         </div>
 
-        <div>
-          <label class="field-label">${this._t('editor.my_team')}</label>
-          <input type="text" placeholder="${this._t('editor.my_team_hint')}"
-            .value=${this._config.highlight_team || this._config.my_team || ''}
-            @change=${(e) => this._fireConfigChanged({...this._config, highlight_team: e.target.value, my_team: e.target.value})} />
-        </div>
+
 
         <div class="option">
           <label>${this._t('editor.show_season_totals')}</label>

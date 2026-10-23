@@ -37,12 +37,7 @@ class SoccerLiveTeamFormEditor extends LitElement {
           </select>
         </div>
 
-        <h3>${this._t('editor.settings')}</h3>
-        <div>
-          <label class="field-label">${this._t('editor.team_name')}</label>
-          <label class="field-hint">${this._t('editor.my_team_hint')}</label>
-          <input type="text" data-config-value="team_name" .value=${this._config.team_name || ''} @input=${this._inputChanged} placeholder=${this._t('editor.my_team_hint')}>
-        </div>
+
 
         ${renderSkinControls(this, this._config, (k) => (this._t ? this._t(k) : k))}
       </div>
