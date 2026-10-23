@@ -27,7 +27,6 @@ import './cards/Team/soccer-live-team.js';
 import './cards/Standings/soccer-live-standings.js';
 import './cards/LastMatch/soccer-live-last-match.js';
 import './cards/MiniStandings/soccer-live-mini-standings.js';
-import './cards/TeamCompetitions/soccer-live-team-competitions.js';
 import './cards/TeamForm/soccer-live-team-form.js';
 
 // ─── Card type registry (All Modules) ─────────────────────────────────────────
@@ -38,7 +37,6 @@ const CARD_MODULES = {
   'mini-standings': { editor: () => import('./cards/MiniStandings/soccer-live-mini-standings-editor.js') },
   'last-match': { editor: () => import('./cards/LastMatch/soccer-live-last-match-editor.js') },
   'team-form': { editor: () => import('./cards/TeamForm/soccer-live-team-form-editor.js') },
-  'team-competitions': { editor: () => import('./cards/TeamCompetitions/soccer-live-team-competitions-editor.js') },
 };
 
 const MODULE_PROMISES = new Map();
@@ -56,7 +54,6 @@ const CARD_REGISTRY = [
   { value: 'standings',         element: 'soccer-live-standings',         editor: 'soccer-live-standings-editor',         label: 'Classificação',          description: 'Tabela classificativa da liga com zonas' },
   { value: 'mini-standings',    element: 'soccer-live-mini-standings',    editor: 'soccer-live-mini-standings-editor',    label: 'Mini Classificação',     description: 'Classificação compacta por grupos ou tabela resumida' },
   { value: 'last-match',        element: 'soccer-live-last-match',        editor: 'soccer-live-last-match-editor',        label: 'Último Jogo',            description: 'Resultado e marcadores do último jogo terminado' },
-  { value: 'team-competitions', element: 'soccer-live-team-competitions', editor: 'soccer-live-team-competitions-editor', label: 'Competições da Equipa',  description: 'Todas as competições da equipa com abas e jogos' },
   { value: 'team-form',         element: 'soccer-live-team-form',         editor: 'soccer-live-team-form-editor',         label: 'Forma da Equipa',        description: 'Tendência de forma, histórico V/E/D e golos' },
 ];
 
@@ -111,6 +108,7 @@ class SoccerLiveCardEditor extends LitElement {
   }
 
   setConfig(config) {
+    const isFirstLoad = !this._config || Object.keys(this._config).length === 0;
     this._config = { ...(config || {}) };
     if (!Array.isArray(this._config.modules)) {
       this._config.modules = [];
@@ -123,6 +121,23 @@ class SoccerLiveCardEditor extends LitElement {
       }
       return mod;
     });
+
+    if (isFirstLoad && this._config.modules.length > 0) {
+      const initMod = this._config.modules[this._selectedModuleIndex || 0];
+      if (initMod) {
+        const team = initMod.team || this._config.team || 'Geral';
+        const cat = getModuleCategory(initMod, this.hass, this._config);
+        setTimeout(() => {
+          this._dispatch({
+            ...this._config,
+            _previewModuleId: initMod.id,
+            _previewTeam: team,
+            _previewCategory: cat,
+          });
+        }, 50);
+      }
+    }
+
     this.requestUpdate();
   }
 
@@ -161,7 +176,6 @@ class SoccerLiveCardEditor extends LitElement {
       'mini-standings': 'card.mini_standings',
       'last-match': 'card.last_match',
       matches: 'card.matches',
-      'team-competitions': 'card.team_competitions',
       scorers: 'card.scorers',
       'team-form': 'card.team_form',
       countdown: 'card.countdown',
@@ -196,7 +210,7 @@ class SoccerLiveCardEditor extends LitElement {
       defaultEntity = models.bracket_model;
     } else if (norm === 'club') {
       defaultEntity = models.club_model;
-    } else if (norm === 'matches' || norm === 'ticker' || norm === 'team-competitions' || norm === 'matchday' || norm === 'minimal') {
+    } else if (norm === 'matches' || norm === 'ticker' || norm === 'matchday' || norm === 'minimal') {
       defaultEntity = models.match_model;
     }
 
@@ -238,7 +252,7 @@ class SoccerLiveCardEditor extends LitElement {
       defaultEntity = models.bracket_model || defaultEntity;
     } else if (norm === 'club') {
       defaultEntity = models.club_model || defaultEntity;
-    } else if (norm === 'matches' || norm === 'ticker' || norm === 'team-competitions' || norm === 'matchday' || norm === 'minimal') {
+    } else if (norm === 'matches' || norm === 'ticker' || norm === 'matchday' || norm === 'minimal') {
       defaultEntity = models.match_model || defaultEntity;
     }
 
@@ -334,7 +348,7 @@ class SoccerLiveCardEditor extends LitElement {
         nextMod.entity = models.bracket_model || mod.entity;
       } else if (norm === 'club') {
         nextMod.entity = models.club_model || mod.entity;
-      } else if (norm === 'matches' || norm === 'ticker' || norm === 'team-competitions' || norm === 'matchday' || norm === 'minimal') {
+      } else if (norm === 'matches' || norm === 'ticker' || norm === 'matchday' || norm === 'minimal') {
         nextMod.entity = models.match_model || mod.entity;
       }
       return nextMod;
@@ -603,7 +617,7 @@ class SoccerLiveCardEditor extends LitElement {
             >
           </div>
 
-          ${['team', 'countdown', 'matches', 'ticker', 'match-center', 'hub', 'team-competitions'].includes(normalizeCardType(selectedMod.type)) ? html`
+          ${['team', 'countdown', 'matches', 'ticker', 'match-center', 'hub'].includes(normalizeCardType(selectedMod.type)) ? html`
             <div class="field-group">
               <label class="field-label">${this._t('editor.broadcast_sensor')}</label>
               <ha-entity-picker
@@ -827,6 +841,17 @@ if (!customElements.get('soccer-live-hub-editor')) {
   customElements.define('soccer-live-hub-editor', SoccerLiveCardEditor);
 }
 
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 // ─── Wrapper card (Modular Main Card) ─────────────────────────────────────────
 
 class SoccerLiveCard extends HTMLElement {
@@ -835,9 +860,42 @@ class SoccerLiveCard extends HTMLElement {
     this._hass = null;
     this._config = {};
     this._activeModuleId = null;
+    this._activeTeam = null;
+    this._activeCategory = null;
     this._tabBar = null;
     this._contentContainer = null;
     this._childElements = new Map();
+  }
+
+  _getStorageKey(subKey) {
+    const rawId = this._config?.card_id || this._config?.title || 'hub';
+    const cleanId = String(rawId).toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+    return `soccer_live_hub_${cleanId}_${subKey}`;
+  }
+
+  _loadSavedState() {
+    try {
+      if (!this._activeTeam) {
+        const savedTeam = sessionStorage.getItem(this._getStorageKey('team'));
+        if (savedTeam) this._activeTeam = savedTeam;
+      }
+      if (!this._activeCategory) {
+        const savedCat = sessionStorage.getItem(this._getStorageKey('cat'));
+        if (savedCat) this._activeCategory = savedCat;
+      }
+      if (!this._activeModuleId) {
+        const savedMod = sessionStorage.getItem(this._getStorageKey('mod'));
+        if (savedMod) this._activeModuleId = savedMod;
+      }
+    } catch (_) {}
+  }
+
+  _saveActiveState() {
+    try {
+      if (this._activeTeam) sessionStorage.setItem(this._getStorageKey('team'), this._activeTeam);
+      if (this._activeCategory) sessionStorage.setItem(this._getStorageKey('cat'), this._activeCategory);
+      if (this._activeModuleId) sessionStorage.setItem(this._getStorageKey('mod'), this._activeModuleId);
+    } catch (_) {}
   }
 
   set hass(hass) {
@@ -998,7 +1056,7 @@ class SoccerLiveCard extends HTMLElement {
     if (type === 'club') {
       return models.club_model || mod.entity || '';
     }
-    if (['matches', 'ticker', 'team-competitions', 'matchday', 'minimal'].includes(type)) {
+    if (['matches', 'ticker', 'matchday', 'minimal'].includes(type)) {
       return models.match_model || mod.entity || '';
     }
 
@@ -1006,9 +1064,10 @@ class SoccerLiveCard extends HTMLElement {
   }
 
   setConfig(config) {
-    const prevActiveId = config?._previewModuleId || this._activeModuleId;
-    const prevActiveTeam = config?._previewTeam || this._activeTeam;
-    const prevActiveCat = config?._previewCategory || this._activeCategory;
+    const isPreviewTrigger = Boolean(config?._previewModuleId);
+    const prevActiveId = config?._previewModuleId;
+    const prevActiveTeam = config?._previewTeam;
+    const prevActiveCat = config?._previewCategory;
 
     const cleanConfig = { ...(config || {}) };
     delete cleanConfig._previewModuleId;
@@ -1016,9 +1075,14 @@ class SoccerLiveCard extends HTMLElement {
     delete cleanConfig._previewCategory;
 
     this._config = cleanConfig;
-    if (prevActiveId) this._activeModuleId = prevActiveId;
-    if (prevActiveTeam) this._activeTeam = prevActiveTeam;
-    if (prevActiveCat) this._activeCategory = prevActiveCat;
+
+    if (isPreviewTrigger) {
+      if (prevActiveId) this._activeModuleId = prevActiveId;
+      if (prevActiveTeam) this._activeTeam = prevActiveTeam;
+      if (prevActiveCat) this._activeCategory = prevActiveCat;
+    } else {
+      this._loadSavedState();
+    }
 
     applySkin(this, this._config);
     this._renderCard();
@@ -1094,8 +1158,8 @@ class SoccerLiveCard extends HTMLElement {
 
     header.innerHTML = `
       <div style="position:relative;z-index:2;">
-        <div style="font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--primary-text-color);">${titleText}</div>
-        <div style="font-size: 12px; color: var(--secondary-text-color); margin-top: 2px; font-weight: 500;">${subtitleText}</div>
+        <div style="font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--primary-text-color);">${escapeHtml(titleText)}</div>
+        <div style="font-size: 12px; color: var(--secondary-text-color); margin-top: 2px; font-weight: 500;">${escapeHtml(subtitleText)}</div>
       </div>
       <div style="position:absolute;right:-10px;top:-10px;width:110px;height:110px;pointer-events:none;z-index:1;overflow:hidden;">
         ${teamLogo
@@ -1257,6 +1321,7 @@ class SoccerLiveCard extends HTMLElement {
           this._activeCategory = null;
           const firstModOfTeam = groups.get(team)?.[0];
           this._activeModuleId = firstModOfTeam?.id;
+          this._saveActiveState();
           this._renderCard();
         });
         teamsRow.appendChild(btn);
@@ -1315,6 +1380,7 @@ class SoccerLiveCard extends HTMLElement {
           this._activeCategory = cat;
           const firstOfCat = categoriesMap.get(cat)?.[0];
           this._activeModuleId = firstOfCat?.id;
+          this._saveActiveState();
           this._renderCard();
         });
         categoriesRow.appendChild(btn);
@@ -1357,6 +1423,7 @@ class SoccerLiveCard extends HTMLElement {
         btn.textContent = this._getModuleDisplayTitle(mod);
         btn.addEventListener('click', () => {
           this._activeModuleId = mod.id;
+          this._saveActiveState();
           this._renderCard();
         });
         modulesRow.appendChild(btn);
