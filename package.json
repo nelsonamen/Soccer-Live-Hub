@@ -15,9 +15,9 @@
   "license": "GPL-3.0-only",
   "homepage": "https://github.com/nelsonamen/Soccer-Live-Hub#readme",
   "devDependencies": {
-    "acorn": "^8.18.0",
+    "acorn": "^8.19.0",
     "terser-webpack-plugin": "^5.6.1",
-    "webpack": "^5.111.1",
+    "webpack": "^5.112.0",
     "webpack-cli": "^7.2.3"
   },
   "dependencies": {
