@@ -292,6 +292,22 @@ class SoccerLiveLastMatchCard extends LitElement {
       : "";
     const competition = displayCompetitionName(match.league_name, lang);
 
+    const statsContent = this._renderStats(match, translate);
+    const eventsContent = this._renderPopupEventGroups(match);
+    const ratingsContent = this._renderRatings(match);
+    const timelineContent = renderPopupTimeline(match, { translate });
+    const lineupContent = renderPopupLineup(match, { translate });
+    const h2hContent = this._renderH2H(match, translate);
+
+    const hasAnyContent = !!(
+      (statsContent && statsContent !== '') ||
+      (eventsContent && eventsContent !== '') ||
+      (ratingsContent && ratingsContent !== '') ||
+      (timelineContent && timelineContent !== '') ||
+      (lineupContent && lineupContent !== '') ||
+      (h2hContent && h2hContent !== '')
+    );
+
     return html`
       <div class="lmp-box">
         <button class="lmp-close" aria-label="${this._t("last_match.close")}" @click=${() => { this._showDetails = false; }}>×</button>
@@ -306,12 +322,18 @@ class SoccerLiveLastMatchCard extends LitElement {
         <p class="lmp-teams"><strong>${match.home_team}</strong> – <strong>${match.away_team}</strong></p>
         ${competition || dateStr ? html`<p class="lmp-meta">${[competition, dateStr].filter(Boolean).join(" · ")}${match.venue && match.venue !== "N/A" ? ` · ${match.venue}` : ""}</p>` : ""}
 
-        ${this._renderStats(match, translate)}
-        ${this._renderPopupEventGroups(match)}
-        ${this._renderRatings(match)}
-        ${renderPopupTimeline(match, { translate })}
-        ${renderPopupLineup(match, { translate })}
-        ${this._renderH2H(match, translate)}
+        ${hasAnyContent ? html`
+          ${statsContent}
+          ${eventsContent}
+          ${ratingsContent}
+          ${timelineContent}
+          ${lineupContent}
+          ${h2hContent}
+        ` : html`
+          <div class="lmp-empty-info" style="padding:20px 16px;text-align:center;color:var(--secondary-text-color,#64748b);background:rgba(0,0,0,0.03);border-radius:12px;margin:16px 0;font-size:13px;font-weight:500;">
+            ℹ️ ${this._t('last_match.details_unavailable') || 'Estatísticas e detalhes indisponíveis para este jogo'}
+          </div>
+        `}
 
         <button class="lmp-done" @click=${() => { this._showDetails = false; }}>${this._t("last_match.close")}</button>
       </div>

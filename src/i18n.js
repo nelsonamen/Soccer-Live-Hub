@@ -293,6 +293,7 @@ const TRANSLATIONS = {
     'last_match.close': 'Close',
     'last_match.none': 'No recent match',
     'last_match.none_hint': 'The most recent finished match will appear here.',
+    'last_match.details_unavailable': 'Detailed statistics unavailable for this match',
     'last_match.editor_hint': 'Shows the most recent finished match for this team.',
     'event.var': 'VAR',
 
@@ -5916,6 +5917,7 @@ const TRANSLATIONS = {
     'last_match.label': 'Último resultado',
     'last_match.none': 'Nenhum jogo recente',
     'last_match.none_hint': 'O último jogo terminado aparecerá aqui.',
+    'last_match.details_unavailable': 'Estatísticas e detalhes indisponíveis para este jogo',
     'lineup.pre.sub': 'Costumam aparecer cerca de uma hora antes do apito inicial.',
     'lineup.pre.title': 'Escalações ainda não publicadas',
     'match.actual': 'Real',
