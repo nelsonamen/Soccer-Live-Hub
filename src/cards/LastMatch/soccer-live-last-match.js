@@ -196,7 +196,11 @@ class SoccerLiveLastMatchCard extends LitElement {
   // ─── Details popup (portal in document.body, so it escapes the card) ────────
 
   _renderDetailsPortal() {
-    const match = pickLastMatch(this._attrs());
+    const options = {
+      category: this._config.category || this._config.competition,
+      lang: resolveLang(this.hass, this._config),
+    };
+    const match = pickLastMatch(this._attrs(), options);
     if (!match) { this._showDetails = false; return; }
 
     if (!this._portal) {
