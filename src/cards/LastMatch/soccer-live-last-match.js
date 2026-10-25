@@ -70,7 +70,10 @@ class SoccerLiveLastMatchCard extends LitElement {
         renderInfoState("📅", this._t("last_match.none"), this._t("last_match.none_hint")));
     }
 
-    const match = pickLastMatch(attrs);
+    const match = pickLastMatch(attrs, {
+      category: this._config.category || this._config.competition,
+      lang: resolveLang(this.hass, this._config),
+    });
     if (!match) {
       return html`<ha-card>${renderInfoState("📅", this._t("last_match.none"), this._t("last_match.none_hint"))}</ha-card>`;
     }
