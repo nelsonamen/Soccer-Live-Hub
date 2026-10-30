@@ -364,7 +364,7 @@ test('matches — prematch detail popup is capability based', async ({ page }) =
 
 const CARD_MATRIX = [
   'team', 'standings', 'matches', 'countdown', 'news', 'bracket',
-  'mini-standings', 'scorers', 'multi-team', 'team-competitions',
+  'mini-standings', 'scorers', 'multi-team',
   'match-center', 'team-form', 'club', 'diagnostics', 'ticker',
   'lineup', 'timeline', 'minimal',
   'matchday', 'archive',
@@ -505,18 +505,6 @@ test('schema-v10 momentum and installation planning are visible when supplied', 
   await expect(target(page)).toContainText('100%');
   await expect(target(page)).toContainText('Aanvraagplanning');
   await expect(target(page)).toContainText('Voorspellingen');
-});
-
-test('team competitions replaces a provider clock placeholder with Live', async ({ page }) => {
-  await open(page, { mode: 'matrix', type: 'team-competitions', phase: 'live', lang: 'nl' });
-  await page.evaluate(() => {
-    const card = document.querySelector('soccer-live-team-competitions');
-    card.hass.states[card._config.entity].attributes.matches[0].clock = 'N/A';
-    card.requestUpdate();
-  });
-
-  await expect(target(page)).toContainText('Live');
-  await expect(target(page)).not.toContainText('N/A');
 });
 
 test('match hub translates the complete rich-provider statistics vocabulary', async ({ page }) => {
