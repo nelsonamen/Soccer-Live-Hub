@@ -1078,22 +1078,24 @@ class SoccerLiveCard extends HTMLElement {
     const prevActiveId = cleanConfig._previewModuleId;
     const prevActiveTeam = cleanConfig._previewTeam;
     const prevActiveCat = cleanConfig._previewCategory;
-    const isPreviewTrigger = Boolean(prevActiveId);
     delete cleanConfig._previewModuleId;
     delete cleanConfig._previewTeam;
     delete cleanConfig._previewCategory;
 
     this._config = cleanConfig;
 
-    if (isPreviewTrigger) {
-      // Coming from the editor live preview — honour the selected module.
+    // Only honour the preview fields if the card is already connected/rendered
+    // (i.e. this is a live editor update, not a cold page load from saved YAML).
+    const isLiveEditorUpdate = Boolean(prevActiveId) && this._tabBar !== null;
+
+    if (isLiveEditorUpdate) {
       if (prevActiveId) this._activeModuleId = prevActiveId;
       if (prevActiveTeam) this._activeTeam = prevActiveTeam;
       if (prevActiveCat) this._activeCategory = prevActiveCat;
     } else {
-      // Normal load / page refresh — always start at the first module.
+      // Cold load / page refresh — always start at the first module.
       this._activeModuleId = null;
-      this._loadSavedState(); // still restores active team/category, not module
+      this._loadSavedState(); // restores active team/category only
     }
 
     applySkin(this, this._config);
