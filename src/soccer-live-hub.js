@@ -127,18 +127,32 @@ class SoccerLiveCardEditor extends LitElement {
       if (initMod) {
         const team = initMod.team || this._config.team || 'Geral';
         const cat = getModuleCategory(initMod, this.hass, this._config);
+        // Use window event instead of config dispatch — does NOT pollute saved YAML
         setTimeout(() => {
-          this._dispatch({
-            ...this._config,
-            _previewModuleId: initMod.id,
-            _previewTeam: team,
-            _previewCategory: cat,
-          });
+          this._firePreviewEvent(initMod.id, team, cat);
         }, 50);
       }
     }
 
     this.requestUpdate();
+  }
+
+  _firePreviewEvent(moduleId, team, category) {
+    const cardId = String(this._config?.card_id || this._config?.title || 'hub')
+      .toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+    window.dispatchEvent(new CustomEvent('soccer-live-hub-preview', {
+      detail: { cardId, moduleId, team, category }
+    }));
+
+    try {
+      const root = this.getRootNode ? this.getRootNode() : null;
+      const host = root?.host || document;
+      const previewCard = host.querySelector?.('soccer-live-hub, soccer-live-card') ||
+        document.querySelector('hui-card-preview soccer-live-hub, hui-card-preview soccer-live-card, .element-preview soccer-live-hub, .element-preview soccer-live-card');
+      if (previewCard && typeof previewCard._setPreviewModule === 'function') {
+        previewCard._setPreviewModule(moduleId, team, category);
+      }
+    } catch (_) {}
   }
 
   _t(key, vars) {
@@ -149,6 +163,9 @@ class SoccerLiveCardEditor extends LitElement {
     const rawType = this._config?.type || WRAPPER_TYPE;
     const type = rawType.startsWith('custom:') ? rawType : `custom:${rawType}`;
     const nextConfig = { ...config, type };
+    delete nextConfig._previewModuleId;
+    delete nextConfig._previewTeam;
+    delete nextConfig._previewCategory;
     this.dispatchEvent(new CustomEvent('config-changed', {
       detail: { config: nextConfig },
       bubbles: true,
@@ -166,6 +183,10 @@ class SoccerLiveCardEditor extends LitElement {
     this._selectedModuleIndex = targetIdx;
     this._subEditorIndex = null;
     this._dispatch({ ...this._config, modules });
+    const moved = modules[targetIdx];
+    if (moved) {
+      this._firePreviewEvent(moved.id, moved.team || this._config.team, getModuleCategory(moved, this.hass, this._config));
+    }
   }
 
   _getCardLabel(item) {
@@ -224,6 +245,7 @@ class SoccerLiveCardEditor extends LitElement {
     this._selectedModuleIndex = modules.length - 1;
     this._subEditorIndex = null;
     this._dispatch({ ...this._config, modules });
+    this._firePreviewEvent(newMod.id, newMod.team || this._config.team, getModuleCategory(newMod, this.hass, this._config));
   }
 
   _changeModuleType(index, newType) {
@@ -272,6 +294,7 @@ class SoccerLiveCardEditor extends LitElement {
     this._subEditorType = null;
     this._subEditorIndex = null;
     this._dispatch({ ...this._config, modules });
+    this._firePreviewEvent(mod.id, modules[index].team || this._config.team, getModuleCategory(modules[index], this.hass, this._config));
   }
 
   _selectModule(index) {
@@ -281,12 +304,9 @@ class SoccerLiveCardEditor extends LitElement {
     if (mod) {
       const team = mod.team || this._config.team || 'Geral';
       const cat = getModuleCategory(mod, this.hass, this._config);
-      this._dispatch({
-        ...this._config,
-        _previewModuleId: mod.id,
-        _previewTeam: team,
-        _previewCategory: cat,
-      });
+      // Fire window event for preview — does NOT go into saved YAML
+      this._firePreviewEvent(mod.id, team, cat);
+      this.requestUpdate();
     } else {
       this.requestUpdate();
     }
@@ -301,6 +321,7 @@ class SoccerLiveCardEditor extends LitElement {
     this._selectedModuleIndex = index + 1;
     this._subEditorIndex = null;
     this._dispatch({ ...this._config, modules });
+    this._firePreviewEvent(cloned.id, cloned.team || this._config.team, getModuleCategory(cloned, this.hass, this._config));
   }
 
   _removeModule(index) {
@@ -311,6 +332,10 @@ class SoccerLiveCardEditor extends LitElement {
     this._subEditorType = null;
     this._subEditorIndex = null;
     this._dispatch({ ...this._config, modules });
+    const remainingMod = modules[this._selectedModuleIndex];
+    if (remainingMod) {
+      this._firePreviewEvent(remainingMod.id, remainingMod.team || this._config.team, getModuleCategory(remainingMod, this.hass, this._config));
+    }
   }
 
   _updateSelectedModule(key, value) {
@@ -866,6 +891,72 @@ class SoccerLiveCard extends HTMLElement {
     this._contentContainer = null;
     this._childElements = new Map();
     this._isColdLoad = true; // true until first render completes
+    this._onPreviewEvent = null;
+  }
+
+  connectedCallback() {
+    if (!this._onPreviewEvent) {
+      this._onPreviewEvent = (e) => {
+        if (!this._isPreviewCard()) return;
+        const { moduleId, team, category } = e.detail || {};
+        if (moduleId) {
+          this._setPreviewModule(moduleId, team, category);
+        }
+      };
+      window.addEventListener('soccer-live-hub-preview', this._onPreviewEvent);
+    }
+  }
+
+  disconnectedCallback() {
+    if (this._onPreviewEvent) {
+      window.removeEventListener('soccer-live-hub-preview', this._onPreviewEvent);
+      this._onPreviewEvent = null;
+    }
+  }
+
+  _isPreviewCard() {
+    if (this.preview === true) return true;
+    let curr = this;
+    while (curr) {
+      const tag = (curr.tagName || '').toLowerCase();
+      const cls = String(curr.className || '').toLowerCase();
+      if (
+        tag === 'hui-card-preview' ||
+        tag === 'hui-dialog-edit-card' ||
+        cls.includes('element-preview')
+      ) {
+        return true;
+      }
+      const root = curr.getRootNode ? curr.getRootNode() : null;
+      if (root && root.host) {
+        curr = root.host;
+      } else {
+        curr = curr.parentElement;
+      }
+    }
+    return false;
+  }
+
+  _setPreviewModule(moduleId, team, category) {
+    if (!this._isPreviewCard()) return;
+    const myModules = this._getModules();
+    const targetMod = myModules.find(m => m.id === moduleId);
+    if (!targetMod) return;
+
+    if (team && team !== 'Geral') {
+      this._activeTeam = team;
+    } else if (targetMod.team && targetMod.team !== 'Geral') {
+      this._activeTeam = targetMod.team;
+    } else {
+      this._activeTeam = this._config?.team || 'Geral';
+    }
+
+    const effectiveCategory = (category && category !== 'Geral')
+      ? category
+      : (targetMod.category || this._getModuleCategory(targetMod));
+    this._activeCategory = effectiveCategory;
+    this._activeModuleId = moduleId;
+    this._renderCard();
   }
 
   _getStorageKey(subKey) {
@@ -893,6 +984,7 @@ class SoccerLiveCard extends HTMLElement {
   }
 
   _saveActiveState() {
+    if (this._isPreviewCard()) return;
     try {
       if (this._activeTeam) sessionStorage.setItem(this._getStorageKey('team'), this._activeTeam);
       if (this._activeCategory) sessionStorage.setItem(this._getStorageKey('cat'), this._activeCategory);
@@ -975,7 +1067,11 @@ class SoccerLiveCard extends HTMLElement {
   }
 
   _getModuleCategory(mod) {
-    return getModuleCategory(mod, this._hass, this._config);
+    if (!mod) return 'Geral';
+    if (mod.category && mod.category.trim()) return mod.category.trim();
+    const entity = this._resolveModuleEntity(mod);
+    const modWithEntity = (entity && !mod.entity) ? { ...mod, entity } : mod;
+    return getModuleCategory(modWithEntity, this._hass, this._config);
   }
 
   _getCategoryGroupedModules(teamModules) {
@@ -1076,21 +1172,22 @@ class SoccerLiveCard extends HTMLElement {
   setConfig(config) {
     // Always strip _preview* fields — they must never be persisted in YAML.
     const cleanConfig = { ...(config || {}) };
-    const prevActiveId = cleanConfig._previewModuleId;
-    const prevActiveTeam = cleanConfig._previewTeam;
-    const prevActiveCat = cleanConfig._previewCategory;
     delete cleanConfig._previewModuleId;
     delete cleanConfig._previewTeam;
     delete cleanConfig._previewCategory;
 
     this._config = cleanConfig;
 
-    // On every config load (page refresh OR editor update), always reset to
-    // the first module. The active team/category are restored from sessionStorage.
-    // _previewModuleId is intentionally NEVER used here to avoid the saved YAML
-    // forcing a non-first module on page load.
-    this._activeModuleId = null;
-    this._loadSavedState(); // restores team/category only
+    if (this._isPreviewCard()) {
+      // In editor preview: keep current selected module if it still exists in the config
+      if (!this._activeModuleId || !cleanConfig.modules?.some(m => m.id === this._activeModuleId)) {
+        this._activeModuleId = cleanConfig.modules?.[0]?.id || null;
+      }
+    } else {
+      // On dashboard: ALWAYS start at first module on fresh load!
+      this._activeModuleId = null;
+      this._loadSavedState(); // restores team/category only
+    }
 
     applySkin(this, this._config);
     this._renderCard();
