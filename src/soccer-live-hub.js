@@ -895,7 +895,7 @@ class SoccerLiveCard extends HTMLElement {
     try {
       if (this._activeTeam) sessionStorage.setItem(this._getStorageKey('team'), this._activeTeam);
       if (this._activeCategory) sessionStorage.setItem(this._getStorageKey('cat'), this._activeCategory);
-      if (this._activeModuleId) sessionStorage.setItem(this._getStorageKey('mod'), this._activeModuleId);
+      // Do NOT persist the active module — the card always starts with module 1 on refresh.
     } catch (_) {}
   }
 
@@ -1073,12 +1073,12 @@ class SoccerLiveCard extends HTMLElement {
   }
 
   setConfig(config) {
-    const isPreviewTrigger = Boolean(config?._previewModuleId);
-    const prevActiveId = config?._previewModuleId;
-    const prevActiveTeam = config?._previewTeam;
-    const prevActiveCat = config?._previewCategory;
-
+    // Always strip _preview* fields — they must never be persisted in YAML.
     const cleanConfig = { ...(config || {}) };
+    const prevActiveId = cleanConfig._previewModuleId;
+    const prevActiveTeam = cleanConfig._previewTeam;
+    const prevActiveCat = cleanConfig._previewCategory;
+    const isPreviewTrigger = Boolean(prevActiveId);
     delete cleanConfig._previewModuleId;
     delete cleanConfig._previewTeam;
     delete cleanConfig._previewCategory;
@@ -1086,11 +1086,14 @@ class SoccerLiveCard extends HTMLElement {
     this._config = cleanConfig;
 
     if (isPreviewTrigger) {
+      // Coming from the editor live preview — honour the selected module.
       if (prevActiveId) this._activeModuleId = prevActiveId;
       if (prevActiveTeam) this._activeTeam = prevActiveTeam;
       if (prevActiveCat) this._activeCategory = prevActiveCat;
     } else {
-      this._loadSavedState();
+      // Normal load / page refresh — always start at the first module.
+      this._activeModuleId = null;
+      this._loadSavedState(); // still restores active team/category, not module
     }
 
     applySkin(this, this._config);
