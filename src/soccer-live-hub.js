@@ -883,10 +883,11 @@ class SoccerLiveCard extends HTMLElement {
         const savedCat = sessionStorage.getItem(this._getStorageKey('cat'));
         if (savedCat) this._activeCategory = savedCat;
       }
-      // Ignore persisted active module so the card always starts with the first module.
-      // This ensures a fresh default view after a page refresh.
-      // If needed, the active module will be set to the first module of the active team later in render.
+      // Clear any persisted active module so the card always starts with the first module.
       this._activeModuleId = null;
+      // Also remove stale entry from sessionStorage to avoid future reads.
+      try { sessionStorage.removeItem(this._getStorageKey('mod')); } catch (_) {}
+
     } catch (_) {}
   }
 
