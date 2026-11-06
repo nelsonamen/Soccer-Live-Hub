@@ -268,17 +268,38 @@ class SoccerLiveLastMatchCard extends LitElement {
     const yellowCards = [];
     const redCards = [];
     details.forEach(d => {
-      const text = typeof d === 'string'
-        ? d
-        : (d.text || d.description || d.type_text || (d.player ? `${d.player} ${d.minute ? `(${d.minute}')` : ''}` : ''));
+      let text = '';
+      if (typeof d === 'string') {
+        text = d;
+      } else if (d && typeof d === 'object') {
+        const athletes = (Array.isArray(d.athletes) ? d.athletes : [d.player, d.name]).filter(Boolean).join(', ');
+        const minute = d.minute ? `${d.minute}'` : (d.clock || '');
+        if (athletes) {
+          text = minute ? `${minute} ${athletes}` : athletes;
+        } else {
+          text = d.text || d.description || d.type_text || '';
+        }
+      }
       const lower = text.toLowerCase();
-      const type = String(d.type || d.event_type || '').toLowerCase();
-      if (lower.includes('goal') || lower.includes('golo') || type === 'goal' || type === 'penalty') {
-        goals.push(text || `${d.player || 'Golo'} ${d.minute ? `(${d.minute}')` : ''}`);
-      } else if (lower.includes('yellow') || lower.includes('amarelo') || type === 'yellow_card' || type.includes('yellow')) {
-        yellowCards.push(text || `${d.player || 'Cartão'} ${d.minute ? `(${d.minute}')` : ''}`);
-      } else if (lower.includes('red') || lower.includes('vermelho') || type === 'red_card' || type.includes('red')) {
-        redCards.push(text || `${d.player || 'Cartão Vermelho'} ${d.minute ? `(${d.minute}')` : ''}`);
+      const type = String(d?.type || d?.event_type || d?.type_text || '').toLowerCase();
+      const isGoal = lower.includes('goal') || lower.includes('golo') || type === 'goal' || type === 'penalty';
+      const isYellow = lower.includes('yellow') || lower.includes('amarelo') || type === 'yellow_card' || type.includes('yellow');
+      const isRed = lower.includes('red') || lower.includes('vermelho') || type === 'red_card' || type.includes('red');
+
+      const cleanText = text
+        .replace(/^Goal\s*[-–:]\s*/i, '')
+        .replace(/^Yellow Card\s*[-–:]\s*/i, '')
+        .replace(/^Red Card\s*[-–:]\s*/i, '')
+        .trim();
+
+      const isJustRawType = /^(goal|yellow card|red card)$/i.test(cleanText);
+
+      if (isGoal) {
+        goals.push(isJustRawType || !cleanText ? this._t('event.goal') : cleanText);
+      } else if (isYellow) {
+        yellowCards.push(isJustRawType || !cleanText ? this._t('event.yellow_card') : cleanText);
+      } else if (isRed) {
+        redCards.push(isJustRawType || !cleanText ? this._t('event.red_card') : cleanText);
       }
     });
     return { goals, yellowCards, redCards };
@@ -319,9 +340,12 @@ class SoccerLiveLastMatchCard extends LitElement {
     const competition = displayCompetitionName(match.league_name, lang);
 
     const statsContent = this._renderStats(match, translate);
-    const eventsContent = this._renderPopupEventGroups(match);
-    const ratingsContent = this._renderRatings(match);
     const timelineContent = renderPopupTimeline(match, { translate });
+    // Only show separate text event groups if there is NO rich timeline
+    const eventsContent = (!timelineContent || timelineContent === '')
+      ? this._renderPopupEventGroups(match)
+      : '';
+    const ratingsContent = this._renderRatings(match);
     const lineupContent = renderPopupLineup(match, { translate });
     const h2hContent = this._renderH2H(match, translate);
 
@@ -502,8 +526,8 @@ class SoccerLiveLastMatchCard extends LitElement {
   _portalStyles() {
     return html`<style>
       ${pitchStyles.cssText}
-      .mp-section { margin: 12px 0 0; padding: 12px 14px; border-radius: 10px; background: rgba(255,255,255,0.045); border-left: 3px solid var(--cl-accent, #6366f1); }
-      .mp-section-title { margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 800; color: var(--cl-text, #f8fafc); }
+      .mp-section { margin: 12px 0 0; padding: 12px 14px; border-radius: 10px; background: var(--cl-surface, rgba(127,127,127,0.06)); border-left: 3px solid var(--cl-accent, #6366f1); }
+      .mp-section-title { margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 800; color: var(--cl-text, var(--primary-text-color)); }
       .soccer-live-last-match-portal {
         border: 0; padding: 0; margin: auto; max-width: none; max-height: none;
         width: 100vw; height: 100vh; background: transparent; overflow: auto;
@@ -513,58 +537,58 @@ class SoccerLiveLastMatchCard extends LitElement {
       .lmp-box {
         position: relative; box-sizing: border-box;
         max-width: 560px; margin: 5vh auto; padding: 20px 18px 24px;
-        background: var(--cl-bg, var(--card-background-color, #1c1c1c));
-        color: var(--cl-text, var(--primary-text-color));
+        background: var(--cl-bg, var(--card-background-color, #ffffff));
+        color: var(--cl-text, var(--primary-text-color, #0f172a));
         border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
       }
       .lmp-close {
         position: absolute; top: 10px; right: 12px; border: 0; background: transparent;
-        color: var(--cl-text-2, var(--secondary-text-color)); font-size: 24px; line-height: 1;
+        color: var(--cl-text-2, var(--secondary-text-color, #64748b)); font-size: 24px; line-height: 1;
         cursor: pointer; padding: 4px;
       }
       .lmp-score-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; }
       .lmp-logo { width: 48px; height: 48px; object-fit: contain; justify-self: center; }
       .lmp-center { text-align: center; }
       .lmp-score { font-size: 2rem; font-weight: 800; font-variant-numeric: tabular-nums; }
-      .lmp-ft { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--cl-text-2, var(--secondary-text-color)); }
-      .lmp-teams { text-align: center; margin: 6px 0 2px; }
-      .lmp-meta { text-align: center; font-size: 0.82rem; color: var(--cl-text-2, var(--secondary-text-color)); margin: 0 0 4px; }
+      .lmp-ft { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--cl-text-2, var(--secondary-text-color, #64748b)); }
+      .lmp-teams { text-align: center; margin: 6px 0 2px; font-weight: 700; color: var(--cl-text, var(--primary-text-color, #0f172a)); }
+      .lmp-meta { text-align: center; font-size: 0.82rem; color: var(--cl-text-2, var(--secondary-text-color, #64748b)); margin: 0 0 4px; }
       .lmp-stats { display: flex; flex-direction: column; gap: 8px; }
       .lmp-stat { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; font-size: 0.85rem; }
-      .lmp-stat-label { text-align: center; color: var(--cl-text-2, var(--secondary-text-color)); }
-      .lmp-stat-h, .lmp-stat-a { font-weight: 700; font-variant-numeric: tabular-nums; }
+      .lmp-stat-label { text-align: center; color: var(--cl-text-2, var(--secondary-text-color, #64748b)); }
+      .lmp-stat-h, .lmp-stat-a { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--cl-text, var(--primary-text-color, #0f172a)); }
       .lmp-stat-a { text-align: right; }
       .lmp-bar { display: flex; height: 5px; border-radius: 3px; overflow: hidden; background: var(--cl-divider, rgba(127,127,127,0.2)); }
       .lmp-bar-h { background: var(--cl-accent, #3b82f6); }
       .lmp-bar-a { background: var(--cl-text-2, #9aa0a6); opacity: 0.6; }
-      .lmp-event-group { margin: 12px 0 0; padding: 12px 14px; border-radius: 10px; border-left: 3px solid; background: rgba(255,255,255,0.045); }
+      .lmp-event-group { margin: 12px 0 0; padding: 12px 14px; border-radius: 10px; border-left: 3px solid; background: var(--cl-surface, rgba(127,127,127,0.06)); }
       .lmp-event-group.goal { border-color: #6366f1; background: rgba(99,102,241,0.08); }
-      .lmp-event-group.yellow { border-color: #f59e0b; background: rgba(245,158,11,0.08); }
+      .lmp-event-group.yellow { border-color: #d97706; background: rgba(245,158,11,0.08); }
       .lmp-event-group.red { border-color: #ef4444; background: rgba(239,68,68,0.08); }
       .lmp-event-title { margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 800; }
       .lmp-event-group.goal .lmp-event-title { color: #6366f1; }
-      .lmp-event-group.yellow .lmp-event-title { color: #f59e0b; }
+      .lmp-event-group.yellow .lmp-event-title { color: #d97706; }
       .lmp-event-group.red .lmp-event-title { color: #ef4444; }
-      .lmp-event-list { margin: 0; padding-left: 18px; font-size: 0.85rem; color: var(--cl-text); }
+      .lmp-event-list { margin: 0; padding-left: 18px; font-size: 0.85rem; color: var(--cl-text, var(--primary-text-color, #0f172a)); }
       .lmp-event-list li { margin: 3px 0; }
       .lmp-potm { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-      .lmp-potm-label { font-size: 0.78rem; color: var(--cl-text-2, var(--secondary-text-color)); white-space: nowrap; }
-      .lmp-potm-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .lmp-potm-label { font-size: 0.78rem; color: var(--cl-text-2, var(--secondary-text-color, #64748b)); white-space: nowrap; }
+      .lmp-potm-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--cl-text, var(--primary-text-color, #0f172a)); }
       .lmp-rating { margin-left: auto; flex: 0 0 auto; min-width: 34px; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; color: #fff; border-radius: 5px; padding: 2px 6px; font-size: 0.8rem; }
       .lmp-ratings { display: flex; flex-direction: column; gap: 6px; }
       .lmp-rated { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
       .lmp-rated img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; flex: 0 0 auto; }
-      .lmp-rated-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .lmp-rated-pos { color: var(--cl-text-2, var(--secondary-text-color)); }
+      .lmp-rated-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--cl-text, var(--primary-text-color, #0f172a)); }
+      .lmp-rated-pos { color: var(--cl-text-2, var(--secondary-text-color, #64748b)); }
       .lmp-h2h > div { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; font-size: 0.85rem; padding: 3px 0; align-items: center; }
       .lmp-h2h > div > span:last-child { text-align: right; }
       .lmp-h2h b { font-variant-numeric: tabular-nums; }
       .lmp-h2h-mid { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-      .lmp-h2h-date { color: var(--cl-text-2, var(--secondary-text-color)); font-size: 0.62rem; white-space: nowrap; }
+      .lmp-h2h-date { color: var(--cl-text-2, var(--secondary-text-color, #64748b)); font-size: 0.62rem; white-space: nowrap; }
       .lmp-h2h-score { padding: 1px 8px; border-radius: 6px; }
       .lmp-h2h-score.win  { color: #fff; background: var(--cl-win, #22c55e); }
       .lmp-h2h-score.loss { color: #fff; background: var(--cl-loss, #ef4444); }
-      .lmp-h2h-score.draw { color: var(--cl-text, #f8fafc); background: var(--cl-divider, rgba(127,127,127,0.28)); }
+      .lmp-h2h-score.draw { color: var(--cl-text, var(--primary-text-color, #0f172a)); background: var(--cl-divider, rgba(127,127,127,0.28)); }
       .lmp-done {
         margin-top: 20px; width: 100%; padding: 12px 20px; border: 0; border-radius: 12px;
         cursor: pointer; font-weight: 800; font-size: 14px; color: #fff;

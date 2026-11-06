@@ -4,30 +4,31 @@ import { renderPitch } from './shared-pitch.js';
 
 export function renderPopupSectionStyles(prefix, lineupGap = 10) {
   return html`<style>
-    .${prefix}-section-lineup{background:rgba(16,185,129,.08);border-color:#10b981}
-    .${prefix}-section-timeline{background:rgba(251,191,36,.08);border-color:#fbbf24}
-    .${prefix}-section-title.lineup{color:#10b981}
-    .${prefix}-section-title.timeline{color:#fbbf24}
+    .${prefix}-section-lineup{background:rgba(16,185,129,.08);border-left:3px solid #10b981;border-radius:10px;margin:12px 0 0;padding:12px 14px}
+    .${prefix}-section-timeline{background:rgba(245,158,11,.08);border-left:3px solid #f59e0b;border-radius:10px;margin:12px 0 0;padding:12px 14px}
+    .${prefix}-section-title.lineup{color:#059669;margin:0 0 10px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+    .${prefix}-section-title.timeline{color:#d97706;margin:0 0 10px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
     .${prefix}-lineup-team{margin-bottom:${lineupGap}px}
     .${prefix}-lineup-team:last-child{margin-bottom:0}
     .${prefix}-lineup-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
-    .${prefix}-lineup-header span:first-child{font-size:12px;font-weight:800;color:#fff}
+    .${prefix}-lineup-header span:first-child{font-size:12px;font-weight:800;color:var(--cl-text, var(--primary-text-color, #0f172a))}
     .${prefix}-formation{font-size:10px;font-weight:700;color:var(--cl-accent,#6366f1);letter-spacing:.1em}
-    .${prefix}-lineup-players{font-size:12px;color:#cbd5e1;line-height:1.7}
-    .${prefix}-player{display:inline-block;padding:2px 8px;background:rgba(255,255,255,.05);border-radius:6px;margin:2px}
-    .${prefix}-jersey{color:#fbbf24;font-weight:800}
+    .${prefix}-lineup-players{font-size:12px;color:var(--cl-text, var(--primary-text-color, #334155));line-height:1.7}
+    .${prefix}-player{display:inline-block;padding:2px 8px;background:var(--cl-surface, rgba(127,127,127,.1));border-radius:6px;margin:2px;color:var(--cl-text, var(--primary-text-color, #0f172a))}
+    .${prefix}-jersey{color:var(--cl-accent, #6366f1);font-weight:800}
     .${prefix}-timeline-list{margin:0;padding:0;list-style:none}
-    .${prefix}-timeline-item{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;color:#cbd5e1}
+    .${prefix}-timeline-item{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--cl-divider, rgba(127,127,127,.12));font-size:12px;color:var(--cl-text, var(--primary-text-color, #1e293b))}
     .${prefix}-timeline-item:last-child{border-bottom:0}
-    .${prefix}-tl-clock{min-width:32px;text-align:right;font-size:11px;font-weight:700;color:#94a3b8;font-variant-numeric:tabular-nums;padding-top:2px;flex-shrink:0}
+    .${prefix}-tl-clock{min-width:32px;text-align:right;font-size:11px;font-weight:700;color:var(--cl-text-2, var(--secondary-text-color, #64748b));font-variant-numeric:tabular-nums;padding-top:2px;flex-shrink:0}
     .${prefix}-tl-badge{display:inline-block;font-size:8px;font-weight:800;padding:1px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0;line-height:15px;white-space:nowrap;margin-top:1px}
     .${prefix}-tl-badge.goal{background:rgba(99,102,241,.18);color:#6366f1}
-    .${prefix}-tl-badge.yellow{background:rgba(245,158,11,.18);color:#f59e0b}
+    .${prefix}-tl-badge.yellow{background:rgba(245,158,11,.18);color:#d97706}
     .${prefix}-tl-badge.red{background:rgba(239,68,68,.18);color:#ef4444}
-    .${prefix}-tl-badge.sub{background:rgba(148,163,184,.12);color:#94a3b8}
-    .${prefix}-tl-badge.meta{background:transparent;color:#94a3b8;font-size:14px;padding:0 4px;letter-spacing:0}
-    .${prefix}-tl-text strong{color:#fff}
-    .${prefix}-tl-team{color:#94a3b8;font-size:11px}
+    .${prefix}-tl-badge.sub{background:rgba(148,163,184,.18);color:var(--cl-text-2, var(--secondary-text-color, #64748b))}
+    .${prefix}-tl-badge.meta{background:transparent;color:var(--cl-text-2, var(--secondary-text-color, #64748b));font-size:14px;padding:0 4px;letter-spacing:0}
+    .${prefix}-tl-text{flex:1;min-width:0;line-height:1.4}
+    .${prefix}-tl-text strong{color:var(--cl-text, var(--primary-text-color, #0f172a));font-weight:700}
+    .${prefix}-tl-team{color:var(--cl-text-2, var(--secondary-text-color, #64748b));font-size:11px}
   </style>`;
 }
 
