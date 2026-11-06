@@ -13,6 +13,8 @@ import { matchStatRows, translateStatKey } from "../shared-stat-labels.js";
 import { renderMatchMeta, matchMetaStyles } from "../shared-match-meta.js";
 import { soccerCardShellStyles } from "../card-shell.js";
 import { renderSoccerHeader, renderSoccerBadge, soccerHeaderStyles } from "../shared-header.js";
+import { requestMatchDetails, matchHasDetails } from "../shared-detail-loader.js";
+import { historicalH2H } from "../shared-archive-model.js";
 
 /**
  * Soccer Live Last Match Card
@@ -186,11 +188,28 @@ class SoccerLiveLastMatchCard extends LitElement {
 
       ${this._hasDetails(match) ? html`
         <div class="lm-actions">
-          <button class="lm-details-btn" @click=${() => { this._showDetails = true; }}>
+          <button class="lm-details-btn" @click=${() => this._openDetails(match)}>
             ${this._t("team.details")} ›
           </button>
         </div>` : ""}
     `;
+  }
+
+  async _openDetails(match) {
+    this._showDetails = true;
+    const attrs = this._attrs();
+    if (attrs?.detail_service && !matchHasDetails(match)) {
+      try {
+        await requestMatchDetails(this.hass, attrs, match);
+      } catch (_) {
+        /* optional enhancement */
+      } finally {
+        this.requestUpdate();
+        if (this._portal && this._showDetails) {
+          this._renderDetailsPortal();
+        }
+      }
+    }
   }
 
   // ─── Details popup (portal in document.body, so it escapes the card) ────────
@@ -244,16 +263,23 @@ class SoccerLiveLastMatchCard extends LitElement {
   }
 
   separateEvents(match) {
-    const details = match.match_details || match.key_events || match.timeline || match.events || [];
+    const details = match.match_details || match.key_events || match.timeline || match.events || match.goals || match.scorers || [];
     const goals = [];
     const yellowCards = [];
     const redCards = [];
     details.forEach(d => {
-      const text = typeof d === 'string' ? d : (d.text || d.description || d.type_text || '');
+      const text = typeof d === 'string'
+        ? d
+        : (d.text || d.description || d.type_text || (d.player ? `${d.player} ${d.minute ? `(${d.minute}')` : ''}` : ''));
       const lower = text.toLowerCase();
-      if (lower.includes('goal') || lower.includes('golo') || d.type === 'goal') goals.push(text);
-      else if (lower.includes('yellow') || lower.includes('amarelo') || d.type === 'yellow_card') yellowCards.push(text);
-      else if (lower.includes('red') || lower.includes('vermelho') || d.type === 'red_card') redCards.push(text);
+      const type = String(d.type || d.event_type || '').toLowerCase();
+      if (lower.includes('goal') || lower.includes('golo') || type === 'goal' || type === 'penalty') {
+        goals.push(text || `${d.player || 'Golo'} ${d.minute ? `(${d.minute}')` : ''}`);
+      } else if (lower.includes('yellow') || lower.includes('amarelo') || type === 'yellow_card' || type.includes('yellow')) {
+        yellowCards.push(text || `${d.player || 'Cartão'} ${d.minute ? `(${d.minute}')` : ''}`);
+      } else if (lower.includes('red') || lower.includes('vermelho') || type === 'red_card' || type.includes('red')) {
+        redCards.push(text || `${d.player || 'Cartão Vermelho'} ${d.minute ? `(${d.minute}')` : ''}`);
+      }
     });
     return { goals, yellowCards, redCards };
   }
@@ -341,8 +367,21 @@ class SoccerLiveLastMatchCard extends LitElement {
   }
 
   _renderStats(match, translate) {
-    const homeStats = match.home_statistics || match.statistics?.home || match.stats?.home || match.homeStats || {};
-    const awayStats = match.away_statistics || match.statistics?.away || match.stats?.away || match.awayStats || {};
+    let homeStats = match.home_statistics || match.statistics?.home || match.stats?.home || match.homeStats || {};
+    let awayStats = match.away_statistics || match.statistics?.away || match.stats?.away || match.awayStats || {};
+
+    if (Array.isArray(match.statistics)) {
+      homeStats = {};
+      awayStats = {};
+      for (const item of match.statistics) {
+        const k = item.name || item.type || item.key;
+        if (k) {
+          homeStats[k] = item.home ?? item.home_value;
+          awayStats[k] = item.away ?? item.away_value;
+        }
+      }
+    }
+
     const rows = matchStatRows(homeStats, awayStats);
     if (!rows.length) return "";
     const num = v => {
@@ -403,7 +442,12 @@ class SoccerLiveLastMatchCard extends LitElement {
   }
 
   _renderH2H(match, translate) {
-    const h2h = Array.isArray(match.head_to_head) ? match.head_to_head : [];
+    let h2h = Array.isArray(match.head_to_head) ? match.head_to_head : [];
+    if (!h2h.length) {
+      const attrs = this._attrs() || {};
+      const allHistory = [...(attrs.matches || []), ...(attrs.previous_matches || []), ...(attrs.match_archive || [])];
+      h2h = historicalH2H(allHistory, match.home_team, match.away_team);
+    }
     if (!h2h.length) return "";
     const attrs = this._attrs() || {};
     const tracked = (this._config.my_team || this._config.team_name || attrs.team_name
