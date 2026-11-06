@@ -2,10 +2,10 @@
 
 [![HACS Badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/default)
 [![Release](https://img.shields.io/github/v/release/nelsonamen/Soccer-Live-Hub?include_prereleases&color=orange)](https://github.com/nelsonamen/Soccer-Live-Hub/releases)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Donate-yellow.svg)](https://www.buymeacoffee.com/nelsonamen)
 
-A clean, modular, and fast Home Assistant Lovelace card for tracking live football matches, standings, results, team competitions, and form.
+A clean, modular, and fast Home Assistant Lovelace card for tracking live football matches, standings, results, and team form.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/nelsonamen/Soccer-Live-Hub/main/images/card-preview.png" alt="Soccer Live Hub Preview" width="350">
@@ -19,8 +19,8 @@ A clean, modular, and fast Home Assistant Lovelace card for tracking live footba
 - **Hierarchical Navigation**:
   - **Level 1 (Teams)**: Switch between configured clubs or national teams.
   - **Level 2 (Competitions)**: Filter content by league or cup.
-  - **Level 3 (Modules)**: Toggle between Next Match, Standings, Last Match, and more.
-- **Visual UI Editor**: Configure everything directly in the Home Assistant dashboard editor with clear module identification badges.
+  - **Level 3 (Modules)**: Toggle between Next Match, Standings, Last Match, and Team Form.
+- **Visual UI Editor**: Configure everything directly in the Home Assistant dashboard editor with live preview synchronization and module options.
 - **Dynamic Team Watermark**: Subtle crest background in the card header.
 - **Multilingual**: Supports English, Português, Español, Français, Deutsch, Italiano, and Nederlands.
 
@@ -33,8 +33,7 @@ A clean, modular, and fast Home Assistant Lovelace card for tracking live footba
 | **Next Match / Live** | Real-time scoreboard, kickoff time, clock, stadium, and TV broadcasts. |
 | **Standings** | League table with points, goal difference, and qualification zones. |
 | **Mini Standings** | Compact table focused on your team and direct rivals. |
-| **Last Match** | Final score, goal scorers, and match recap. |
-| **Team Competitions** | Tabbed overview of all active tournaments for your team. |
+| **Last Match** | Final score, goal scorers, head-to-head, and match recap. |
 | **Team Form** | Form guide chart and win/draw/loss statistics. |
 
 ---

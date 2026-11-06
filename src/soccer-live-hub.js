@@ -18,7 +18,7 @@ if (!window.customCards.some(c => c.type === 'soccer-live-hub')) {
     name: 'Soccer Live Hub',
     description: 'Cartão modular de Futebol com placares ao vivo, classificação, último jogo e mais.',
     preview: true,
-    documentationURL: 'https://github.com/nelsonamen/Teste',
+    documentationURL: 'https://github.com/nelsonamen/Soccer-Live-Hub',
   });
 }
 
@@ -1693,7 +1693,7 @@ for (const cardType of hubTypes) {
       name: 'Soccer Live Hub',
       description: 'Cartão modular de Futebol com placares ao vivo, classificação, último jogo e mais.',
       preview: true,
-      documentationURL: 'https://github.com/nelsonamen/Teste',
+      documentationURL: 'https://github.com/nelsonamen/Soccer-Live-Hub',
     });
   }
 }
