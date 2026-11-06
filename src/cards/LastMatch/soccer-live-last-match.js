@@ -442,13 +442,36 @@ class SoccerLiveLastMatchCard extends LitElement {
   }
 
   _renderH2H(match, translate) {
-    let h2h = Array.isArray(match.head_to_head) ? match.head_to_head : [];
-    if (!h2h.length) {
+    let rawH2h = Array.isArray(match.head_to_head) ? match.head_to_head : [];
+    if (!rawH2h.length) {
       const attrs = this._attrs() || {};
       const allHistory = [...(attrs.matches || []), ...(attrs.previous_matches || []), ...(attrs.match_archive || [])];
-      h2h = historicalH2H(allHistory, match.home_team, match.away_team);
+      rawH2h = historicalH2H(allHistory, match.home_team, match.away_team);
     }
+    if (!rawH2h.length) return "";
+
+    const matchDateKey = String(match.date_iso || match.date || '').slice(0, 10);
+    const matchId = match.event_id != null ? String(match.event_id) : null;
+
+    const seen = new Set();
+    const h2h = [];
+    for (const g of rawH2h) {
+      if (!g) continue;
+      const gId = g.event_id != null ? String(g.event_id) : (g.id != null ? String(g.id) : null);
+      const gDateKey = String(g.date_iso || g.date || '').slice(0, 10);
+
+      // Exclude the current match itself from previous H2H!
+      if (matchId && gId && matchId === gId) continue;
+      if (matchDateKey && gDateKey && matchDateKey === gDateKey) continue;
+
+      const dedupeKey = gId || `${gDateKey}_${g.home_team || g.home}_${g.away_team || g.away}`;
+      if (seen.has(dedupeKey)) continue;
+      seen.add(dedupeKey);
+      h2h.push(g);
+    }
+
     if (!h2h.length) return "";
+
     const attrs = this._attrs() || {};
     const tracked = (this._config.my_team || this._config.team_name || attrs.team_name
       || match.home_team || "").toLowerCase();
