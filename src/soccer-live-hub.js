@@ -865,6 +865,7 @@ class SoccerLiveCard extends HTMLElement {
     this._tabBar = null;
     this._contentContainer = null;
     this._childElements = new Map();
+    this._isColdLoad = true; // true until first render completes
   }
 
   _getStorageKey(subKey) {
@@ -1086,7 +1087,7 @@ class SoccerLiveCard extends HTMLElement {
 
     // Only honour the preview fields if the card is already connected/rendered
     // (i.e. this is a live editor update, not a cold page load from saved YAML).
-    const isLiveEditorUpdate = Boolean(prevActiveId) && this._tabBar !== null;
+    const isLiveEditorUpdate = Boolean(prevActiveId) && !this._isColdLoad;
 
     if (isLiveEditorUpdate) {
       if (prevActiveId) this._activeModuleId = prevActiveId;
@@ -1100,6 +1101,8 @@ class SoccerLiveCard extends HTMLElement {
 
     applySkin(this, this._config);
     this._renderCard();
+    // After first render, the card is no longer in cold-load state.
+    this._isColdLoad = false;
   }
 
   _applyWrapperTheme(wrapper) {
