@@ -1242,15 +1242,23 @@ class SoccerLiveCard extends HTMLElement {
       }
     }
 
-    const groups = this._getGroupedModules();
+// Remove any stray "Competições da Equipa" module
+    const cleanModules = modules.filter(m => m.title !== 'Competições da Equipa');
+
+    const groups = this._getGroupedModules(cleanModules);
     const teams = [...groups.keys()];
     if (!this._activeTeam || !groups.has(this._activeTeam)) {
       this._activeTeam = teams[0];
     }
     const teamModules = groups.get(this._activeTeam) || [];
-    this._updateTabBar(modules);
+    this._updateTabBar(cleanModules);
 
-    const activeMod = modules.find(m => m.id === this._activeModuleId) || teamModules[0];
+    // Choose active module from the filtered team list
+    let activeMod = teamModules.find(m => m.id === this._activeModuleId);
+    if (!activeMod) {
+      activeMod = teamModules[0];
+      this._activeModuleId = activeMod?.id;
+    }
     this._contentContainer.innerHTML = '';
     const activeEl = activeMod ? this._createModuleElement(activeMod) : null;
     if (activeEl) this._contentContainer.appendChild(activeEl);
