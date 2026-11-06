@@ -1085,23 +1085,15 @@ class SoccerLiveCard extends HTMLElement {
 
     this._config = cleanConfig;
 
-    // Only honour the preview fields if the card is already connected/rendered
-    // (i.e. this is a live editor update, not a cold page load from saved YAML).
-    const isLiveEditorUpdate = Boolean(prevActiveId) && !this._isColdLoad;
-
-    if (isLiveEditorUpdate) {
-      if (prevActiveId) this._activeModuleId = prevActiveId;
-      if (prevActiveTeam) this._activeTeam = prevActiveTeam;
-      if (prevActiveCat) this._activeCategory = prevActiveCat;
-    } else {
-      // Cold load / page refresh — always start at the first module.
-      this._activeModuleId = null;
-      this._loadSavedState(); // restores active team/category only
-    }
+    // On every config load (page refresh OR editor update), always reset to
+    // the first module. The active team/category are restored from sessionStorage.
+    // _previewModuleId is intentionally NEVER used here to avoid the saved YAML
+    // forcing a non-first module on page load.
+    this._activeModuleId = null;
+    this._loadSavedState(); // restores team/category only
 
     applySkin(this, this._config);
     this._renderCard();
-    // After first render, the card is no longer in cold-load state.
     this._isColdLoad = false;
   }
 
