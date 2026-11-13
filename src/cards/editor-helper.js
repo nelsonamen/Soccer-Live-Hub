@@ -238,6 +238,8 @@ export function discoverSoccerModels(hass, config = {}) {
       models.standings_model = entityId;
     } else if (!models.last_match_model && (sensorType === 'last_match' || cleanId.includes('last'))) {
       models.last_match_model = entityId;
+    } else if (!models.bracket_model && (sensorType === 'bracket' || cleanId.includes('bracket') || stateObj?.attributes?.rounds)) {
+      models.bracket_model = entityId;
     }
   }
 
@@ -280,6 +282,17 @@ export function discoverSoccerModels(hass, config = {}) {
       if (!isSoccerSensor(entityId, stateObj)) continue;
       if (stateObj?.attributes?.sensor_type === 'standings') {
         models.standings_model = entityId;
+        break;
+      }
+    }
+  }
+
+  if (!models.bracket_model) {
+    for (const [entityId, stateObj] of Object.entries(hass.states)) {
+      if (!isSoccerSensor(entityId, stateObj)) continue;
+      const cleanId = entityId.toLowerCase();
+      if (stateObj?.attributes?.sensor_type === 'bracket' || cleanId.includes('bracket') || stateObj?.attributes?.rounds) {
+        models.bracket_model = entityId;
         break;
       }
     }

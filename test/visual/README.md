@@ -12,7 +12,7 @@ warning, and the shared-inheritance status).
 ## Run
 
 ```bash
-npm run build           # the harness loads dist/soccer-live-card.bundle.js
+npm run build           # the harness loads dist/soccer-live-hub.bundle.js
 npm run test:visual
 ```
 

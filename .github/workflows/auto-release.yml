@@ -90,7 +90,7 @@ jobs:
       - name: Verify bundle asset
         if: steps.check.outputs.exists == 'false'
         run: |
-          test -s dist/soccer-live-card.bundle.js
+          test -s dist/soccer-live-hub.bundle.js
 
       - name: Create tag and release
         if: steps.check.outputs.exists == 'false'
@@ -99,7 +99,7 @@ jobs:
           tag_name: ${{ steps.version.outputs.tag }}
           name: ${{ steps.version.outputs.tag }}
           body: ${{ steps.notes.outputs.notes }}
-          files: dist/soccer-live-card.bundle.js
+          files: dist/soccer-live-hub.bundle.js
           draft: false
           prerelease: false
 
@@ -112,7 +112,7 @@ jobs:
           for attempt in 1 2 3 4 5; do
             SIZE=$(gh release view "${{ steps.version.outputs.tag }}" \
               --json assets \
-              --jq '.assets[] | select(.name == "soccer-live-card.bundle.js") | .size' \
+              --jq '.assets[] | select(.name == "soccer-live-hub.bundle.js") | .size' \
               2>/dev/null || true)
             [ -n "$SIZE" ] && [ "$SIZE" -gt 0 ] && break
             sleep $((attempt * 2))

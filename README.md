@@ -35,6 +35,7 @@ A clean, modular, and fast Home Assistant Lovelace card for tracking live footba
 | **Mini Standings** | Compact table focused on your team and direct rivals. |
 | **Last Match** | Final score, goal scorers, head-to-head, and match recap. |
 | **Team Form** | Form guide chart and win/draw/loss statistics. |
+| **Bracket / Cups** | Tournament bracket tree or round-by-round knockout list for cups and finals. |
 
 ---
 

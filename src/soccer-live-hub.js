@@ -28,6 +28,7 @@ import './cards/Standings/soccer-live-standings.js';
 import './cards/LastMatch/soccer-live-last-match.js';
 import './cards/MiniStandings/soccer-live-mini-standings.js';
 import './cards/TeamForm/soccer-live-team-form.js';
+import './cards/Bracket/soccer-live-bracket.js';
 
 // ─── Card type registry (All Modules) ─────────────────────────────────────────
 
@@ -37,6 +38,7 @@ const CARD_MODULES = {
   'mini-standings': { editor: () => import('./cards/MiniStandings/soccer-live-mini-standings-editor.js') },
   'last-match': { editor: () => import('./cards/LastMatch/soccer-live-last-match-editor.js') },
   'team-form': { editor: () => import('./cards/TeamForm/soccer-live-team-form-editor.js') },
+  bracket: { editor: () => import('./cards/Bracket/soccer-live-bracket-editor.js') },
 };
 
 const MODULE_PROMISES = new Map();
@@ -55,6 +57,7 @@ const CARD_REGISTRY = [
   { value: 'mini-standings',    element: 'soccer-live-mini-standings',    editor: 'soccer-live-mini-standings-editor',    label: 'Mini Classificação',     description: 'Classificação compacta por grupos ou tabela resumida' },
   { value: 'last-match',        element: 'soccer-live-last-match',        editor: 'soccer-live-last-match-editor',        label: 'Último Jogo',            description: 'Resultado e marcadores do último jogo terminado' },
   { value: 'team-form',         element: 'soccer-live-team-form',         editor: 'soccer-live-team-form-editor',         label: 'Forma da Equipa',        description: 'Tendência de forma, histórico V/E/D e golos' },
+  { value: 'bracket',           element: 'soccer-live-bracket',           editor: 'soccer-live-bracket-editor',           label: 'Eliminatórias / Taça',   description: 'Quadro da fase a eliminar ou árvore do torneio' },
 ];
 
 const CARD_TYPE_ALIASES = {};
@@ -1696,4 +1699,13 @@ for (const cardType of hubTypes) {
       documentationURL: 'https://github.com/nelsonamen/Soccer-Live-Hub',
     });
   }
+}
+if (!window.customCards.some(c => c.type === 'soccer-live-bracket' || c.type === 'custom:soccer-live-bracket')) {
+  window.customCards.push({
+    type: 'soccer-live-bracket',
+    name: 'Soccer Live Bracket',
+    description: 'Quadro de eliminatórias, árvore do torneio e calendário para taças e fases a eliminar.',
+    preview: true,
+    documentationURL: 'https://github.com/nelsonamen/Soccer-Live-Hub',
+  });
 }

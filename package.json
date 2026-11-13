@@ -6,7 +6,11 @@
   "scripts": {
     "build": "webpack && npm run check:bundle-size",
     "check:bundle-size": "node scripts/check-bundle-size.mjs",
-    "smoke:i18n": "node scripts/smoke-i18n.mjs"
+    "smoke:i18n": "node scripts/smoke-i18n.mjs",
+    "smoke:preview": "node scripts/smoke-preview.mjs",
+    "check:playwright-sync": "node scripts/check-playwright-sync.mjs",
+    "test:unit": "node --test test/unit/*.test.mjs",
+    "test": "npm run test:unit && npm run smoke:i18n"
   },
   "repository": {
     "type": "git",
@@ -15,6 +19,7 @@
   "license": "GPL-3.0-only",
   "homepage": "https://github.com/nelsonamen/Soccer-Live-Hub#readme",
   "devDependencies": {
+    "@playwright/test": "1.61.1",
     "acorn": "^8.18.0",
     "terser-webpack-plugin": "^5.6.1",
     "webpack": "^5.111.1",
