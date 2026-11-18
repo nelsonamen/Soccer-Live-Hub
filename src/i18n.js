@@ -6190,7 +6190,7 @@ const TRANSLATIONS = {
     'bracket.empty.sub': 'A fase eliminatória começa em breve',
     'bracket.tbd': 'A def.',
     'bracket.tied_agg': 'Empate no agregado',
-    'bracket.agg': 'Agregado',
+    'bracket.agg': 'Combinado:',
     'bracket.tab_bracket': 'Eliminatórias',
     'bracket.tab_groups': 'Grupos',
     'bracket.tab_schedule': 'Jogos',

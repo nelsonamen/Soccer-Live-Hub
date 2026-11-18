@@ -23,6 +23,7 @@ class SoccerLiveBracketCard extends LitElement {
       _collapsedRounds: { type: Object },
       _expandedRounds: { type: Object },
       _schedFilter: { type: String },
+      _activeRoundIdx: { type: Number },
     };
   }
 
@@ -37,6 +38,7 @@ class SoccerLiveBracketCard extends LitElement {
     this._myTeam = config.my_team || '';
     this._matchesEntity = config.matches_entity || '';
     this._activeTab = 'bracket';
+    this._activeRoundIdx = 0;
     this._collapsedRounds = new Set();
     this._expandedRounds = new Set();
     this._schedFilter = 'auto';
@@ -444,6 +446,13 @@ class SoccerLiveBracketCard extends LitElement {
       return null;
     };
 
+    const penFor = (match, team) => {
+      if (!match || !team || !team.name) return null;
+      if (match.home_team === team.name) return match.home_penalty ?? match.home_penalties ?? match.home_penalty_score;
+      if (match.away_team === team.name) return match.away_penalty ?? match.away_penalties ?? match.away_penalty_score;
+      return null;
+    };
+
     const aL1 = scoreFor(leg1, a);
     const bL1 = scoreFor(leg1, b);
     const aL2 = scoreFor(leg2, a);
@@ -451,37 +460,70 @@ class SoccerLiveBracketCard extends LitElement {
     const aSingle = scoreFor(single, a);
     const bSingle = scoreFor(single, b);
 
+    const aPen = penFor(single, a) ?? penFor(leg2, a) ?? tie.team_a_penalties ?? tie.penalties_a;
+    const bPen = penFor(single, b) ?? penFor(leg2, b) ?? tie.team_b_penalties ?? tie.penalties_b;
+    const hasPenalties = aPen !== null && aPen !== undefined && bPen !== null && bPen !== undefined;
+
     const isLive = (leg1 && leg1.state === 'in') || (leg2 && leg2.state === 'in') || (single && single.state === 'in');
     const isPending = !leg1 && !single;
-
     const hasMyTeam = this._myTeam ? this._tieHasMyTeam(tie) : null;
+    const isTwoLegs = !single && (leg1 || leg2 || (aL1 !== null && aL2 !== null));
+    const tieDate = this._matchDate(single) || this._matchDate(leg2) || this._matchDate(leg1) || tie.first_leg_date;
+
     return html`
       <div class="tie ${isLive ? 'live' : ''} ${tie.completed ? 'done' : ''} ${hasMyTeam === true ? 'my-team' : ''} ${hasMyTeam === false ? 'other-team' : ''}">
+        ${isTwoLegs ? html`
+          <div class="tie-head">
+            <span class="tie-head-phase">${tieDate ? this._formatDate(tieDate) : ''}</span>
+            <div class="tie-head-legs">
+              <span class="leg-pill">F1</span>
+              <span class="leg-pill">F2</span>
+            </div>
+          </div>
+        ` : (single && (tieDate || hasPenalties)) ? html`
+          <div class="tie-head">
+            <span class="tie-head-phase">${tieDate ? this._formatDate(tieDate) : ''}</span>
+            <span class="tie-head-status">${hasPenalties ? 'T (P)' : (tie.completed ? 'TR' : '')}</span>
+          </div>
+        ` : ''}
+
         <div class="tie-row ${isAWinner ? 'winner' : ''} ${isBWinner ? 'loser' : ''}">
-          <img src="${a.logo}" alt="${a.name}" />
-          <span class="tname">${a.name || this._t('bracket.tbd')}</span>
+          <div class="team-brand">
+            ${a.logo ? html`<img src="${a.logo}" alt="${a.name}" @error=${e => e.target.style.display='none'} />` : ''}
+            <span class="tname" title="${a.name || ''}">${a.abbrev || a.name || this._t('bracket.tbd')}</span>
+          </div>
           <span class="legs">
-            ${single ? html`<span class="leg">${this._formatScore(aSingle)}</span>` : html`
+            ${single ? html`
+              <span class="leg">${this._formatScore(aSingle)}${hasPenalties && aPen != null ? ` (${aPen})` : ''}</span>
+            ` : html`
               <span class="leg">${this._formatScore(aL1)}</span>
               <span class="leg">${this._formatScore(aL2)}</span>
             `}
+            ${isAWinner ? html`<span class="winner-arrow">◀</span>` : html`<span class="winner-arrow-spacer"></span>`}
           </span>
         </div>
+
         <div class="tie-row ${isBWinner ? 'winner' : ''} ${isAWinner ? 'loser' : ''}">
-          <img src="${b.logo}" alt="${b.name}" />
-          <span class="tname">${b.name || this._t('bracket.tbd')}</span>
+          <div class="team-brand">
+            ${b.logo ? html`<img src="${b.logo}" alt="${b.name}" @error=${e => e.target.style.display='none'} />` : ''}
+            <span class="tname" title="${b.name || ''}">${b.abbrev || b.name || this._t('bracket.tbd')}</span>
+          </div>
           <span class="legs">
-            ${single ? html`<span class="leg">${this._formatScore(bSingle)}</span>` : html`
+            ${single ? html`
+              <span class="leg">${this._formatScore(bSingle)}${hasPenalties && bPen != null ? ` (${bPen})` : ''}</span>
+            ` : html`
               <span class="leg">${this._formatScore(bL1)}</span>
               <span class="leg">${this._formatScore(bL2)}</span>
             `}
+            ${isBWinner ? html`<span class="winner-arrow">◀</span>` : html`<span class="winner-arrow-spacer"></span>`}
           </span>
         </div>
+
         <div class="tie-foot">
           ${isLive ? html`<span class="live-badge"><span class="dot"></span>${this._t('status.live')}</span>` : ''}
           ${tie.aggregate ? html`<span class="agg">${this._t('bracket.agg')} ${tie.aggregate}</span>` : ''}
           ${tie.tied ? html`<span class="agg tied">${this._t('bracket.tied_agg')}</span>` : ''}
-          ${!tie.completed && !isLive && tie.first_leg_date ? html`<span class="date">${this._formatDate(tie.first_leg_date)}</span>` : ''}
+          ${!isTwoLegs && !tie.completed && !isLive && tie.first_leg_date ? html`<span class="date">${this._formatDate(tie.first_leg_date)}</span>` : ''}
           ${isPending ? html`<span class="date pending">${this._t('bracket.tbd')}</span>` : ''}
           ${tie.completed && hasMyTeam
             ? this._matchesMyTeam(tie.winner_team)
@@ -845,6 +887,97 @@ class SoccerLiveBracketCard extends LitElement {
     `;
   }
 
+  _normalizeBracketRounds(rawRounds) {
+    if (!Array.isArray(rawRounds) || rawRounds.length === 0) return [];
+    const normalized = [];
+
+    for (const round of rawRounds) {
+      const ties = Array.isArray(round?.ties) ? round.ties : [];
+      if (ties.length === 0) {
+        normalized.push(round);
+        continue;
+      }
+
+      // Check if ties have distinct season_info or match_phase
+      const phases = [];
+      const phaseSet = new Set();
+      for (const t of ties) {
+        const p = t.season_info || t.match_phase || t.round || t.phase;
+        if (p && p !== 'N/A' && p !== 'Unknown') {
+          if (!phaseSet.has(p)) {
+            phaseSet.add(p);
+            phases.push(p);
+          }
+        }
+      }
+
+      if (phases.length > 1) {
+        const byPhase = new Map();
+        for (const t of ties) {
+          const p = t.season_info || t.match_phase || t.round || t.phase || round.name;
+          if (!byPhase.has(p)) byPhase.set(p, []);
+          byPhase.get(p).push(t);
+        }
+        for (const [pName, pTies] of byPhase.entries()) {
+          normalized.push({
+            ...round,
+            name: pName,
+            size: pTies.length,
+            ties: pTies,
+          });
+        }
+      } else if (ties.length === 22 && (!round.name || round.name.toLowerCase() === 'chave' || round.name.toLowerCase() === 'eliminatórias' || round.name.toLowerCase() === 'bracket' || round.name.toLowerCase() === 'quadro')) {
+        normalized.push({ ...round, name: 'Knockout Playoffs', size: 8, ties: ties.slice(0, 8) });
+        normalized.push({ ...round, name: 'Round of 16', size: 8, ties: ties.slice(8, 16) });
+        normalized.push({ ...round, name: 'Quarterfinals', size: 4, ties: ties.slice(16, 20) });
+        normalized.push({ ...round, name: 'Semifinals', size: 2, ties: ties.slice(20, 22) });
+      } else if (ties.length === 14 && (!round.name || round.name.toLowerCase() === 'chave' || round.name.toLowerCase() === 'eliminatórias' || round.name.toLowerCase() === 'bracket' || round.name.toLowerCase() === 'quadro')) {
+        normalized.push({ ...round, name: 'Round of 16', size: 8, ties: ties.slice(0, 8) });
+        normalized.push({ ...round, name: 'Quarterfinals', size: 4, ties: ties.slice(8, 12) });
+        normalized.push({ ...round, name: 'Semifinals', size: 2, ties: ties.slice(12, 14) });
+      } else if (ties.length === 6 && (!round.name || round.name.toLowerCase() === 'chave' || round.name.toLowerCase() === 'eliminatórias' || round.name.toLowerCase() === 'bracket' || round.name.toLowerCase() === 'quadro')) {
+        normalized.push({ ...round, name: 'Quarterfinals', size: 4, ties: ties.slice(0, 4) });
+        normalized.push({ ...round, name: 'Semifinals', size: 2, ties: ties.slice(4, 6) });
+      } else {
+        normalized.push(round);
+      }
+    }
+
+    return normalized;
+  }
+
+  _scrollToRound(idx) {
+    this._activeRoundIdx = idx;
+    const container = this.shadowRoot?.querySelector('.rounds-container');
+    const target = this.shadowRoot?.getElementById(`round-col-${idx}`);
+    if (container && target) {
+      const left = target.offsetLeft - container.offsetLeft;
+      container.scrollTo({ left, behavior: 'smooth' });
+    }
+  }
+
+  _onRoundsScroll(e) {
+    const container = e.target;
+    if (!container) return;
+    const scrollLeft = container.scrollLeft;
+    const roundCols = container.querySelectorAll('.round');
+    if (!roundCols.length) return;
+    let closestIdx = 0;
+    let minDiff = Infinity;
+    roundCols.forEach((col, idx) => {
+      const diff = Math.abs((col.offsetLeft - container.offsetLeft) - scrollLeft);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIdx = idx;
+      }
+    });
+    if (this._activeRoundIdx !== closestIdx) {
+      this._activeRoundIdx = closestIdx;
+      const navBtn = this.shadowRoot?.querySelector(`.bracket-round-nav .round-nav-tab:nth-child(${closestIdx + 1})`);
+      navBtn?.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+    }
+  }
+
   render() {
     applySkin(this, this._config);
     if (!this.hass || !this._config) return html``;
@@ -905,7 +1038,9 @@ class SoccerLiveBracketCard extends LitElement {
     };
 
     const rawRounds = stateObj.attributes.rounds || [];
-    const rounds = [...rawRounds].sort((a, b) => getRoundRank(a) - getRoundRank(b));
+    const normalizedRounds = this._normalizeBracketRounds(rawRounds);
+    const rounds = [...normalizedRounds].sort((a, b) => getRoundRank(a) - getRoundRank(b));
+    const activeRound = Math.min(this._activeRoundIdx ?? 0, Math.max(0, rounds.length - 1));
 
     const groupsEntityId = this._config.groups_entity;
     const groupsStateObj = groupsEntityId ? this.hass.states[groupsEntityId] : null;
@@ -982,12 +1117,30 @@ class SoccerLiveBracketCard extends LitElement {
             : this._cardStyle === 'tree'
             ? this._renderTree(rounds)
             : html`
-              <div class="rounds-container"
+              ${rounds.length > 1 && !this._compact ? html`
+                <div class="bracket-round-nav" role="tablist">
+                  ${rounds.map((round, idx) => {
+                    const isActive = activeRound === idx;
+                    return html`
+                      <button
+                        class="round-nav-tab ${isActive ? 'active' : ''}"
+                        role="tab"
+                        aria-selected="${isActive}"
+                        @click=${() => this._scrollToRound(idx)}
+                      >
+                        ${this._roundLabel(round)}
+                      </button>
+                    `;
+                  })}
+                </div>
+              ` : ''}
+              <div class="rounds-container ${this._compact ? 'compact' : ''}"
+                   @scroll=${(e) => this._onRoundsScroll(e)}
                    style="${this._compact ? 'flex-direction:column;overflow-x:visible;' : ''}">
-                ${rounds.map(round => {
+                ${rounds.map((round, idx) => {
                   const collapsed = this._isCollapsed(round);
                   return html`
-                  <div class="round ${collapsed ? 'collapsed' : ''}"
+                  <div id="round-col-${idx}" class="round ${collapsed ? 'collapsed' : ''}"
                        style="${this._compact ? 'flex:none;min-width:0;' : ''}">
                     <div class="round-name" style="cursor:pointer;" role="button" tabindex="0" aria-expanded="${!collapsed}"
                          @click=${() => this._toggleRound(round)}
@@ -1004,7 +1157,6 @@ class SoccerLiveBracketCard extends LitElement {
                     `}
                   </div>
                 `;})}
-
               </div>
             `
         }
@@ -1057,16 +1209,58 @@ class SoccerLiveBracketCard extends LitElement {
       }
 
 
+      .bracket-round-nav {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 4px 18px 0 18px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        border-bottom: 1px solid var(--cl-divider);
+        position: relative;
+        z-index: 2;
+      }
+      .bracket-round-nav::-webkit-scrollbar {
+        display: none;
+      }
+      .round-nav-tab {
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        padding: 6px 2px 8px 2px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--cl-text-2);
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        outline: none;
+      }
+      .round-nav-tab:hover {
+        color: var(--cl-text);
+      }
+      .round-nav-tab.active {
+        color: #8ab4f8;
+        border-bottom-color: #8ab4f8;
+        font-weight: 700;
+      }
+
       .rounds-container {
         position: relative; z-index: 1;
         display: flex;
         gap: 16px;
-        padding: 18px;
+        padding: 14px 18px 18px 18px;
         overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: thin;
+        -webkit-overflow-scrolling: touch;
       }
       .round {
-        flex: 1 0 240px;
-        min-width: 240px;
+        flex: 0 0 280px;
+        min-width: 280px;
+        max-width: 320px;
+        scroll-snap-align: start;
         display: flex; flex-direction: column;
         gap: 8px;
         justify-content: space-around;
@@ -1123,9 +1317,68 @@ class SoccerLiveBracketCard extends LitElement {
         border-color: rgba(16,185,129,0.3);
       }
 
+      .tie-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+        padding-bottom: 2px;
+      }
+      .tie-head-phase, .tie-head-date {
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--cl-text-2);
+        opacity: 0.75;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .tie-head-status {
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--cl-text-2);
+        padding: 1px 5px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .tie-head-legs {
+        display: flex;
+        gap: 6px;
+        margin-left: auto;
+        padding-right: 18px;
+      }
+      .leg-pill {
+        font-size: 9px;
+        font-weight: 700;
+        color: var(--cl-text-2);
+        background: rgba(255, 255, 255, 0.08);
+        padding: 1px 5px;
+        border-radius: 4px;
+        min-width: 22px;
+        text-align: center;
+      }
+      .team-brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        overflow: hidden;
+      }
+      .winner-arrow {
+        font-size: 10px;
+        color: var(--cl-text);
+        width: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .winner-arrow-spacer {
+        width: 12px;
+        display: inline-block;
+      }
+
       .tie-row {
         display: grid;
-        grid-template-columns: 22px 1fr auto;
+        grid-template-columns: 1fr auto;
         align-items: center;
         gap: 10px;
         padding: 5px 0;
@@ -1374,12 +1627,25 @@ class SoccerLiveBracketCard extends LitElement {
       }
 
       @media (max-width: 600px) {
-        ha-card.style-list .rounds-container {
+        ha-card.style-list .rounds-container.compact {
           flex-direction: column;
         }
-        ha-card.style-list .round {
+        ha-card.style-list .rounds-container.compact .round {
           flex: none;
           min-width: 0;
+        }
+        ha-card.style-list .rounds-container:not(.compact) {
+          flex-direction: row;
+          overflow-x: auto;
+          scroll-snap-type: x mandatory;
+          padding: 10px 14px 16px 14px;
+          gap: 12px;
+        }
+        ha-card.style-list .rounds-container:not(.compact) .round {
+          flex: 0 0 calc(100vw - 64px);
+          min-width: 260px;
+          max-width: 320px;
+          scroll-snap-align: start;
         }
       }
       .round .round-name { cursor: pointer; }
