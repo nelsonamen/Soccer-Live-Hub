@@ -926,16 +926,16 @@ class SoccerLiveBracketCard extends LitElement {
             ties: pTies,
           });
         }
-      } else if (ties.length === 22 && (!round.name || round.name.toLowerCase() === 'chave' || round.name.toLowerCase() === 'eliminatórias' || round.name.toLowerCase() === 'bracket' || round.name.toLowerCase() === 'quadro')) {
+      } else if (ties.length === 22) {
         normalized.push({ ...round, name: 'Knockout Playoffs', size: 8, ties: ties.slice(0, 8) });
         normalized.push({ ...round, name: 'Round of 16', size: 8, ties: ties.slice(8, 16) });
         normalized.push({ ...round, name: 'Quarterfinals', size: 4, ties: ties.slice(16, 20) });
         normalized.push({ ...round, name: 'Semifinals', size: 2, ties: ties.slice(20, 22) });
-      } else if (ties.length === 14 && (!round.name || round.name.toLowerCase() === 'chave' || round.name.toLowerCase() === 'eliminatórias' || round.name.toLowerCase() === 'bracket' || round.name.toLowerCase() === 'quadro')) {
+      } else if (ties.length === 14) {
         normalized.push({ ...round, name: 'Round of 16', size: 8, ties: ties.slice(0, 8) });
         normalized.push({ ...round, name: 'Quarterfinals', size: 4, ties: ties.slice(8, 12) });
         normalized.push({ ...round, name: 'Semifinals', size: 2, ties: ties.slice(12, 14) });
-      } else if (ties.length === 6 && (!round.name || round.name.toLowerCase() === 'chave' || round.name.toLowerCase() === 'eliminatórias' || round.name.toLowerCase() === 'bracket' || round.name.toLowerCase() === 'quadro')) {
+      } else if (ties.length === 6) {
         normalized.push({ ...round, name: 'Quarterfinals', size: 4, ties: ties.slice(0, 4) });
         normalized.push({ ...round, name: 'Semifinals', size: 2, ties: ties.slice(4, 6) });
       } else {
