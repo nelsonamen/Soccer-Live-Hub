@@ -561,7 +561,10 @@ class SoccerLiveCardEditor extends LitElement {
             const isSelected = index === selectedIdx;
             const numStr = String(index + 1).padStart(2, '0');
             const modMeta = CARD_REGISTRY.find(c => c.value === mod.type);
-            const titleStr = mod.title || modMeta?.label || mod.type;
+            const rawTitle = mod.title || '';
+            const titleStr = (rawTitle.toLowerCase() === 'chave' || rawTitle.toLowerCase() === 'eliminatórias' || rawTitle.toLowerCase() === 'eliminatorias')
+              ? (this._t('card.bracket') || modMeta?.label || 'Eliminatórias')
+              : (rawTitle || modMeta?.label || mod.type);
             const teamName = mod.team || this._config?.team || '';
             const catName = getModuleCategory(mod, this.hass, this._config);
             const tagParts = [teamName, catName && catName !== 'Geral' ? catName : ''].filter(Boolean);
@@ -630,7 +633,7 @@ class SoccerLiveCardEditor extends LitElement {
             <label class="field-label">${this._t('editor.module_title')}</label>
             <input
               type="text"
-              .value=${selectedMod.title || ''}
+              .value=${(selectedMod.title || '').trim().toLowerCase() === 'chave' ? (this._t('card.bracket') || 'Eliminatórias') : (selectedMod.title || '')}
               @change=${e => this._updateSelectedModule('title', e.target.value)}
             >
           </div>
@@ -1106,6 +1109,9 @@ class SoccerLiveCard extends HTMLElement {
   _getModuleDisplayTitle(mod) {
     if (!mod) return '';
     const rawTitle = (mod.title || '').trim();
+    if (rawTitle.toLowerCase() === 'chave') {
+      return this._t('card.bracket') || 'Eliminatórias';
+    }
     if (rawTitle) return rawTitle;
     const meta = CARD_REGISTRY.find(c => c.value === mod.type);
     return meta?.label || mod.type || 'Módulo';

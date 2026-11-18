@@ -92,32 +92,63 @@ class SoccerLiveBracketCard extends LitElement {
     if (!round) return '';
     const name = typeof round === 'string' ? round : (round.name || '');
     if (!name || name === 'Unknown' || name === 'unknown' || name === 'N/A') return '';
+    const lower = name.trim().toLowerCase();
     const map = {
-      'Final': 'round.final',
-      'Finals': 'round.final',
-      'Semifinals': 'round.semifinals',
-      'Semi-finals': 'round.semifinals',
-      'Quarterfinals': 'round.quarterfinals',
-      'Quarter-finals': 'round.quarterfinals',
-      'Round of 16': 'round.r16',
-      'Round of 32': 'round.r32',
-      'Round of 64': 'round.r64',
-      'Third Place': 'round.third_place',
-      'Knockout Playoffs': 'round.knockout_playoffs',
-      'Preliminary Round': 'round.preliminary',
-      'League Phase': 'round.league_phase',
-      'Group Stage': 'round.group_stage',
+      'final': 'round.final',
+      'finals': 'round.final',
+      'semifinals': 'round.semifinals',
+      'semi-finals': 'round.semifinals',
+      'meias-finais': 'round.semifinals',
+      'meia-final': 'round.semifinals',
+      'semifinal': 'round.semifinals',
+      'quarterfinals': 'round.quarterfinals',
+      'quarter-finals': 'round.quarterfinals',
+      'quartos de final': 'round.quarterfinals',
+      'quartas de final': 'round.quarterfinals',
+      'round of 16': 'round.r16',
+      'oitavos de final': 'round.r16',
+      'oitavas de final': 'round.r16',
+      'round of 32': 'round.r32',
+      '1/16 de final': 'round.r32',
+      'round of 64': 'round.r64',
+      '1/32 de final': 'round.r64',
+      'third place': 'round.third_place',
+      '3º e 4º lugar': 'round.third_place',
+      'knockout playoffs': 'round.knockout_playoffs',
+      'knockout round play-offs': 'round.knockout_playoffs',
+      'knockout play-offs': 'round.knockout_playoffs',
+      'knockout-playoffs': 'round.knockout_playoffs',
+      'play-offs': 'round.knockout_playoffs',
+      'playoffs': 'round.knockout_playoffs',
+      'preliminary round': 'round.preliminary',
+      'ronda preliminar': 'round.preliminary',
+      'league phase': 'round.league_phase',
+      'fase de liga': 'round.league_phase',
+      'group stage': 'round.group_stage',
+      'fase de grupos': 'round.group_stage',
+      'chave': 'card.bracket',
+      'bracket': 'card.bracket',
+      'quadro': 'card.bracket',
+      'eliminatórias': 'card.bracket',
+      'eliminatorias': 'card.bracket',
     };
-    const key = map[name];
+    const key = map[lower];
     return key ? this._t(key) : name;
   }
 
   _roundLabel(round) {
     const loc = this._localizeRoundName(round);
-    if (loc && loc !== 'Unknown' && loc !== 'unknown' && loc !== 'N/A') return loc;
-    const tieSeasonInfo = round?.ties?.[0]?.season_info || round?.ties?.[0]?.match_phase;
+    if (loc && loc !== 'Unknown' && loc !== 'unknown' && loc !== 'N/A' && loc.toLowerCase() !== 'chave') return loc;
+    const firstWithInfo = round?.ties?.find(t => (t?.season_info && t.season_info !== 'N/A') || (t?.match_phase && t.match_phase !== 'N/A'));
+    const tieSeasonInfo = firstWithInfo?.season_info || firstWithInfo?.match_phase;
     const infoLoc = tieSeasonInfo ? this._formatSeasonInfo(tieSeasonInfo) : '';
     if (infoLoc && infoLoc !== 'Unknown' && infoLoc !== 'N/A') return infoLoc;
+    const count = Array.isArray(round?.ties) ? round.ties.length : (round?.size || 0);
+    if (count === 1) return this._t('round.final');
+    if (count === 2) return this._t('round.semifinals');
+    if (count === 4) return this._t('round.quarterfinals');
+    if (count === 8) return this._t('round.r16');
+    if (count === 16) return this._t('round.r32');
     return this._t('card.bracket') || 'Eliminatórias';
   }
 
@@ -134,10 +165,15 @@ class SoccerLiveBracketCard extends LitElement {
       'third-place': 'round.third_place',
       'knockout-playoffs': 'round.knockout_playoffs',
       'knockout-round': 'round.knockout_playoffs',
+      'play-offs': 'round.knockout_playoffs',
+      'playoffs': 'round.knockout_playoffs',
       'preliminary': 'round.preliminary',
       'preliminary-round': 'round.preliminary',
       'league-phase': 'round.league_phase',
       'group-stage': 'round.group_stage',
+      'bracket': 'card.bracket',
+      'chave': 'card.bracket',
+      'quadro': 'card.bracket',
     };
     if (slug in map) {
       if (!map[slug]) return '';
@@ -219,6 +255,7 @@ class SoccerLiveBracketCard extends LitElement {
   }
 
   _renderMyNextMatch(scheduleMatches) {
+    if (this._config.show_next_match === false) return '';
     if (!this._myTeam || !scheduleMatches?.length) return '';
     const now = Date.now();
     const next = scheduleMatches.find(m => {
@@ -757,12 +794,27 @@ class SoccerLiveBracketCard extends LitElement {
     `;
   }
 
+  _localizeGroupName(name, totalGroups = 1) {
+    if (!name) return this._t('card.standings');
+    const lower = name.trim().toLowerCase();
+    if (lower === 'league phase' || lower === 'fase de liga') {
+      return this._t('round.league_phase');
+    }
+    if (lower === 'group stage' || lower === 'fase de grupos') {
+      return this._t('round.group_stage');
+    }
+    if (totalGroups <= 1 && (lower.includes('group') || lower.includes('grupo') || lower === 'standings' || lower === 'table' || lower === 'classificação')) {
+      return this._t('card.standings');
+    }
+    return name;
+  }
+
   _renderGroups(groups) {
     return html`
       <div class="groups-view">
         ${groups.map(g => html`
           <div class="group-block">
-            <div class="group-title">${g.name}</div>
+            <div class="group-title">${this._localizeGroupName(g.name, groups.length)}</div>
             <div class="group-header-row">
               <span class="gh-name"></span>
               <span class="gh-stat">${this._t('mini.p')}</span>
@@ -799,26 +851,61 @@ class SoccerLiveBracketCard extends LitElement {
     const stateObj = this.hass.states[this._config.entity];
     if (!stateObj) return html`<ha-card class="empty">${this._t('generic.unknown_entity')}: ${this._config.entity}</ha-card>`;
 
-    const ROUND_RANK = {
-      'preliminary round': 1,
-      'league phase': 2,
-      'group stage': 2,
-      'round of 64': 3,
-      'round of 32': 4,
-      'round of 16': 5,
-      'quarterfinals': 6,
-      'quarter-finals': 6,
-      'semifinals': 7,
-      'semi-finals': 7,
-      'third place': 8,
-      'final': 9,
+    const getRoundRank = (round) => {
+      const name = String(round?.name || '').trim().toLowerCase();
+      const tiesCount = Array.isArray(round?.ties) ? round.ties.length : (round?.size || 0);
+
+      const nameRanks = {
+        'preliminary': 1,
+        'preliminary round': 1,
+        'ronda preliminar': 1,
+        'league phase': 2,
+        'fase de liga': 2,
+        'group stage': 2,
+        'fase de grupos': 2,
+        'round of 64': 10,
+        '1/32 de final': 10,
+        'round of 32': 20,
+        '1/16 de final': 20,
+        'knockout playoffs': 25,
+        'knockout-playoffs': 25,
+        'knockout play-offs': 25,
+        'knockout round play-offs': 25,
+        'play-offs': 25,
+        'playoffs': 25,
+        'round of 16': 30,
+        'oitavos de final': 30,
+        'oitavas de final': 30,
+        'quarterfinals': 40,
+        'quarter-finals': 40,
+        'quartos de final': 40,
+        'quartas de final': 40,
+        'semifinals': 50,
+        'semi-finals': 50,
+        'meias-finais': 50,
+        'third place': 60,
+        '3º e 4º lugar': 60,
+        'final': 90,
+        'finals': 90,
+      };
+
+      if (name in nameRanks) return nameRanks[name];
+
+      // If tiesCount is known, infer round order: more ties = earlier round, 1 tie = Final
+      if (tiesCount > 0) {
+        if (tiesCount === 1) return 90;
+        if (tiesCount === 2) return 50;
+        if (tiesCount <= 4) return 40;
+        if (tiesCount <= 8) return 30;
+        if (tiesCount <= 16) return 20;
+        return 15;
+      }
+
+      return 50;
     };
+
     const rawRounds = stateObj.attributes.rounds || [];
-    const rounds = [...rawRounds].sort((a, b) => {
-      const rankA = ROUND_RANK[String(a?.name || '').trim().toLowerCase()] || 50;
-      const rankB = ROUND_RANK[String(b?.name || '').trim().toLowerCase()] || 50;
-      return rankA - rankB;
-    });
+    const rounds = [...rawRounds].sort((a, b) => getRoundRank(a) - getRoundRank(b));
 
     const groupsEntityId = this._config.groups_entity;
     const groupsStateObj = groupsEntityId ? this.hass.states[groupsEntityId] : null;
@@ -874,7 +961,7 @@ class SoccerLiveBracketCard extends LitElement {
                     role="tab" tabindex="0" aria-selected="${this._activeTab === 'groups'}"
                     @click=${() => { this._activeTab = 'groups'; }}
                     @keydown=${e => this._kbActivate(e, () => { this._activeTab = 'groups'; })}>
-                📊 ${this._t('bracket.tab_groups')}
+                📊 ${groupsData.length <= 1 ? this._t('card.standings') : this._t('bracket.tab_groups')}
               </span>
             ` : ''}
             ${hasSchedule ? html`

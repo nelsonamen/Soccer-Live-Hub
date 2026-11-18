@@ -132,11 +132,21 @@ class SoccerLiveBracketEditor extends LitElement {
             <option value="tree" ?selected=${this._config.style === 'tree'}>${this._t('editor.style_tree')}</option>
           </select>
         </div>
+        ${!this._config._hide_skin_controls ? html`
+          <div class="option">
+            <label>${this._t('editor.hide_header')}</label>
+            <ha-switch
+              .checked=${this._config.hide_header === true}
+              data-config-value="hide_header"
+              @change=${this._switchChanged}
+            ></ha-switch>
+          </div>
+        ` : ''}
         <div class="option">
-          <label>${this._t('editor.hide_header')}</label>
+          <label>${this._t('editor.bracket_show_next_match')}</label>
           <ha-switch
-            .checked=${this._config.hide_header === true}
-            data-config-value="hide_header"
+            .checked=${this._config.show_next_match !== false}
+            data-config-value="show_next_match"
             @change=${this._switchChanged}
           ></ha-switch>
         </div>
@@ -165,14 +175,14 @@ class SoccerLiveBracketEditor extends LitElement {
           <input type="text"
             data-config-value="my_team"
             .value=${this._config.my_team || ''}
-            placeholder="${this._t('editor.my_team_hint')}"
+            placeholder="${this._config.team || this._t('editor.my_team_hint')}"
             @change=${this._textChanged}
           >
         </div>
         <div>
           <label class="field-label">${this._t('editor.groups_entity')}</label>
           <select data-config-value="groups_entity" @change=${this._selectChanged}>
-            <option value="" ?selected=${!this._config.groups_entity}>— None —</option>
+            <option value="" ?selected=${!this._config.groups_entity}>— ${this._t('generic.none') || 'Nenhum'} —</option>
             ${this.standingsEntities.map(e => html`<option value="${e}" ?selected=${e === this._config.groups_entity}>${e}</option>`)}
           </select>
           <div class="hint" style="margin-top:4px">${this._t('editor.hint_groups_entity')}</div>
@@ -180,7 +190,7 @@ class SoccerLiveBracketEditor extends LitElement {
         <div>
           <label class="field-label">${this._t('editor.matches_entity')}</label>
           <select data-config-value="matches_entity" @change=${this._selectChanged}>
-            <option value="" ?selected=${!this._config.matches_entity}>— None —</option>
+            <option value="" ?selected=${!this._config.matches_entity}>— ${this._t('generic.none') || 'Nenhum'} —</option>
             ${this.matchesEntities.map(e => html`<option value="${e}" ?selected=${e === this._config.matches_entity}>${e}</option>`)}
           </select>
           <div class="hint" style="margin-top:4px">${this._t('editor.hint_matches_entity')}</div>
