@@ -900,6 +900,10 @@ class SoccerLiveCard extends HTMLElement {
     this._onPreviewEvent = null;
   }
 
+  _t(key, vars) {
+    return t(key, resolveLang(this._hass, this._config), vars);
+  }
+
   connectedCallback() {
     if (!this._onPreviewEvent) {
       this._onPreviewEvent = (e) => {
@@ -1110,7 +1114,7 @@ class SoccerLiveCard extends HTMLElement {
     if (!mod) return '';
     const rawTitle = (mod.title || '').trim();
     if (rawTitle.toLowerCase() === 'chave') {
-      return this._t('card.bracket') || 'Eliminatórias';
+      return (typeof this._t === 'function' ? this._t('card.bracket') : null) || 'Eliminatórias';
     }
     if (rawTitle) return rawTitle;
     const meta = CARD_REGISTRY.find(c => c.value === mod.type);
