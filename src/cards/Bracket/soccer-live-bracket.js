@@ -489,7 +489,7 @@ class SoccerLiveBracketCard extends LitElement {
 
         <div class="tie-row ${isAWinner ? 'winner' : ''} ${isBWinner ? 'loser' : ''}">
           <div class="team-brand">
-            ${a.logo ? html`<img src="${a.logo}" alt="${a.name}" @error=${e => e.target.style.display='none'} />` : ''}
+            ${a.logo ? html`<img src="${a.logo}" alt="${a.name || ''}" @error=${e => e.target.style.display='none'} />` : ''}
             <span class="tname" title="${a.name || ''}">${a.abbrev || a.name || this._t('bracket.tbd')}</span>
           </div>
           <span class="legs">
@@ -505,7 +505,7 @@ class SoccerLiveBracketCard extends LitElement {
 
         <div class="tie-row ${isBWinner ? 'winner' : ''} ${isAWinner ? 'loser' : ''}">
           <div class="team-brand">
-            ${b.logo ? html`<img src="${b.logo}" alt="${b.name}" @error=${e => e.target.style.display='none'} />` : ''}
+            ${b.logo ? html`<img src="${b.logo}" alt="${b.name || ''}" @error=${e => e.target.style.display='none'} />` : ''}
             <span class="tname" title="${b.name || ''}">${b.abbrev || b.name || this._t('bracket.tbd')}</span>
           </div>
           <span class="legs">
@@ -519,18 +519,19 @@ class SoccerLiveBracketCard extends LitElement {
           </span>
         </div>
 
-        <div class="tie-foot">
-          ${isLive ? html`<span class="live-badge"><span class="dot"></span>${this._t('status.live')}</span>` : ''}
-          ${tie.aggregate ? html`<span class="agg">${this._t('bracket.agg')} ${tie.aggregate}</span>` : ''}
-          ${tie.tied ? html`<span class="agg tied">${this._t('bracket.tied_agg')}</span>` : ''}
-          ${!isTwoLegs && !tie.completed && !isLive && tie.first_leg_date ? html`<span class="date">${this._formatDate(tie.first_leg_date)}</span>` : ''}
-          ${isPending ? html`<span class="date pending">${this._t('bracket.tbd')}</span>` : ''}
-          ${tie.completed && hasMyTeam
-            ? this._matchesMyTeam(tie.winner_team)
-              ? html`<span class="my-result won">✓ ${this._t('bracket.won')}</span>`
-              : html`<span class="my-result lost">✗ ${this._t('bracket.eliminated')}</span>`
-            : ''}
-        </div>
+        ${isLive || tie.aggregate || tie.tied || isPending || (tie.completed && hasMyTeam) ? html`
+          <div class="tie-foot">
+            ${isLive ? html`<span class="live-badge"><span class="dot"></span>${this._t('status.live')}</span>` : ''}
+            ${tie.aggregate ? html`<span class="agg">${this._t('bracket.agg')} ${tie.aggregate}</span>` : ''}
+            ${!tie.aggregate && tie.tied ? html`<span class="agg tied">${this._t('bracket.tied_agg')}</span>` : ''}
+            ${isPending ? html`<span class="date pending">${this._t('bracket.tbd')}</span>` : ''}
+            ${tie.completed && hasMyTeam
+              ? this._matchesMyTeam(tie.winner_team)
+                ? html`<span class="my-result won">✓ ${this._t('bracket.won')}</span>`
+                : html`<span class="my-result lost">✗ ${this._t('bracket.eliminated')}</span>`
+              : ''}
+          </div>
+        ` : ''}
       </div>
     `;
   }
@@ -926,24 +927,64 @@ class SoccerLiveBracketCard extends LitElement {
             ties: pTies,
           });
         }
+      } else if (ties.length === 23) {
+        normalized.push({ ...round, name: 'Knockout Playoffs', size: 8, ties: ties.slice(0, 8) });
+        normalized.push({ ...round, name: 'Round of 16', size: 8, ties: ties.slice(8, 16) });
+        normalized.push({ ...round, name: 'Quarterfinals', size: 4, ties: ties.slice(16, 20) });
+        normalized.push({ ...round, name: 'Semifinals', size: 2, ties: ties.slice(20, 22) });
+        normalized.push({ ...round, name: 'Final', size: 1, ties: ties.slice(22, 23) });
       } else if (ties.length === 22) {
         normalized.push({ ...round, name: 'Knockout Playoffs', size: 8, ties: ties.slice(0, 8) });
         normalized.push({ ...round, name: 'Round of 16', size: 8, ties: ties.slice(8, 16) });
         normalized.push({ ...round, name: 'Quarterfinals', size: 4, ties: ties.slice(16, 20) });
         normalized.push({ ...round, name: 'Semifinals', size: 2, ties: ties.slice(20, 22) });
+      } else if (ties.length === 15) {
+        normalized.push({ ...round, name: 'Round of 16', size: 8, ties: ties.slice(0, 8) });
+        normalized.push({ ...round, name: 'Quarterfinals', size: 4, ties: ties.slice(8, 12) });
+        normalized.push({ ...round, name: 'Semifinals', size: 2, ties: ties.slice(12, 14) });
+        normalized.push({ ...round, name: 'Final', size: 1, ties: ties.slice(14, 15) });
       } else if (ties.length === 14) {
         normalized.push({ ...round, name: 'Round of 16', size: 8, ties: ties.slice(0, 8) });
         normalized.push({ ...round, name: 'Quarterfinals', size: 4, ties: ties.slice(8, 12) });
         normalized.push({ ...round, name: 'Semifinals', size: 2, ties: ties.slice(12, 14) });
+      } else if (ties.length === 7) {
+        normalized.push({ ...round, name: 'Quarterfinals', size: 4, ties: ties.slice(0, 4) });
+        normalized.push({ ...round, name: 'Semifinals', size: 2, ties: ties.slice(4, 6) });
+        normalized.push({ ...round, name: 'Final', size: 1, ties: ties.slice(6, 7) });
       } else if (ties.length === 6) {
         normalized.push({ ...round, name: 'Quarterfinals', size: 4, ties: ties.slice(0, 4) });
         normalized.push({ ...round, name: 'Semifinals', size: 2, ties: ties.slice(4, 6) });
+      } else if (ties.length === 3) {
+        normalized.push({ ...round, name: 'Semifinals', size: 2, ties: ties.slice(0, 2) });
+        normalized.push({ ...round, name: 'Final', size: 1, ties: ties.slice(2, 3) });
       } else {
         normalized.push(round);
       }
     }
 
     return normalized;
+  }
+
+  _renderRoundConnector(outputCount) {
+    if (outputCount <= 0) return nothing;
+    const inputCount = outputCount * 2;
+    const lines = [];
+    for (let j = 0; j < outputCount; j++) {
+      const yTop = ((2 * j + 0.5) / inputCount) * 100;
+      const yBot = ((2 * j + 1.5) / inputCount) * 100;
+      const yMid = ((j + 0.5) / outputCount) * 100;
+      lines.push(svg`<line x1="0" y1="${yTop}%" x2="50%" y2="${yTop}%" />`);
+      lines.push(svg`<line x1="0" y1="${yBot}%" x2="50%" y2="${yBot}%" />`);
+      lines.push(svg`<line x1="50%" y1="${yTop}%" x2="50%" y2="${yBot}%" />`);
+      lines.push(svg`<line x1="50%" y1="${yMid}%" x2="100%" y2="${yMid}%" />`);
+    }
+    return html`
+      <div class="round-connector">
+        <svg preserveAspectRatio="none">
+          ${lines}
+        </svg>
+      </div>
+    `;
   }
 
   _scrollToRound(idx) {
@@ -974,7 +1015,7 @@ class SoccerLiveBracketCard extends LitElement {
     if (this._activeRoundIdx !== closestIdx) {
       this._activeRoundIdx = closestIdx;
       const navBtn = this.shadowRoot?.querySelector(`.bracket-round-nav .round-nav-tab:nth-child(${closestIdx + 1})`);
-      navBtn?.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+      navBtn?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     }
   }
 
@@ -1125,7 +1166,7 @@ class SoccerLiveBracketCard extends LitElement {
                       <button
                         class="round-nav-tab ${isActive ? 'active' : ''}"
                         role="tab"
-                        aria-selected="${isActive}"
+                        aria-selected="${isActive ? 'true' : 'false'}"
                         @click=${() => this._scrollToRound(idx)}
                       >
                         ${this._roundLabel(round)}
@@ -1135,27 +1176,23 @@ class SoccerLiveBracketCard extends LitElement {
                 </div>
               ` : ''}
               <div class="rounds-container ${this._compact ? 'compact' : ''}"
-                   @scroll=${(e) => this._onRoundsScroll(e)}
-                   style="${this._compact ? 'flex-direction:column;overflow-x:visible;' : ''}">
+                   @scroll=${(e) => this._onRoundsScroll(e)}>
                 ${rounds.map((round, idx) => {
-                  const collapsed = this._isCollapsed(round);
+                  const nextRound = rounds[idx + 1];
+                  const hasConnector = !this._compact && nextRound && round.ties.length === nextRound.ties.length * 2;
                   return html`
-                  <div id="round-col-${idx}" class="round ${collapsed ? 'collapsed' : ''}"
-                       style="${this._compact ? 'flex:none;min-width:0;' : ''}">
-                    <div class="round-name" style="cursor:pointer;" role="button" tabindex="0" aria-expanded="${!collapsed}"
-                         @click=${() => this._toggleRound(round)}
-                         @keydown=${e => this._kbActivate(e, () => this._toggleRound(round))}>
-                      <span class="round-name-en">${this._roundLabel(round)}</span>
-                      ${(() => { const prog = this._roundProgress(round); return prog && prog.done > 0 ? html`<span class="round-prog-count ${prog.live ? 'live' : ''}">${prog.live ? html`<span class="dot"></span>` : ''}${prog.done}/${prog.total}</span>` : ''; })()}
-                      <span class="round-chevron">${collapsed ? '›' : '‹'}</span>
-                    </div>
-                    ${collapsed ? '' : html`
+                  <div id="round-col-${idx}" class="round">
+                    ${this._compact ? html`
+                      <div class="round-col-header">
+                        <span class="round-col-name">${this._roundLabel(round)}</span>
+                      </div>
+                    ` : ''}
                     <div class="round-ties"
                          style="${this._compact ? 'display:grid;grid-template-columns:1fr 1fr;gap:8px;' : ''}">
                       ${round.ties.map(tie => this._renderTie(tie))}
                     </div>
-                    `}
                   </div>
+                  ${hasConnector ? this._renderRoundConnector(nextRound.ties.length) : ''}
                 `;})}
               </div>
             `
@@ -1212,14 +1249,16 @@ class SoccerLiveBracketCard extends LitElement {
       .bracket-round-nav {
         display: flex;
         align-items: center;
-        gap: 16px;
-        padding: 4px 18px 0 18px;
+        gap: 18px;
+        padding: 6px 16px 0 16px;
         overflow-x: auto;
         scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
         border-bottom: 1px solid var(--cl-divider);
-        position: relative;
-        z-index: 2;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: var(--cl-bg);
       }
       .bracket-round-nav::-webkit-scrollbar {
         display: none;
@@ -1228,13 +1267,13 @@ class SoccerLiveBracketCard extends LitElement {
         background: none;
         border: none;
         border-bottom: 2px solid transparent;
-        padding: 6px 2px 8px 2px;
+        padding: 8px 4px 10px 4px;
         font-size: 13px;
         font-weight: 600;
         color: var(--cl-text-2);
         cursor: pointer;
         white-space: nowrap;
-        transition: all 0.2s ease;
+        transition: color 0.15s ease, border-color 0.15s ease;
         outline: none;
       }
       .round-nav-tab:hover {
@@ -1249,91 +1288,91 @@ class SoccerLiveBracketCard extends LitElement {
       .rounds-container {
         position: relative; z-index: 1;
         display: flex;
-        gap: 16px;
-        padding: 14px 18px 18px 18px;
+        gap: 8px;
+        padding: 12px 14px 16px 14px;
         overflow-x: auto;
         scroll-snap-type: x mandatory;
         scrollbar-width: thin;
         -webkit-overflow-scrolling: touch;
       }
       .round {
-        flex: 0 0 280px;
-        min-width: 280px;
-        max-width: 320px;
+        flex: 0 0 215px;
+        min-width: 215px;
+        max-width: 235px;
         scroll-snap-align: start;
         display: flex; flex-direction: column;
         gap: 8px;
         justify-content: space-around;
       }
-      .round-name {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 2px;
+      .round-col-header {
+        padding: 4px 6px;
         text-align: center;
-        padding: 6px 12px;
-        border-radius: 12px;
-        background: rgba(var(--cl-accent-rgb),0.12);
-        align-self: center;
-        margin-bottom: 4px;
       }
-      .round-name-en {
+      .round-col-name {
         font-size: 11px;
         font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 0.12em;
+        letter-spacing: 0.1em;
         color: var(--cl-accent);
-        line-height: 1;
       }
       .round-ties {
         display: flex; flex-direction: column;
-        gap: 12px;
+        gap: 8px;
         justify-content: space-around;
         flex: 1;
+        min-height: 100%;
+      }
+      .round-connector {
+        flex: 0 0 16px;
+        min-width: 16px;
+        display: flex;
+        align-items: stretch;
+      }
+      .round-connector svg {
+        width: 100%;
+        height: 100%;
+        stroke: var(--cl-divider);
+        stroke-width: 1.5;
+        fill: none;
       }
 
       .tie {
         background: var(--cl-card-2);
         border: 1px solid var(--cl-glass-border);
         border-radius: 12px;
-        padding: 10px 12px;
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 6px 10px;
+        transition: all 0.2s ease;
         position: relative;
       }
       .tie:hover {
         border-color: var(--cl-accent);
-        transform: translateY(-2px);
+        transform: translateY(-1px);
       }
       .tie.live {
         border-color: var(--cl-live);
-        box-shadow: 0 0 0 1px var(--cl-live), 0 0 20px var(--cl-live-glow);
-        animation: tie-pulse 2s ease-in-out infinite;
-      }
-      @keyframes tie-pulse {
-        0%, 100% { box-shadow: 0 0 0 1px var(--cl-live), 0 0 20px var(--cl-live-glow); }
-        50% { box-shadow: 0 0 0 2px var(--cl-live), 0 0 30px var(--cl-live-glow); }
+        box-shadow: 0 0 0 1px var(--cl-live), 0 0 12px var(--cl-live-glow);
       }
       .tie.done {
-        border-color: rgba(16,185,129,0.3);
+        border-color: rgba(255, 255, 255, 0.08);
       }
 
       .tie-head {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
         padding-bottom: 2px;
       }
       .tie-head-phase, .tie-head-date {
         font-size: 10px;
         font-weight: 600;
         color: var(--cl-text-2);
-        opacity: 0.75;
+        opacity: 0.8;
         text-transform: uppercase;
         letter-spacing: 0.04em;
       }
       .tie-head-status {
-        font-size: 10px;
+        font-size: 9px;
         font-weight: 700;
         color: var(--cl-text-2);
         padding: 1px 5px;
@@ -1342,37 +1381,37 @@ class SoccerLiveBracketCard extends LitElement {
       }
       .tie-head-legs {
         display: flex;
-        gap: 6px;
+        gap: 4px;
         margin-left: auto;
-        padding-right: 18px;
+        padding-right: 14px;
       }
       .leg-pill {
-        font-size: 9px;
+        font-size: 8px;
         font-weight: 700;
         color: var(--cl-text-2);
         background: rgba(255, 255, 255, 0.08);
-        padding: 1px 5px;
-        border-radius: 4px;
-        min-width: 22px;
+        padding: 1px 4px;
+        border-radius: 3px;
+        min-width: 18px;
         text-align: center;
       }
       .team-brand {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
         min-width: 0;
         overflow: hidden;
       }
       .winner-arrow {
-        font-size: 10px;
-        color: var(--cl-text);
-        width: 12px;
+        font-size: 8px;
+        color: var(--cl-text-2);
+        width: 10px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
       }
       .winner-arrow-spacer {
-        width: 12px;
+        width: 10px;
         display: inline-block;
       }
 
@@ -1380,18 +1419,18 @@ class SoccerLiveBracketCard extends LitElement {
         display: grid;
         grid-template-columns: 1fr auto;
         align-items: center;
-        gap: 10px;
-        padding: 5px 0;
+        gap: 8px;
+        padding: 3px 0;
       }
       .tie-row + .tie-row {
         border-top: 1px solid var(--cl-divider);
       }
       .tie-row img {
-        width: 22px; height: 22px;
+        width: 18px; height: 18px;
         object-fit: contain;
       }
       .tie-row .tname {
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 600;
         color: var(--cl-text);
         white-space: nowrap;
@@ -1399,7 +1438,7 @@ class SoccerLiveBracketCard extends LitElement {
         text-overflow: ellipsis;
         letter-spacing: -0.01em;
       }
-      .tie-row.winner .tname { font-weight: 800; }
+      .tie-row.winner .tname { font-weight: 700; }
       .tie-row.loser .tname { color: var(--cl-text-2); }
       .tie-row.loser img { opacity: 0.55; }
 
@@ -1408,47 +1447,41 @@ class SoccerLiveBracketCard extends LitElement {
         gap: 4px;
       }
       .leg {
-        min-width: 22px;
+        min-width: 18px;
         text-align: center;
-        font-size: 13px;
-        font-weight: 800;
+        font-size: 12px;
+        font-weight: 700;
         font-variant-numeric: tabular-nums;
-        padding: 2px 6px;
-        border-radius: 6px;
+        padding: 1px 4px;
+        border-radius: 4px;
         background: rgba(255,255,255,0.06);
         color: var(--cl-text);
       }
       .tie-row.winner .leg {
-        background: rgba(16,185,129,0.2);
         color: var(--cl-green);
+        font-weight: 800;
       }
       .tie-row.loser .leg {
         opacity: 0.5;
       }
 
       .tie-foot {
-        margin-top: 8px;
-        padding-top: 8px;
+        margin-top: 4px;
+        padding-top: 4px;
         border-top: 1px dashed var(--cl-divider);
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 6px;
+        gap: 4px;
         flex-wrap: wrap;
       }
       .agg {
         font-size: 10px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        color: var(--cl-green);
-        padding: 2px 8px;
-        background: rgba(16,185,129,0.12);
-        border-radius: 6px;
+        font-weight: 500;
+        color: var(--cl-text-2);
       }
       .agg.tied {
         color: var(--cl-gold);
-        background: rgba(251,191,36,0.12);
       }
       .date {
         font-size: 10px;
@@ -1638,21 +1671,16 @@ class SoccerLiveBracketCard extends LitElement {
           flex-direction: row;
           overflow-x: auto;
           scroll-snap-type: x mandatory;
-          padding: 10px 14px 16px 14px;
-          gap: 12px;
+          padding: 10px 12px 14px 12px;
+          gap: 8px;
         }
         ha-card.style-list .rounds-container:not(.compact) .round {
-          flex: 0 0 calc(100vw - 64px);
-          min-width: 260px;
-          max-width: 320px;
+          flex: 0 0 215px;
+          min-width: 215px;
+          max-width: 235px;
           scroll-snap-align: start;
         }
       }
-      .round .round-name { cursor: pointer; }
-      .round.collapsed .round-chevron { transform: rotate(-90deg); }
-      .round.collapsed .round-name { margin-bottom: 0; }
-      .round-prog-count { font-size: 9px; font-weight: 700; color: var(--cl-text-2); opacity: 0.7; display: inline-flex; align-items: center; gap: 3px; }
-      .round-prog-count.live { color: var(--cl-live); opacity: 1; }
 
       /* ============== STYLE: TREE ============== */
       .tree-wrap {

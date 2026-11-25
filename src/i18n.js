@@ -6178,7 +6178,7 @@ const TRANSLATIONS = {
     'round.r32': '16 avos-de-final',
     'round.r64': '32 avos-de-final',
     'round.third_place': 'Terceiro lugar',
-    'round.knockout_playoffs': 'Pré-eliminatórias',
+    'round.knockout_playoffs': 'Play-offs',
     'round.preliminary': 'Fase preliminar',
     'round.league_phase': 'Fase de Liga',
     'round.group_stage': 'Fase de Grupos',

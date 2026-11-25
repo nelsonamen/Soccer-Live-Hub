@@ -6,7 +6,7 @@ import { applySkin } from './skins.js';
 import { displayCompetitionName } from './cards/shared-competition.js';
 
 console.info(
-  '%c SOCCER-LIVE-HUB %c v1.1.0-bracket Loaded successfully ',
+  '%c SOCCER-LIVE-HUB %c v1.2.0-google-bracket Loaded successfully ',
   'background: #0284c7; color: #fff; font-weight: bold; padding: 2px 6px; border-radius: 4px;',
   'color: #0284c7; font-weight: bold;'
 );
